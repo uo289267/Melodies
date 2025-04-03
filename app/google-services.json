@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "350677382145",
+    "project_id": "melodies-d156f",
+    "storage_bucket": "melodies-d156f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:350677382145:android:c94be73bb4a01b2ff17c00",
+        "android_client_info": {
+          "package_name": "tfg.uniovi.melodies"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGaXuB8NyfWeYdxdAw33dS1pb57Ykv198"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
