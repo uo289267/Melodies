@@ -10,9 +10,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
+import tfg.uniovi.melodies.entities.MusicXMLSheet
+import tfg.uniovi.melodies.repositories.FolderFirestore
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector
 
 class MainActivity : AppCompatActivity() {
@@ -29,6 +35,19 @@ class MainActivity : AppCompatActivity() {
         val bottomNavView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         val navHostFragment = findNavController(R.id.fragmentContainerView)
         bottomNavView.setupWithNavController(navHostFragment)
+
+        val folderFirestore = FolderFirestore()
+        lifecycleScope.launch {
+            /*
+            val musicXMLSheetAll :List<MusicXMLSheet> =
+                folderFirestore.getAllSheetsFromFolder("7f7bbeb3-010b-4418-8453-bc618d8fbbb9")
+            musicXMLSheetAll.forEach {
+                Log.d("FIRESTORE",it.name);
+            }*/
+            val folders = folderFirestore.getAllFolders();
+            Log.d("FIRESTORE", folders.toString())
+        }
+
 
         /*
         val RECORD_AUDIO_PERMISSION_CODE = 101
