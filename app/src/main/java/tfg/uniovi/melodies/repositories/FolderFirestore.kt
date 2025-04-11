@@ -3,6 +3,7 @@ package tfg.uniovi.melodies.repositories
 import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
@@ -33,7 +34,7 @@ class FolderFirestore {
         return try {
             val result = foldersColletion.get().await()
             result.documents.mapNotNull { doc ->
-                doc.data?.let { doc2folder(it) }
+                doc?.let { doc2folder(it) }
             }
         } catch (e: Exception) {
             Log.e("FIRESTORE", "Error getting folders", e)
@@ -41,11 +42,12 @@ class FolderFirestore {
         }
     }
 
-    private fun doc2folder(data:  Map<String, Any>): Folder {
-        return Folder(data["name"].toString(),data["color"].toString(),
-                        data["creationTime"] as Timestamp,
-                        UUID.fromString(data["ownerUUID"].toString()),
-            UUID.fromString(data["folderId"].toString()))
+    private fun doc2folder(doc:  DocumentSnapshot): Folder {
+        return Folder(doc.data!!["name"].toString(),
+            doc.data!!["color"].toString().toInt(),
+            doc.data!!["creationTime"] as Timestamp,
+            UUID.fromString(doc.data!!["ownerUUID"].toString()),
+            doc.id)
     }
 
     suspend fun addFolder(folder:Folder) : String?{
@@ -86,7 +88,8 @@ class FolderFirestore {
     private fun docToMusicXMLSheet(data: Map<String, Any>): MusicXMLSheet {
         return MusicXMLSheet(
             data["name"].toString(),
-            data["musicxml"].toString())
+            data["musicxml"].toString(),
+            data["author"].toString())
     }
 
     private suspend fun getAllSheets(querySnapshot: QuerySnapshot): List<MusicXMLSheet> {

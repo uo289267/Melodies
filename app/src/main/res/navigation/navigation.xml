@@ -7,12 +7,26 @@
 
     <fragment
         android:id="@+id/home_fragment"
-        android:name="tfg.uniovi.melodies.fragments.home_fragment"
+        android:name="tfg.uniovi.melodies.fragments.Home"
         android:label="fragment_home_fragment"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_home_fragment_to_addFolder"
+            app:destination="@id/addFolder" />
+        <action
+            android:id="@+id/action_home_fragment_to_library"
+            app:destination="@id/library" />
+    </fragment>
     <fragment
         android:id="@+id/library"
-        android:name="tfg.uniovi.melodies.fragments.library"
+        android:name="tfg.uniovi.melodies.fragments.Library"
         android:label="fragment_library"
-        tools:layout="@layout/fragment_library" />
+        tools:layout="@layout/fragment_library" >
+        <argument android:name="folderId" />
+    </fragment>
+    <fragment
+        android:id="@+id/addFolder"
+        android:name="tfg.uniovi.melodies.fragments.AddFolder"
+        android:label="fragment_add_folder"
+        tools:layout="@layout/fragment_add_folder" />
 </navigation>

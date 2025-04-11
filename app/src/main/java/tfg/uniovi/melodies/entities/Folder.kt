@@ -5,10 +5,10 @@ import java.util.UUID
 
 class Folder(
     val name: String, //max 30 chars
-    val color: String,
+    val color: Int,
     val creationTime: Timestamp,
     val ownerUUID: UUID,
-    val folderId: UUID
+    val folderId: String
 ) {
 
 }

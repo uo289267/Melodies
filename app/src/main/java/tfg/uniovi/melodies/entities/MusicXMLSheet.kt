@@ -4,7 +4,7 @@ import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
 import javax.xml.parsers.DocumentBuilderFactory
 
-class MusicXMLSheet(val name: String, stringSheet: String) {
+class MusicXMLSheet(val name: String, stringSheet: String, val author: String) {
 
     val musicxml: Document = stringToDocument(stringSheet)
 

@@ -1,4 +1,4 @@
-package tfg.uniovi.melodies.fragments.adapters
+package tfg.uniovi.melodies.fragments.adapters.viewHolders
 
 import android.view.View
 import android.widget.ImageView
@@ -14,17 +14,18 @@ class FolderViewHolder(
     private val tvFolderTitle: TextView = view.findViewById(R.id.tv_folder_title)
     private val ivFolder: ImageView = view.findViewById(R.id.iv_folder)
     private var currentFolder : Folder? = null
+
     init{
         view.setOnClickListener{ view ->
-            //currentFolder?.onClickAction(navigateFunction)
-            //navigateFunction(currentFolder.folderId)
+            navigateFunction(currentFolder!!.folderId)
         }
     }
 
     fun bind(folder: Folder){
         currentFolder = folder
         tvFolderTitle.text = folder.name
-        ivFolder.setImageResource(R.drawable.folder)
+        //ivFolder.setImageResource(R.drawable.folder)
+        ivFolder.setImageResource(currentFolder!!.color)
     }
 
 }
