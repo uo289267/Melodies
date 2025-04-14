@@ -12,15 +12,19 @@ import tfg.uniovi.melodies.entities.Folder
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import java.util.UUID
 
-class FolderFirestore {
+class UsersFirestore (val userUUID: UUID){
     private val db = Firebase.firestore
-    private val foldersColletion = db.collection("folders")
+    private val usersCollection = db.collection("users")
+
 
     suspend fun getFolderById(folderId: String): Folder? {
         return try {
-            val document = foldersColletion.document(folderId).get().await()
+            val document = usersCollection.document(userUUID.toString())
+                            .collection("folders")
+                            .document(folderId).get().await()
             if (document.exists()) {
-                document.toObject(Folder::class.java) // Assuming you have a Song data class
+                doc2folder(document)
+                //document.toObject(Folder::class.java)
             } else {
                 null
             }
@@ -30,9 +34,11 @@ class FolderFirestore {
             null
         }
     }
+
     suspend fun getAllFolders(): List<Folder> {
         return try {
-            val result = foldersColletion.get().await()
+            val result = usersCollection.document(userUUID.toString())
+                .collection("folders").get().await()
             result.documents.mapNotNull { doc ->
                 doc?.let { doc2folder(it) }
             }
@@ -45,7 +51,8 @@ class FolderFirestore {
 
     suspend fun addFolder(folder:Folder) : String?{
         return try {
-            val documentReference = foldersColletion.add(folder).await()
+            val documentReference = usersCollection.document(userUUID.toString())
+                .collection("folders").add(folder).await()
             documentReference.id // Return the new document ID
         } catch (e: Exception) {
             // Handle error
@@ -56,7 +63,8 @@ class FolderFirestore {
     // Coroutine-based function to delete a song
     suspend fun deleteFolder(folderId: String) {
         try {
-            foldersColletion.document(folderId).delete().await()
+            usersCollection.document(userUUID.toString())
+                .collection("folders").document(folderId).delete().await()
         } catch (e: Exception) {
             // Handle error
             println("Error deleting song: $e")
@@ -65,7 +73,8 @@ class FolderFirestore {
 
     suspend fun getAllSheetsFromFolder(folderId: String): List<MusicXMLSheet> {
         return try {
-            val querySnapshot = foldersColletion
+            val querySnapshot = usersCollection.document(userUUID.toString())
+                .collection("folders")
                 .whereEqualTo("folderId", folderId) // Filtramos por folderId
                 .get()
                 .await()

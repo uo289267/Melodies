@@ -7,7 +7,6 @@ class Folder(
     val name: String, //max 30 chars
     val color: Int,
     val creationTime: Timestamp,
-    val ownerUUID: UUID,
     val folderId: String
 ) {
 
