@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.entities.Folder
-import tfg.uniovi.melodies.repositories.FolderFirestore
 import tfg.uniovi.melodies.repositories.UsersFirestore
 import java.util.UUID
 
@@ -30,7 +29,7 @@ class FolderViewModel(
         get() = _folders
 
     /**
-     * To be called before from the view
+     * To be called before from the adapter
      */
     fun loadFolders(){
         viewModelScope.launch {

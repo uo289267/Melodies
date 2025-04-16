@@ -7,10 +7,8 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
-import org.w3c.dom.Document
 import tfg.uniovi.melodies.entities.Folder
 import tfg.uniovi.melodies.entities.MusicXMLSheet
-import java.util.UUID
 
 class FolderFirestore {
     private val db = Firebase.firestore

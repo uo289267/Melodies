@@ -7,4 +7,6 @@
     <string name="blue">Blue</string>
     <string name="author">Author:</string>
     <string name="play_icon">play icon</string>
+    <string name="error_blank_folder_name">Folder\'s name cannot be empty</string>
+    <string name="too_long_folder_name">Folder\'s name cannot be longer than 30 characters\n</string>
 </resources>

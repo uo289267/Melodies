@@ -6,6 +6,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.AddFolder">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/arrow_back"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:title="New Folder" />
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/folder_name"
         android:layout_marginTop="150dp"

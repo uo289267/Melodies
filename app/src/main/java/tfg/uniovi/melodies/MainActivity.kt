@@ -1,25 +1,13 @@
 package tfg.uniovi.melodies
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.launch
-import tfg.uniovi.melodies.entities.MusicXMLSheet
-import tfg.uniovi.melodies.repositories.FolderFirestore
-import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,17 +24,6 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = findNavController(R.id.fragmentContainerView)
         bottomNavView.setupWithNavController(navHostFragment)
 
-        val folderFirestore = FolderFirestore()
-        lifecycleScope.launch {
-            /*
-            val musicXMLSheetAll :List<MusicXMLSheet> =
-                folderFirestore.getAllSheetsFromFolder("7f7bbeb3-010b-4418-8453-bc618d8fbbb9")
-            musicXMLSheetAll.forEach {
-                Log.d("FIRESTORE",it.name);
-            }*/
-            val folders = folderFirestore.getAllFolders();
-            Log.d("FIRESTORE", folders.toString())
-        }
 
 
         /*

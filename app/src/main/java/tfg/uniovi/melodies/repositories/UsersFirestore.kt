@@ -4,12 +4,13 @@ import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
-import org.w3c.dom.Document
 import tfg.uniovi.melodies.entities.Folder
 import tfg.uniovi.melodies.entities.MusicXMLSheet
+import tfg.uniovi.melodies.fragments.viewmodels.FolderDTO
 import java.util.UUID
 
 class UsersFirestore (val userUUID: UUID){
@@ -38,7 +39,9 @@ class UsersFirestore (val userUUID: UUID){
     suspend fun getAllFolders(): List<Folder> {
         return try {
             val result = usersCollection.document(userUUID.toString())
-                .collection("folders").get().await()
+                .collection("folders").orderBy("creationTime",
+                                                            Query.Direction.ASCENDING)
+                                                            .get().await()
             result.documents.mapNotNull { doc ->
                 doc?.let { doc2folder(it) }
             }
@@ -49,10 +52,14 @@ class UsersFirestore (val userUUID: UUID){
     }
 
 
-    suspend fun addFolder(folder:Folder) : String?{
+    suspend fun addFolder(dto : FolderDTO) : String?{
+        val data = hashMapOf(
+            "name" to dto.name,
+            "creationTime" to Timestamp.now(),
+            "color" to dto.color)
         return try {
             val documentReference = usersCollection.document(userUUID.toString())
-                .collection("folders").add(folder).await()
+                .collection("folders").add(data).await()
             documentReference.id // Return the new document ID
         } catch (e: Exception) {
             // Handle error
@@ -73,12 +80,17 @@ class UsersFirestore (val userUUID: UUID){
 
     suspend fun getAllSheetsFromFolder(folderId: String): List<MusicXMLSheet> {
         return try {
-            val querySnapshot = usersCollection.document(userUUID.toString())
+            val result = usersCollection.document(userUUID.toString())
                 .collection("folders")
-                .whereEqualTo("folderId", folderId) // Filtramos por folderId
+                .document(folderId) // Filter with folderId
+                .collection("sheets")
                 .get()
                 .await()
-            getAllSheets(querySnapshot)
+            Log.d("FIRESTORE", folderId)
+
+            result.documents.mapNotNull { doc ->
+                doc?.let { doc2sheet(it) }
+            }
 
         } catch (e: Exception) {
             // Handle error
@@ -114,5 +126,12 @@ class UsersFirestore (val userUUID: UUID){
             doc.data!!["creationTime"] as Timestamp,
             doc.id)
     }
+
+    private fun doc2sheet(doc:  DocumentSnapshot): MusicXMLSheet {
+        return MusicXMLSheet(doc.data!!["name"].toString(),
+            doc.data!!["musicxml"].toString(),
+            doc.data!!["author"].toString())
+    }
+
 
 }

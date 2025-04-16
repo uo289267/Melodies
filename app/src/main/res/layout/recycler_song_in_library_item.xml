@@ -2,6 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingBottom="12dp"
+    android:paddingTop="5dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageButton
@@ -9,7 +11,6 @@
         android:layout_width="50dp"
         android:layout_marginTop="5dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="10dp"
         android:contentDescription="@string/play_icon"
         android:src="@drawable/play"
         android:scaleType="fitCenter"
@@ -38,7 +39,7 @@
         android:layout_marginTop="20dp"
         android:text="@string/author"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.582"
+        app:layout_constraintHorizontal_bias="0.68"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:textSize="20sp"

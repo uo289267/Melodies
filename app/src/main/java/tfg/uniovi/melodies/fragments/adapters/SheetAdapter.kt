@@ -7,19 +7,35 @@ import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.adapters.viewHolders.SheetViewHolder
+import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 
 class SheetAdapter : RecyclerView.Adapter<SheetViewHolder> {
     private val sheetList: MutableList<MusicXMLSheet>
     private val navigateFunction: (String) -> Unit
+    private val viewModel : LibraryViewModel
 
-    constructor(sheetList: List<MusicXMLSheet>, navigateFunction: (String) -> Unit, lifecycleOwner: LifecycleOwner){
+    constructor(sheetList: List<MusicXMLSheet>,
+                navigateFunction: (String) -> Unit,
+                viewModel: LibraryViewModel,
+                lifecycleOwner: LifecycleOwner){
         this.sheetList = sheetList.toMutableList()
         this.navigateFunction = navigateFunction
-        /*
         this.viewModel = viewModel
-        this.viewModel.tareas.observe(lifecycleOwner){lista ->
-            updateTareas(lista)
-        }*/
+        this.viewModel.sheets.observe(lifecycleOwner){
+            list -> updateSheets(list)
+        }
+        this.viewModel.loadSheets()
+    }
+
+    private fun updateSheets(newSheets: List<MusicXMLSheet>){
+        val oldSize = newSheets.size
+        sheetList.clear()
+        sheetList.addAll(newSheets)
+        //items beyond the newsize need to be removed when the oldsize is greater than the newsize
+        if(oldSize > sheetList.size)
+            notifyItemRangeRemoved(sheetList.size, oldSize - sheetList.size)
+        //all items need to be updated
+        notifyItemRangeChanged(0, sheetList.size)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): SheetViewHolder {

@@ -6,18 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.databinding.FragmentHomeBinding
 import tfg.uniovi.melodies.entities.Folder
 import tfg.uniovi.melodies.fragments.adapters.FolderAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModelProviderFactory
-import tfg.uniovi.melodies.repositories.FolderFirestore
-import tfg.uniovi.melodies.repositories.UsersFirestore
 import java.util.UUID
 
 class Home : Fragment() {
@@ -38,7 +33,6 @@ class Home : Fragment() {
         folderViewModel = ViewModelProvider(this, FolderViewModelProviderFactory(
             UUID.fromString("a5ba172c-39d8-4181-9b79-76b8f23b5d18")
         )).get(FolderViewModel::class.java)
-        //folderViewModel.loadFolders()
         binding.fabAddNewFolder.setOnClickListener{
             val destination = HomeDirections.actionHomeFragmentToAddFolder()
             findNavController().navigate(destination)
@@ -51,6 +45,11 @@ class Home : Fragment() {
         binding.recyclerView.adapter = FolderAdapter(folderList, navigationFunction, folderViewModel ,viewLifecycleOwner)
 
         return binding.root
+
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
     }
 

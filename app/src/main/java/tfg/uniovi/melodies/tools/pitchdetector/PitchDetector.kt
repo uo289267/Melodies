@@ -1,10 +1,6 @@
 package tfg.uniovi.melodies.tools.pitchdetector
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import be.tarsos.dsp.AudioDispatcher
 import be.tarsos.dsp.io.android.AudioDispatcherFactory
 import be.tarsos.dsp.pitch.PitchDetectionHandler

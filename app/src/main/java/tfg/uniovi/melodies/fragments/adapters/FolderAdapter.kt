@@ -14,14 +14,15 @@ class FolderAdapter : RecyclerView.Adapter<FolderViewHolder> {
     private val navigateFunction: (String) -> Unit
     private val viewModel : FolderViewModel
 
-    constructor(folderList: List<Folder>, navigateFunction: (String) -> Unit
+    constructor(folderList: List<Folder>,
+                navigateFunction: (String) -> Unit
                 , viewModel: FolderViewModel
                 ,lifecycleOwner: LifecycleOwner){
         this.folderList = folderList.toMutableList()
         this.navigateFunction = navigateFunction
         this.viewModel = viewModel
         this.viewModel.folders.observe(lifecycleOwner){
-            lista -> updateFolders(lista)
+            list -> updateFolders(list)
         }
         this.viewModel.loadFolders()
     }
