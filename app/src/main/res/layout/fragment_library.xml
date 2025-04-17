@@ -17,7 +17,8 @@
         app:navigationIcon="@drawable/arrow_back"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:title="Library"
-        app:layout_constraintBottom_toTopOf="@+id/recycler_view_library"/>
+        app:layout_constraintBottom_toTopOf="@+id/recycler_view_library"
+        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_library"

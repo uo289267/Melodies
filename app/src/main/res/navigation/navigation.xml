@@ -24,10 +24,18 @@
         android:label="fragment_library"
         tools:layout="@layout/fragment_library" >
         <argument android:name="folderId" />
+        <action
+            android:id="@+id/action_library_to_sheetVisualization"
+            app:destination="@id/sheetVisualization" />
     </fragment>
     <fragment
         android:id="@+id/addFolder"
         android:name="tfg.uniovi.melodies.fragments.AddFolder"
         android:label="fragment_add_folder"
         tools:layout="@layout/fragment_add_folder" />
+    <fragment
+        android:id="@+id/sheetVisualization"
+        android:name="tfg.uniovi.melodies.fragments.SheetVisualization"
+        android:label="fragment_sheet_visualization"
+        tools:layout="@layout/fragment_sheet_visualization" />
 </navigation>

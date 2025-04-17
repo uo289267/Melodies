@@ -103,7 +103,7 @@ class UsersFirestore (val userUUID: UUID){
         return MusicXMLSheet(
             data["name"].toString(),
             data["musicxml"].toString(),
-            data["author"].toString())
+            data["author"].toString(), data["id"].toString())//puede que este mal
     }
 
     private suspend fun getAllSheets(querySnapshot: QuerySnapshot): List<MusicXMLSheet> {
@@ -112,7 +112,7 @@ class UsersFirestore (val userUUID: UUID){
         for (document in querySnapshot.documents) {
             val sheetsSnapshot = document.reference.collection("sheets").get().await()
             val sheets = sheetsSnapshot.documents.mapNotNull { sheetDoc ->
-                sheetDoc.data?.let { docToMusicXMLSheet(it) }
+                sheetDoc.data?.let { docToMusicXMLSheet(it) } // revisar doctomusicxml antes
             }
             allSheets.addAll(sheets)
         }
@@ -130,7 +130,7 @@ class UsersFirestore (val userUUID: UUID){
     private fun doc2sheet(doc:  DocumentSnapshot): MusicXMLSheet {
         return MusicXMLSheet(doc.data!!["name"].toString(),
             doc.data!!["musicxml"].toString(),
-            doc.data!!["author"].toString())
+            doc.data!!["author"].toString(), doc.id)
     }
 
 

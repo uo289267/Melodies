@@ -3,11 +3,13 @@ package tfg.uniovi.melodies.fragments.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.adapters.viewHolders.SheetViewHolder
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
+import tfg.uniovi.melodies.utils.SheetDiffCallback
 
 class SheetAdapter : RecyclerView.Adapter<SheetViewHolder> {
     private val sheetList: MutableList<MusicXMLSheet>
@@ -21,13 +23,14 @@ class SheetAdapter : RecyclerView.Adapter<SheetViewHolder> {
         this.sheetList = sheetList.toMutableList()
         this.navigateFunction = navigateFunction
         this.viewModel = viewModel
-        this.viewModel.sheets.observe(lifecycleOwner){
+        /*this.viewModel.sheets.observe(lifecycleOwner){
             list -> updateSheets(list)
         }
-        this.viewModel.loadSheets()
+        this.viewModel.loadSheets()*/
     }
 
-    private fun updateSheets(newSheets: List<MusicXMLSheet>){
+    fun updateSheets(newSheets: List<MusicXMLSheet>){
+        /*
         val oldSize = newSheets.size
         sheetList.clear()
         sheetList.addAll(newSheets)
@@ -35,7 +38,18 @@ class SheetAdapter : RecyclerView.Adapter<SheetViewHolder> {
         if(oldSize > sheetList.size)
             notifyItemRangeRemoved(sheetList.size, oldSize - sheetList.size)
         //all items need to be updated
-        notifyItemRangeChanged(0, sheetList.size)
+        notifyItemRangeChanged(0, sheetList.size)*/
+        /*
+        sheetList.clear()
+        sheetList.addAll(newSheets)
+        notifyDataSetChanged()*/
+        val diffCallback = SheetDiffCallback(sheetList, newSheets)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
+        sheetList.clear()
+        sheetList.addAll(newSheets)
+        diffResult.dispatchUpdatesTo(this)
+
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): SheetViewHolder {

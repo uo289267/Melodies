@@ -80,7 +80,7 @@ class FolderFirestore {
         return MusicXMLSheet(
             data["name"].toString(),
             data["musicxml"].toString(),
-            data["author"].toString())
+            data["author"].toString(), data["id"].toString())
     }
 
     private suspend fun getAllSheets(querySnapshot: QuerySnapshot): List<MusicXMLSheet> {

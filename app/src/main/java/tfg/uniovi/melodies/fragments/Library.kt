@@ -2,10 +2,18 @@ package tfg.uniovi.melodies.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,6 +36,8 @@ class Library : Fragment() {
     private lateinit var binding: FragmentLibraryBinding
     private lateinit var libraryViewModel: LibraryViewModel
     private val args : LibraryArgs by navArgs()
+    private lateinit var  adapter:SheetAdapter
+    private var allSheets = listOf<MusicXMLSheet>()
     private val navigationFunction =  { dest: String -> println(dest) }
 
 
@@ -42,20 +52,59 @@ class Library : Fragment() {
         )).get(LibraryViewModel::class.java)
 
         val navFunc = { dest: String -> println(dest) }
-        binding.recyclerViewLibrary.adapter = SheetAdapter(sheetList,navFunc,libraryViewModel ,viewLifecycleOwner )
+        adapter = SheetAdapter(sheetList,navFunc,libraryViewModel ,viewLifecycleOwner )
+
+        binding.recyclerViewLibrary.adapter = adapter
         binding.recyclerViewLibrary.layoutManager = LinearLayoutManager(context)
         binding.recyclerViewLibrary.addItemDecoration(RecyclerViewItemDecoration(requireContext(), R.drawable.divider))
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        libraryViewModel.sheets.observe(viewLifecycleOwner) { list ->
+            allSheets = list
+            adapter.updateSheets(allSheets)
+        }
+        libraryViewModel.loadSheets()
         super.onViewCreated(view, savedInstanceState)
-        val toolbar = activity?.findViewById<Toolbar>(R.id.toolbar)
+        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
         toolbar?.setNavigationOnClickListener{
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
+        val menuHost : MenuHost = requireActivity()
 
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.library, menu)
+
+                val searchItem = menu.findItem(R.id.app_bar_search)
+                val searchView = searchItem.actionView as SearchView
+
+                searchView.queryHint = "Search ..."
+
+                searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        // Handle search submit
+                        return true
+                    }
+
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        val filteredList = allSheets.filter { sheet ->
+                            sheet.name.contains(newText.orEmpty(), ignoreCase = true)
+                        }
+                        adapter.updateSheets(filteredList)
+                        return true
+                    }
+                })
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return false
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
+
 
 
 }
