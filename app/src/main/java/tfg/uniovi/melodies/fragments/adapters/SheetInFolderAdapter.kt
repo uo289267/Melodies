@@ -7,19 +7,18 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.MusicXMLSheet
-import tfg.uniovi.melodies.fragments.adapters.viewHolders.SheetViewHolder
+import tfg.uniovi.melodies.fragments.adapters.viewHolders.SheetInFolderViewHolder
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.utils.SheetDiffCallback
 
-class SheetAdapter : RecyclerView.Adapter<SheetViewHolder> {
+class SheetInFolderAdapter : RecyclerView.Adapter<SheetInFolderViewHolder> {
     private val sheetList: MutableList<MusicXMLSheet>
     private val navigateFunction: (String) -> Unit
     private val viewModel : LibraryViewModel
 
     constructor(sheetList: List<MusicXMLSheet>,
                 navigateFunction: (String) -> Unit,
-                viewModel: LibraryViewModel,
-                lifecycleOwner: LifecycleOwner){
+                viewModel: LibraryViewModel){
         this.sheetList = sheetList.toMutableList()
         this.navigateFunction = navigateFunction
         this.viewModel = viewModel
@@ -52,13 +51,13 @@ class SheetAdapter : RecyclerView.Adapter<SheetViewHolder> {
 
     }
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): SheetViewHolder {
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): SheetInFolderViewHolder {
         val layout = R.layout.recycler_song_in_library_item
         val view = LayoutInflater.from(viewGroup.context).inflate(layout, viewGroup, false)
-        return SheetViewHolder(view, navigateFunction)
+        return SheetInFolderViewHolder(view, navigateFunction)
     }
 
-    override fun onBindViewHolder(viewHolder: SheetViewHolder, position: Int) {
+    override fun onBindViewHolder(viewHolder: SheetInFolderViewHolder, position: Int) {
         viewHolder.bind(sheetList[position])
     }
 

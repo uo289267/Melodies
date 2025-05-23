@@ -15,12 +15,13 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentLibraryBinding
 import tfg.uniovi.melodies.entities.MusicXMLSheet
-import tfg.uniovi.melodies.fragments.adapters.SheetAdapter
+import tfg.uniovi.melodies.fragments.adapters.SheetInFolderAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModelProviderFactory
 import tfg.uniovi.melodies.utils.RecyclerViewItemDecoration
@@ -36,10 +37,14 @@ class Library : Fragment() {
     private lateinit var binding: FragmentLibraryBinding
     private lateinit var libraryViewModel: LibraryViewModel
     private val args : LibraryArgs by navArgs()
-    private lateinit var  adapter:SheetAdapter
-    private var allSheets = listOf<MusicXMLSheet>()
-    private val navigationFunction =  { dest: String -> println(dest) }
-
+    private lateinit var adapter : SheetInFolderAdapter
+    private var allSheetsInFolder = listOf<MusicXMLSheet>()
+    private val navigationFunction = {sheetId: String ->
+        run{
+            val destination = LibraryDirections.actionLibraryToSheetVisualization(sheetId)
+            findNavController().navigate(destination)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,8 +56,7 @@ class Library : Fragment() {
             UUID.fromString("a5ba172c-39d8-4181-9b79-76b8f23b5d18"), args.folderId
         )).get(LibraryViewModel::class.java)
 
-        val navFunc = { dest: String -> println(dest) }
-        adapter = SheetAdapter(sheetList,navFunc,libraryViewModel ,viewLifecycleOwner )
+        adapter = SheetInFolderAdapter(sheetList,navigationFunction,libraryViewModel )
 
         binding.recyclerViewLibrary.adapter = adapter
         binding.recyclerViewLibrary.layoutManager = LinearLayoutManager(context)
@@ -62,8 +66,8 @@ class Library : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         libraryViewModel.sheets.observe(viewLifecycleOwner) { list ->
-            allSheets = list
-            adapter.updateSheets(allSheets)
+            allSheetsInFolder = list
+            adapter.updateSheets(allSheetsInFolder)
         }
         libraryViewModel.loadSheets()
         super.onViewCreated(view, savedInstanceState)
@@ -90,7 +94,7 @@ class Library : Fragment() {
                     }
 
                     override fun onQueryTextChange(newText: String?): Boolean {
-                        val filteredList = allSheets.filter { sheet ->
+                        val filteredList = allSheetsInFolder.filter { sheet ->
                             sheet.name.contains(newText.orEmpty(), ignoreCase = true)
                         }
                         adapter.updateSheets(filteredList)

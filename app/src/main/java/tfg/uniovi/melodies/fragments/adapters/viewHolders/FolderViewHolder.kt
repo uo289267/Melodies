@@ -16,7 +16,7 @@ class FolderViewHolder(
     private var currentFolder : Folder? = null
 
     init{
-        view.setOnClickListener{ view ->
+        view.setOnClickListener{
             navigateFunction(currentFolder!!.folderId)
         }
     }

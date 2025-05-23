@@ -20,8 +20,8 @@ class Home : Fragment() {
     private lateinit var folderViewModel : FolderViewModel
     private val navigationFunction = {folderId: String ->
         run{
-            val destino = HomeDirections.actionHomeFragmentToLibrary(folderId)
-            findNavController().navigate(destino)
+            val destination = HomeDirections.actionHomeFragmentToLibrary(folderId)
+            findNavController().navigate(destination)
         }
     }
     override fun onCreateView(

@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_home_fragment_to_library"
             app:destination="@id/library" />
+        <action
+            android:id="@+id/action_home_fragment_to_fullLibrary"
+            app:destination="@id/fullLibrary" />
     </fragment>
     <fragment
         android:id="@+id/library"
@@ -37,5 +40,18 @@
         android:id="@+id/sheetVisualization"
         android:name="tfg.uniovi.melodies.fragments.SheetVisualization"
         android:label="fragment_sheet_visualization"
-        tools:layout="@layout/fragment_sheet_visualization" />
+        tools:layout="@layout/fragment_sheet_visualization" >
+        <argument
+            android:name="SheetId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/fullLibrary"
+        android:name="tfg.uniovi.melodies.fragments.FullLibrary"
+        android:label="fragment_full_library"
+        tools:layout="@layout/fragment_full_library" >
+        <action
+            android:id="@+id/action_fullLibrary_to_sheetVisualization"
+            app:destination="@id/sheetVisualization" />
+    </fragment>
 </navigation>

@@ -1,22 +1,30 @@
 package tfg.uniovi.melodies.tools.pitchdetector
 
 import android.util.Log
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.LifecycleOwner
 import be.tarsos.dsp.AudioDispatcher
 import be.tarsos.dsp.io.android.AudioDispatcherFactory
 import be.tarsos.dsp.pitch.PitchDetectionHandler
 import be.tarsos.dsp.pitch.PitchProcessor
-import be.tarsos.dsp.pitch.PitchProcessor.PitchEstimationAlgorithm
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.math.ln
 
 object PitchDetector {
     private const val SAMPLE_RATE = 44100
     private const val BUFFER_SIZE = 2048
     private var dispatcher: AudioDispatcher? = null
-    private var audioThread: Thread? = null
+   // private var audioThread: Thread? = null
     @Volatile private var isRunning = false
     private var lastDetectedNote: String = "None"
+    val MIC_REQ_CODE = 11223344
 
-    fun startListening() {
+
+
+
+    fun startListening(scope: CoroutineScope) {
 
         if (isRunning) return  // Evitar múltiples inicios
         isRunning = true
@@ -32,15 +40,11 @@ object PitchDetector {
         }
 
         dispatcher?.addAudioProcessor(
-            PitchProcessor(PitchEstimationAlgorithm.YIN, SAMPLE_RATE.toFloat(), BUFFER_SIZE, pdh)
+            PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.YIN, SAMPLE_RATE.toFloat(), BUFFER_SIZE, pdh)
         )
-
-        audioThread = Thread {
-            Log.d("PITCH", "Iniciando detección...")
+        scope.launch(Dispatchers.IO) {
             dispatcher?.run()
-            Log.d("PITCH", "Dispatcher detenido")
-            isRunning = false // Restablecer cuando termine
-        }.apply { start() }
+        }
     }
 
     fun stopListening() {
@@ -48,7 +52,6 @@ object PitchDetector {
 
         isRunning = false
         dispatcher?.stop() // Detener el procesamiento de audio
-        audioThread?.join() // Esperar a que termine
     }
 
     fun getLastDetectedNote(): String = lastDetectedNote

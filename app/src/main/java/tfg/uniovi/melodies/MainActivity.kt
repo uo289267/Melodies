@@ -1,15 +1,27 @@
 package tfg.uniovi.melodies
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector
+import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.MIC_REQ_CODE
+import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.startListening
 
 class MainActivity : AppCompatActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +36,16 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = findNavController(R.id.fragmentContainerView)
         bottomNavView.setupWithNavController(navHostFragment)
 
+        //requestMicPermission()
+/*
+        var prev = PitchDetector.getLastDetectedNote()
+        while(true) {
+            if (prev != PitchDetector.getLastDetectedNote()) {
+
+                prev = PitchDetector.getLastDetectedNote()
+                Log.d("MINE", "last Note:${prev}")
+            }
+        }*/
 
 
         /*
@@ -48,6 +70,29 @@ class MainActivity : AppCompatActivity() {
             i--
         }
         PitchDetector.stopListening()*/
+
+
+    }
+    // Callback cuando el usuario responde a la solicitud de permisos
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == MIC_REQ_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Log.d("PITCH_DETECTOR", "Permission accepted")
+            //pitch detector start listening
+            startListening(lifecycleScope)
+        } else {
+            Log.d("PITCH_DETECTOR", "Permission denied")
+        }
     }
 
+
+
+
 }
+
