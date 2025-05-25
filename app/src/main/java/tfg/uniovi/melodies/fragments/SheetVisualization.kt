@@ -19,6 +19,7 @@ import kotlinx.coroutines.withContext
 import tfg.uniovi.melodies.databinding.FragmentSheetVisualizationBinding
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.MIC_REQ_CODE
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.startListening
+import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.stopListening
 import tfg.uniovi.melodies.tools.pitchdetector.SheetChecker
 
 class SheetVisualization : Fragment() {
@@ -42,23 +43,38 @@ class SheetVisualization : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        lifecycle.coroutineScope.launch(Dispatchers.Default) {
-            val checker = SheetChecker()
-            val noteToPlay = checker.getNotesToPlay()
-            val isGood = checker.areNotesPlayedCorrectly()
-
-            withContext(Dispatchers.Main) {
-                Log.d("SHEET_vISUALIZATION", "The note to play is: $noteToPlay")
-                Log.d("SHEET_vISUALIZATION", "Are notes played correctly: $isGood")
-                binding.noteToPlay.text = noteToPlay
-                binding.result.text = checker.numTimes.toString()
-            }
-        }
+    ): View {
         binding = FragmentSheetVisualizationBinding.inflate(inflater, container, false)
-        binding.sheetName.text=args.sheetId
+        binding.sheetName.text = args.sheetId
+        val checker = SheetChecker()
+        val noteToPlay = checker.getNotesToPlay()
+        binding.noteToPlay.text = noteToPlay
+        Log.d("SHEET_vISUALIZATION", "The note to play is: $noteToPlay")
+        lifecycle.coroutineScope.launch(Dispatchers.Default) {
+            var num = 3
+            while(num>0){
+                val isGood = checker.isNotePlayedCorrectly()
+                if(isGood){
+                    withContext(Dispatchers.Main) {
+                        binding.result.text = num.toString()
+                        Log.d("SHEET_VISUAL", "The note has been played!!!")
+                    }
+                    num--
+                }
+            }
+
+
+
+        }
 
         return binding.root
+    }
+
+    override fun onStop() {
+        super.onStop()
+        //Pitch detector stop listening and processing audio
+        stopListening()
+
     }
 
     /*
@@ -66,9 +82,8 @@ class SheetVisualization : Fragment() {
      */
     private fun requestMicPermission() {
         if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            //Pitch detector start listening and processing audio
             startListening(lifecycle.coroutineScope)
-
-
         }
         else {
             ActivityCompat.requestPermissions(

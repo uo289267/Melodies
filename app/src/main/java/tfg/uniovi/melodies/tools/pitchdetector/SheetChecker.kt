@@ -7,53 +7,39 @@ class SheetChecker () {
     val solfegeNotes =
         arrayOf("Do", "Re", "Mi", "Fa", "Sol", "La", "Si")
     var noteToPlay ="Do"
-    var numTimes = 0
     fun getNotesToPlay(): String {
-        var num = Random.nextInt(solfegeNotes.size)
+        val num = Random.nextInt(solfegeNotes.size)
         noteToPlay = solfegeNotes[num]
         return solfegeNotes[num]
     }
-    fun areNotesPlayedCorrectly(): Boolean{/*
-        var lastNote = PitchDetector.getLastDetectedNote().substring(0,2)
-        while(lastNote!=noteToPlay){
-                lastNote = PitchDetector.getLastDetectedNote().substring(0,2)
-            Log.d("sound", "We wanted $noteToPlay but got $lastNote")
+    fun isNotePlayedCorrectly(): Boolean {
+        val listOfNotes = mutableListOf<String>()
+        val start = System.currentTimeMillis()
+        val samplingIntervalMs = 100L
+        val durationMs = 1000L
+
+        // Escuchar durante 1 segundo (1000 ms)
+        while (System.currentTimeMillis() - start < durationMs) {
+            val note = PitchDetector.getLastDetectedNote()
+            listOfNotes.add(note)
+            println("Escuchando nota: $note")
+            Thread.sleep(samplingIntervalMs)
         }
-        return true*/
-/*
-        var numTimes = 3
-        var lastNote = PitchDetector.getLastDetectedNote()
-        while(numTimes!=0){
-            if(!lastNote.contains(noteToPlay) ){
-                lastNote = PitchDetector.getLastDetectedNote()
-                Log.d("sound", "We wanted $noteToPlay but got $lastNote")
-            }
 
-            else{
-                Log.d("SHEETcHECKER", "NOTE: $noteToPlay HAS BEEN PLAYED")
-                numTimes--
-            }
+        // Contar frecuencia de cada nota
+        val noteCounts = listOfNotes.groupingBy { it }.eachCount()
+        val totalSamples = listOfNotes.size
+        val threshold = (totalSamples * 0.95).toInt()
 
-        }*/
+        // Buscar la nota que aparece al menos en el 95% de los casos
+        val dominantNote = noteCounts.entries.find { it.value >= threshold }?.key
 
-        var listOfNotes : MutableList<String> = mutableListOf()
-        var start = System.currentTimeMillis()
-        while (System.currentTimeMillis() - start < 1000) {
-            // Ejecuta esto durante 1 segundo
-            listOfNotes.add(PitchDetector.getLastDetectedNote())
-            println("Ejecutando...")
-            Thread.sleep(100) // Evita que sature el CPU
-        }
-        var freq = notaMasFrecuente(listOfNotes)
-        if (freq.equals(noteToPlay)){
-            numTimes++
-            return true
-        }
-        else
-            return false
+        Log.d("SHEETcHECKER", "Esperado: $noteToPlay, Detectado: $dominantNote")
 
-
+        return dominantNote?.let { notaBase(it) } == noteToPlay
     }
+
+
 
     fun notaBase(nota: String): String {
         return when {
@@ -62,16 +48,4 @@ class SheetChecker () {
             else -> nota.substring(0, 2) // ej: "Si6", "La5"
         }
     }
-
-    fun notaMasFrecuente(notas: List<String>): String? {
-        val frecuencia = notas
-            .map { notaBase(it) }
-            .groupingBy { it }
-            .eachCount()
-
-        return frecuencia.maxByOrNull { it.value }?.key
-    }
-
-
-
 }
