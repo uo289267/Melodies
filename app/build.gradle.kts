@@ -60,4 +60,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("androidx.webkit:webkit:1.8.0")
+    implementation ("com.caverock:androidsvg:1.4")
+
 }
