@@ -42,8 +42,8 @@
         android:label="fragment_sheet_visualization"
         tools:layout="@layout/fragment_sheet_visualization" >
         <argument
-            android:name="SheetId"
-            app:argType="string" />
+            android:name="SheetIdNFolderId"
+            app:argType="tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto" />
     </fragment>
     <fragment
         android:id="@+id/fullLibrary"

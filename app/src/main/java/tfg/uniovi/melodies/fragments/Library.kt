@@ -24,6 +24,7 @@ import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.adapters.SheetInFolderAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModelProviderFactory
+import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 import tfg.uniovi.melodies.utils.RecyclerViewItemDecoration
 import java.util.UUID
 
@@ -39,9 +40,9 @@ class Library : Fragment() {
     private val args : LibraryArgs by navArgs()
     private lateinit var adapter : SheetInFolderAdapter
     private var allSheetsInFolder = listOf<MusicXMLSheet>()
-    private val navigationFunction = {sheetId: String ->
+    private val navigationFunction = {dto: SheetVisualizationDto ->
         run{
-            val destination = LibraryDirections.actionLibraryToSheetVisualization(sheetId)
+            val destination = LibraryDirections.actionLibraryToSheetVisualization(dto)
             findNavController().navigate(destination)
         }
     }

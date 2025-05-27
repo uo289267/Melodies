@@ -25,12 +25,28 @@ class UsersFirestore (val userUUID: UUID){
                             .document(folderId).get().await()
             if (document.exists()) {
                 doc2folder(document)
-                //document.toObject(Folder::class.java)
             } else {
                 null
             }
         } catch (e: Exception) {
-            // Handle error (log, throw custom exception, etc.)
+            println("Error getting song: $e")
+            null
+        }
+    }
+
+    suspend fun getSheetById(sheetId: String, folderId: String): MusicXMLSheet?{
+        return try{
+            val document = usersCollection.document(userUUID.toString())
+                            .collection("folders")
+                            .document(folderId)
+                            .collection("sheets")
+                            .document(sheetId).get().await()
+            if (document.exists()){
+                doc2sheet(document, folderId)
+            }else{
+                null
+            }
+        } catch (e: Exception) {
             println("Error getting song: $e")
             null
         }
@@ -89,7 +105,7 @@ class UsersFirestore (val userUUID: UUID){
             Log.d("FIRESTORE", folderId)
 
             result.documents.mapNotNull { doc ->
-                doc?.let { doc2sheet(it) }
+                doc?.let { doc2sheet(it, folderId) }
             }
 
         } catch (e: Exception) {
@@ -99,20 +115,23 @@ class UsersFirestore (val userUUID: UUID){
         }
     }
 
-    private fun docToMusicXMLSheet(data: Map<String, Any>): MusicXMLSheet {
+    private fun docToMusicXMLSheet(data: Map<String, Any>, folderId: String): MusicXMLSheet {
         return MusicXMLSheet(
             data["name"].toString(),
             data["musicxml"].toString(),
-            data["author"].toString(), data["id"].toString())//puede que este mal
+            data["author"].toString(),
+            data["id"].toString(),
+            folderId
+        )
     }
 
-    private suspend fun getAllSheets(querySnapshot: QuerySnapshot): List<MusicXMLSheet> {
+    private suspend fun getAllSheets(querySnapshot: QuerySnapshot,folderId: String ): List<MusicXMLSheet> {
         val allSheets = mutableListOf<MusicXMLSheet>()
 
         for (document in querySnapshot.documents) {
             val sheetsSnapshot = document.reference.collection("sheets").get().await()
             val sheets = sheetsSnapshot.documents.mapNotNull { sheetDoc ->
-                sheetDoc.data?.let { docToMusicXMLSheet(it) } // revisar doctomusicxml antes
+                sheetDoc.data?.let { docToMusicXMLSheet(it, folderId) } // revisar doctomusicxml antes
             }
             allSheets.addAll(sheets)
         }
@@ -127,10 +146,14 @@ class UsersFirestore (val userUUID: UUID){
             doc.id)
     }
 
-    private fun doc2sheet(doc:  DocumentSnapshot): MusicXMLSheet {
-        return MusicXMLSheet(doc.data!!["name"].toString(),
+    private fun doc2sheet(doc:  DocumentSnapshot, folderId: String): MusicXMLSheet {
+        return MusicXMLSheet(
+            doc.data!!["name"].toString(),
             doc.data!!["musicxml"].toString(),
-            doc.data!!["author"].toString(), doc.id)
+            doc.data!!["author"].toString(),
+            doc.id,
+            folderId
+        )
     }
 
 

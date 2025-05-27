@@ -1,45 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verovio</title>
     <script src="https://www.verovio.org/javascript/latest/verovio-toolkit.js"></script>
+    <script src="veroviofunctions.js"></script>
 </head>
-
 <body style="margin:0; padding:0;">
 </body>
-
-<script>
-    var tk = new verovio.toolkit();
-    console.log(tk.getOptions());
-
-    tk.setOptions({
-        scaleToPageSize: true,
-        landscape: true,
-        adjustPageWidth: true,
-        scale: 220
-    });
-
-    function loadMusicXmlFromBase64(base64) {
-        const xml = atob(base64);
-        try {
-            tk.loadData(xml);
-            return true;
-        } catch (e) {
-            console.error("Verovio loadData error", e);
-            return false;
-        }
-    }
-
-    function renderPageToDom(page) {
-        console.log("pase");
-        const svg = tk.renderToSVG(page, {});
-        return svg;
-    }
-
-    function getPageCount() {
-        return tk.getPageCount();
-    }
-</script>
 </html>

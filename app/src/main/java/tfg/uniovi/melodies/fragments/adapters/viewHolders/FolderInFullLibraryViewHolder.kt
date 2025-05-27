@@ -1,6 +1,5 @@
 package tfg.uniovi.melodies.fragments.adapters.viewHolders
 
-import android.content.Context
 import android.view.View
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
@@ -10,11 +9,12 @@ import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.Folder
 import tfg.uniovi.melodies.fragments.adapters.SheetInFolderAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
+import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 import tfg.uniovi.melodies.utils.RecyclerViewItemDecoration
 
-class FolderInFullLibraryViewHolder (
+class FolderInFullLibraryViewHolder(
     private val view: View,
-    private val navigateFunction: (String)-> Unit,
+    private val navigateFunction: (SheetVisualizationDto) -> Unit,
     private val lifecycleOwner: LifecycleOwner
 ): RecyclerView.ViewHolder (view) {
     private var tvFolderTitle : TextView = view.findViewById(R.id.tv_folder_title)

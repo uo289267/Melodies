@@ -14,14 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentFullLibraryBinding
 import tfg.uniovi.melodies.entities.Folder
-import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.adapters.FolderInFullLibraryAdapter
-import tfg.uniovi.melodies.fragments.adapters.SheetInFolderAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.FullLibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.FullLibraryViewModelProviderFactory
-import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModelProviderFactory
-import tfg.uniovi.melodies.utils.RecyclerViewItemDecoration
+import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 import java.util.UUID
 
 
@@ -31,9 +28,9 @@ class FullLibrary : Fragment() {
     private val args : LibraryArgs by navArgs()
     private lateinit var adapter: FolderInFullLibraryAdapter
     private var allFolders = listOf<Folder>()
-    private val navigationFunction = {sheetId: String ->
+    private val navigationFunction = {dto: SheetVisualizationDto ->
         run{
-            val destination = FullLibraryDirections.actionFullLibraryToSheetVisualization(sheetId)
+            val destination = FullLibraryDirections.actionFullLibraryToSheetVisualization(dto)
             findNavController().navigate(destination)
         }
     }
