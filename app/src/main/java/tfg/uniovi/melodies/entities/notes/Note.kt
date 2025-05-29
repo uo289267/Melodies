@@ -12,7 +12,7 @@ class Note(id: Int, duration: Long,
      * @param noteToCheck note that needs to be checked with this note
       */
     override fun check(noteToCheck: NoteDominant): Boolean {
-        return noteToCheck.name.compareTo(this.name) == 0
+        return noteToCheck.getName().compareTo(this.name) == 0
     }
 
     fun getName(): Char{
