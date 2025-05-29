@@ -1,6 +1,5 @@
 package tfg.uniovi.melodies.fragments.viewmodels
 
-import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,7 +7,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.entities.MusicXMLSheet
+import tfg.uniovi.melodies.entities.notes.ScoreElement
 import tfg.uniovi.melodies.repositories.UsersFirestore
+import tfg.uniovi.melodies.utils.parser.SVGParser
 import java.io.Serializable
 import java.util.UUID
 
@@ -27,6 +28,15 @@ class SheetVisualizationViewModel(
     val musicXMLSheet: LiveData<MusicXMLSheet>
         get()= _musicXML
 
+    private val _svg = MutableLiveData<String>()
+    val svg : LiveData<String>
+        get() = _svg
+
+    private val _correctlyPlayedNotesCounter = MutableLiveData<Int>()
+    val correctlyPlayedNotesCounter : LiveData<Int>
+        get()= _correctlyPlayedNotesCounter
+
+    private var _noteList : MutableList<ScoreElement> = mutableListOf()
     /**
      * Loads the musicxml given the sheedId and the folderId where the sheet resides
      */
@@ -34,6 +44,22 @@ class SheetVisualizationViewModel(
         viewModelScope.launch {
             _musicXML.postValue(sheetBD.getSheetById(dto.sheetId, dto.folderId))
         }
+
+    }
+    /**
+     * Updates counter when a note has been played correctly
+     */
+    fun updateCounter(){
+        _correctlyPlayedNotesCounter.postValue(_correctlyPlayedNotesCounter.value!!+1)
+    }
+
+    fun parseMusicXML(){
+        _musicXML.value?.let {
+            val parser = SVGParser(it.musicxml)
+            parser.parseAllNotes()
+            _noteList = parser.getAllNotes().toMutableList()
+        }
+
     }
 }
 

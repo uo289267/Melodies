@@ -1,24 +1,27 @@
 package tfg.uniovi.melodies.tools.pitchdetector
 
 import android.util.Log
-import kotlin.random.Random
+import tfg.uniovi.melodies.entities.notes.NoteDominant
+import tfg.uniovi.melodies.entities.notes.ScoreElement
 
 class SheetChecker () {
-    val solfegeNotes =
-        arrayOf("Do", "Re", "Mi", "Fa", "Sol", "La", "Si")
-    var noteToPlay ="Do"
-    fun getNotesToPlay(): String {
-        val num = Random.nextInt(solfegeNotes.size)
-        noteToPlay = solfegeNotes[num]
-        return solfegeNotes[num]
-    }
-    fun isNotePlayedCorrectly(): Boolean {
+    val notes =
+        arrayOf("C", "D", "E", "F", "G", "A", "B")
+
+    /**
+     * Returns true if the noteToCheck has been played
+     *          false if the noteToCheck was not played
+     *          null if there was no dominant note when listening
+     */
+    fun isNotePlayedCorrectly(noteToCheck : ScoreElement,
+                              samplingIntervalMs: Long = 1000L,
+                              dominancePercentage : Double = 0.95): Boolean? {
+
         val listOfNotes = mutableListOf<String>()
         val start = System.currentTimeMillis()
-        val samplingIntervalMs = 100L
-        val durationMs = 1000L
+        val durationMs = noteToCheck.getDuration()
 
-        // Escuchar durante 1 segundo (1000 ms)
+        // Listening for the amount of time said in samplingInterval
         while (System.currentTimeMillis() - start < durationMs) {
             val note = PitchDetector.getLastDetectedNote()
             listOfNotes.add(note)
@@ -26,26 +29,21 @@ class SheetChecker () {
             Thread.sleep(samplingIntervalMs)
         }
 
-        // Contar frecuencia de cada nota
+        // Get the frequency of each note
         val noteCounts = listOfNotes.groupingBy { it }.eachCount()
         val totalSamples = listOfNotes.size
-        val threshold = (totalSamples * 0.95).toInt()
+        val threshold = (totalSamples * dominancePercentage).toInt()
 
-        // Buscar la nota que aparece al menos en el 95% de los casos
+        // find the note that appears at least 95%
         val dominantNote = noteCounts.entries.find { it.value >= threshold }?.key
 
-        Log.d("SHEETcHECKER", "Esperado: $noteToPlay, Detectado: $dominantNote")
+        Log.d("SHEETcHECKER", "Esperado: , Detectado: $dominantNote")
 
-        return dominantNote?.let { notaBase(it) } == noteToPlay
+        return dominantNote?.let { noteToCheck.check(NoteDominant(notaBase(it)))  }
     }
 
-
-
-    fun notaBase(nota: String): String {
-        return when {
-            nota.length >= 4 && nota[3] == '#' -> nota.substring(0, 4) // ej: "Sol#7" → "Sol#"
-            nota.length >= 3 && nota.substring(0, 3) in listOf("Sol", "La#", "Si#", "Do#", "Re#", "Fa#", "Mi#") -> nota.substring(0, 3)
-            else -> nota.substring(0, 2) // ej: "Si6", "La5"
-        }
+    fun notaBase(nota: String): Char {
+        return nota[0]
     }
+
 }

@@ -1,8 +1,8 @@
 package tfg.uniovi.melodies.fragments
 
 import android.Manifest
+import android.content.DialogInterface
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -14,29 +14,23 @@ import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.caverock.androidsvg.SVG
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentSheetVisualizationBinding
 import tfg.uniovi.melodies.entities.MusicXMLSheet
-import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModelFactory
-import tfg.uniovi.melodies.repositories.UsersFirestore
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.MIC_REQ_CODE
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.stopListening
+import tfg.uniovi.melodies.utils.parser.SVGParserException
 import java.util.UUID
 
 private const val VEROVIO_HTML = "file:///android_asset/verovio.html"
@@ -46,7 +40,7 @@ class SheetVisualization : Fragment() {
     private val args : SheetVisualizationArgs by navArgs()
     private lateinit var binding: FragmentSheetVisualizationBinding
     private lateinit var sheetVisualizationViewModel: SheetVisualizationViewModel
-    private lateinit var musicxml: MusicXMLSheet
+    private lateinit var musicXMLSheet: MusicXMLSheet
     private var currentPage = 1
     private var totalPages = 1
 
@@ -73,29 +67,11 @@ class SheetVisualization : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSheetVisualizationBinding.inflate(inflater, container, false)
-        /*
-        val checker = SheetChecker()
-        val noteToPlay = checker.getNotesToPlay()
-        binding.noteToPlay.text = noteToPlay
-        Log.d("SHEET_vISUALIZATION", "The note to play is: $noteToPlay")
-        lifecycle.coroutineScope.launch(Dispatchers.Default) {
-            var num = 3
-            while(num>0){
-                val isGood = checker.isNotePlayedCorrectly()
-                if(isGood){
-                    withContext(Dispatchers.Main) {
-                        binding.result.text = num.toString()
-                        Log.d("SHEET_VISUAL", "The note has been played!!!")
-                    }
-                    num--
-                }
-            }
-        }*/
 
         sheetVisualizationViewModel = ViewModelProvider(this, SheetVisualizationViewModelFactory(
             UUID.fromString("a5ba172c-39d8-4181-9b79-76b8f23b5d18")
         )).get(SheetVisualizationViewModel::class.java)
-        setBottomNavMenuVisibility(View.GONE)
+
 
         setupWebView()
         setupNavigationButtons()
@@ -104,32 +80,60 @@ class SheetVisualization : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        sheetVisualizationViewModel.musicXMLSheet.observe(viewLifecycleOwner){
-            musicxml ->
-            this.musicxml = musicxml
+        view.post {
+            setBottomNavMenuVisibility(View.GONE)
+        }
+        viewModelSetUp()
+        toolBarSetUp()
 
-            musicxml?.let{
-                val encondedXML = Base64.encodeToString(it.stringSheet.toByteArray(), Base64.NO_WRAP)
+    }
 
+
+    private fun viewModelSetUp() {
+        sheetVisualizationViewModel.musicXMLSheet.observe(viewLifecycleOwner) { musicxml ->
+            this.musicXMLSheet = musicxml
+            musicxml?.let {
+                val encondedXML =
+                    Base64.encodeToString(it.stringSheet.toByteArray(), Base64.NO_WRAP)
                 binding.webView.evaluateJavascript(
                     "loadMusicXmlFromBase64('$encondedXML');"
-                ){
-                    _ ->
+                ) { _ ->
                     binding.webView.evaluateJavascript("getPageCount();") { pageCount ->
                         totalPages = pageCount.toIntOrNull() ?: 1
                         renderCurrentPage()
                     }
                 }
+                binding.toolbar.title = it.name
+                try{
+                    sheetVisualizationViewModel.parseMusicXML()
+                }catch (e : SVGParserException){
+                    showAlertDialog()
+
+                }
+
             }
+        }
+        sheetVisualizationViewModel.svg.observe(viewLifecycleOwner){ svg ->
+            renderCurrentPage() //TODO is this oke
 
-            binding.toolbar.title = musicxml.name
         }
 
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
-        toolbar?.setNavigationOnClickListener{
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+        sheetVisualizationViewModel.correctlyPlayedNotesCounter.observe(viewLifecycleOwner){ newCorrect ->
+            //highlightNoteByIndex(,newCorrect,"green") svg as attribute?
+
         }
+    }
+
+    private fun showAlertDialog() {
+        AlertDialog.Builder(requireContext()).setTitle("Invalid MusicXML")
+            .setMessage(
+                "MusicXML is missing attributes and/or elements, " +
+                        "no feedback will be given tap each end of the screen to navigate"
+            )
+            .setIcon(R.drawable.icon_alert)
+            .setPositiveButton(android.R.string.ok) { dialogInterface, i ->
+                Log.d("PARSE", "alert dialog showed")
+            }.show()
     }
 
 
@@ -146,6 +150,16 @@ class SheetVisualization : Fragment() {
         }
     }
 
+    /**
+     * Sets up the toolbar and its back button
+     */
+    private fun toolBarSetUp() {
+        val toolbar = binding.toolbar
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+        toolbar.setNavigationOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
+    }
 
     /**
      * Configures the WebView with Verovio JS
@@ -161,9 +175,7 @@ class SheetVisualization : Fragment() {
         }
         binding.webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
-                //loadMusicXMLAndRender()
                 sheetVisualizationViewModel.loadMusicSheet(args.sheetIdNFolderId)
-
             }
         }
         binding.webView.loadUrl(VEROVIO_HTML)
@@ -173,29 +185,7 @@ class SheetVisualization : Fragment() {
     /**
      * Loads MUSICXML and gives it to VEROVIO
      */
-    /*
-    private fun loadMusicXMLAndRender() {
-        lifecycleScope.launch(Dispatchers.Default) {
-            /*
-            val inputStream = requireContext().assets.open("cuna.xml")
-            val musicXml = inputStream.bufferedReader().use { it.readText() }*/
-            val db = UsersFirestore(UUID.fromString("a5ba172c-39d8-4181-9b79-76b8f23b5d18"))
-            val musicXMLSheet = db.getSheetById(args.sheetIdNFolderId.sheetId, args.sheetIdNFolderId.folderId)
-            val encodedXml = Base64.encodeToString(musicXMLSheet?.stringSheet!!.toByteArray(), Base64.NO_WRAP)
 
-
-            withContext(Dispatchers.Main) {
-                binding.webView.evaluateJavascript(
-                    "loadMusicXmlFromBase64('$encodedXml');"
-                ) { _ ->
-                    binding.webView.evaluateJavascript("getPageCount();") { pageCount ->
-                        totalPages = pageCount.toIntOrNull() ?: 1
-                        renderCurrentPage()
-                    }
-                }
-            }
-        }
-    }*/
     private fun highlightNoteByIndex(svg: String, index: Int, color: String): String {
         // Find the notes
         val regex = Regex("""<g[^>]*class="[^"]*note[^"]*"[^>]*>.*?</g>""", RegexOption.DOT_MATCHES_ALL)
@@ -223,33 +213,10 @@ class SheetVisualization : Fragment() {
     /**
      * Renders current page and shows its SVG in the ImageView
      */
-    /* OG
-    private fun renderCurrentPage(){
-        binding.webView.evaluateJavascript("renderPageToDom($currentPage);"){rawSvg ->
-            val svgClean = cleanSvg(rawSvg)
-            binding.sheetImageView.setSVG(SVG.getFromString(svgClean))
-        }
-
-
-    }*/
     private fun renderCurrentPage() {
         binding.webView.evaluateJavascript("renderPageToDom($currentPage);") { rawSvg ->
             val svgClean = cleanSvg(rawSvg)
-            binding.sheetImageView.setSVG(SVG.getFromString(svgClean))
-
-            // Esperar 3 segundos y luego resaltar la nota
-            // Coroutine para pintar notas una por una con delay
-            viewLifecycleOwner.lifecycleScope.launch { // TODO pasar al viewmodel
-                val totalNotes = countNotesInSvg(svgClean) // función para contar notas
-                var currentSvg = svgClean
-
-                for (i in 0 until totalNotes) {
-                    currentSvg = highlightNoteByIndex(currentSvg, i, "red")
-                    val svg = SVG.getFromString(currentSvg)
-                    binding.sheetImageView.setSVG(svg)
-                    delay(1000) // espera 1 segundo antes de pintar siguiente
-                }
-            }
+            binding.sheetImageView.setSVG(SVG.getFromString(svgClean)) // TODO DA NULL AL GIRAR
         }
     }
     private fun countNotesInSvg(svg: String): Int {

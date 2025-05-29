@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -62,22 +61,34 @@ class Library : Fragment() {
         binding.recyclerViewLibrary.adapter = adapter
         binding.recyclerViewLibrary.layoutManager = LinearLayoutManager(context)
         binding.recyclerViewLibrary.addItemDecoration(RecyclerViewItemDecoration(requireContext(), R.drawable.divider))
+
+        val toolbar = binding.toolbar
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+        toolbar.setNavigationOnClickListener{
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         libraryViewModel.sheets.observe(viewLifecycleOwner) { list ->
             allSheetsInFolder = list
             adapter.updateSheets(allSheetsInFolder)
+
         }
         libraryViewModel.loadSheets()
-        super.onViewCreated(view, savedInstanceState)
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
-        toolbar?.setNavigationOnClickListener{
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+        libraryViewModel.folderName.observe(viewLifecycleOwner) { name ->
+            binding.toolbar.title = name
         }
-        val menuHost : MenuHost = requireActivity()
+        libraryViewModel.loadFolderName()
+
+        searchMenuSetUp()
+    }
+
+    private fun searchMenuSetUp() {
+        val menuHost: MenuHost = requireActivity()
 
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -109,7 +120,6 @@ class Library : Fragment() {
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
-
 
 
 }

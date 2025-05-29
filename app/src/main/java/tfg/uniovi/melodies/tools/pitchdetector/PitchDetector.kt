@@ -57,19 +57,18 @@ object PitchDetector {
     fun getLastDetectedNote(): String = lastDetectedNote
 
     private fun convertFrequencyToNote(frequency: Float): String {
-        // Notas musicales en sistema Do, Re, Mi
-        val solfegeNotes =
-            arrayOf("Do", "Do#", "Re", "Re#", "Mi", "Fa", "Fa#", "Sol", "Sol#", "La", "La#", "Si")
-        // Referencia A4 = 440 Hz
+        val notes = arrayOf("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
+        // Reference A4 = 440 Hz
         val A4 = 440
         val noteIndex = Math.round(12 * ln((frequency / A4).toDouble()) / ln(2.0)).toInt()
         val noteNumber = (noteIndex + 69) % 12
         val octave = (noteIndex + 69) / 12
 
-        return if (noteNumber >= 0 && noteNumber < solfegeNotes.size) {
-            solfegeNotes[noteNumber] + octave
+        return if (noteNumber >= 0 && noteNumber < notes.size) {
+            notes[noteNumber] + octave
         } else {
             "Desconocido"
         }
     }
+
 }
