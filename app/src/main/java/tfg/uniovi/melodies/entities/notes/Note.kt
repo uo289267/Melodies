@@ -19,4 +19,14 @@ class Note(id: Int, duration: Long,
         return this.name
     }
 
+    fun getSharp(): Boolean{
+        return this.sharp
+    }
+
+    fun getOctave(): Int{
+        return this.octave
+    }
+
+
+
 }

@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.entities.notes.ScoreElement
 import tfg.uniovi.melodies.repositories.UsersFirestore
-import tfg.uniovi.melodies.utils.parser.SVGParser
+import tfg.uniovi.melodies.utils.parser.XMLParser
 import java.io.Serializable
 import java.util.UUID
 
@@ -55,7 +55,7 @@ class SheetVisualizationViewModel(
 
     fun parseMusicXML(){
         _musicXML.value?.let {
-            val parser = SVGParser(it.musicxml)
+            val parser = XMLParser(it.musicxml)
             parser.parseAllNotes()
             _noteList = parser.getAllNotes().toMutableList()
         }

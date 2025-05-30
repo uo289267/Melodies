@@ -7,7 +7,7 @@ import tfg.uniovi.melodies.entities.notes.Note
 import tfg.uniovi.melodies.entities.notes.ScoreElement
 import tfg.uniovi.melodies.entities.notes.Rest
 
-class SVGParser() {
+class XMLParser() {
     private lateinit var musicxml: Document
     private val notes = mutableListOf<ScoreElement>()
     private var quarterNoteDuration : Long? = null
