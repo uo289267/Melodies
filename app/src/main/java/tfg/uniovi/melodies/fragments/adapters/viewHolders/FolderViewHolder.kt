@@ -5,6 +5,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
+import tfg.uniovi.melodies.entities.Colors
 import tfg.uniovi.melodies.entities.Folder
 
 class FolderViewHolder(
@@ -23,9 +24,15 @@ class FolderViewHolder(
 
     fun bind(folder: Folder){
         currentFolder = folder
+
         tvFolderTitle.text = folder.name
-        //ivFolder.setImageResource(R.drawable.folder)
-        ivFolder.setImageResource(currentFolder!!.color)
+
+        val resId = when (folder.color) {
+            Colors.YELLOW -> R.drawable.folder_yellow
+            Colors.PINK-> R.drawable.folder_pink
+            Colors.BLUE -> R.drawable.folder_blue
+        }
+        ivFolder.setImageResource(resId)
     }
 
 }

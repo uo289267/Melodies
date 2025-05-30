@@ -37,7 +37,7 @@ class AddFolder : Fragment() {
         }
     }
     private val colors = listOf(
-        Pair(R.drawable.folder,R.string.yellow),
+        Pair(R.drawable.folder_yellow,R.string.yellow),
         Pair(R.drawable.folder_pink,R.string.pink),
         Pair(R.drawable.folder_blue, R.string.blue)
     )

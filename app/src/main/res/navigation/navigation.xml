@@ -20,6 +20,9 @@
         <action
             android:id="@+id/action_home_fragment_to_fullLibrary"
             app:destination="@id/fullLibrary" />
+        <action
+            android:id="@+id/action_home_fragment_to_import1"
+            app:destination="@id/importing" />
     </fragment>
     <fragment
         android:id="@+id/library"
@@ -54,4 +57,9 @@
             android:id="@+id/action_fullLibrary_to_sheetVisualization"
             app:destination="@id/sheetVisualization" />
     </fragment>
+    <fragment
+        android:id="@+id/importing"
+        android:name="tfg.uniovi.melodies.fragments.Import"
+        android:label="fragment_import"
+        tools:layout="@layout/fragment_import" />
 </navigation>

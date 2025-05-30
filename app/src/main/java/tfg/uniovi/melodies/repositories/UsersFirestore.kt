@@ -8,6 +8,7 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
+import tfg.uniovi.melodies.entities.Colors
 import tfg.uniovi.melodies.entities.Folder
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.viewmodels.FolderDTO
@@ -122,7 +123,7 @@ class UsersFirestore (val userUUID: UUID){
 
     private fun doc2folder(doc:  DocumentSnapshot): Folder {
         return Folder(doc.data!!["name"].toString(),
-            doc.data!!["color"].toString().toInt(),
+            Colors.valueOf(doc.data!!["color"].toString().uppercase()),
             doc.data!!["creationTime"] as Timestamp,
             doc.id)
     }

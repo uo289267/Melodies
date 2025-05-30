@@ -10,7 +10,7 @@ import kotlinx.coroutines.tasks.await
 import tfg.uniovi.melodies.entities.Folder
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 
-class FolderFirestore {
+class FolderFirestore { //TODO DELETE
     private val db = Firebase.firestore
     private val foldersColletion = db.collection("folders")
 
@@ -28,6 +28,7 @@ class FolderFirestore {
             null
         }
     }
+    /*
     suspend fun getAllFolders(): List<Folder> {
         return try {
             val result = foldersColletion.get().await()
@@ -38,7 +39,7 @@ class FolderFirestore {
             Log.e("FIRESTORE", "Error getting folders", e)
             emptyList()
         }
-    }
+    }*/
 
 
     suspend fun addFolder(folder:Folder) : String?{
@@ -96,12 +97,12 @@ class FolderFirestore {
 
         return allSheets
     }
-
+/*
     private fun doc2folder(doc:  DocumentSnapshot): Folder {
         return Folder(doc.data!!["name"].toString(),
             doc.data!!["color"].toString().toInt(),
             doc.data!!["creationTime"] as Timestamp,
             doc.id)
-    }
+    }*/
 
 }
