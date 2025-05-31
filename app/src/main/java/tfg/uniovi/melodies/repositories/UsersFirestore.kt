@@ -12,6 +12,7 @@ import tfg.uniovi.melodies.entities.Colors
 import tfg.uniovi.melodies.entities.Folder
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.viewmodels.FolderDTO
+import tfg.uniovi.melodies.fragments.viewmodels.MusicXMLDTO
 import java.util.UUID
 
 class UsersFirestore (val userUUID: UUID){
@@ -84,6 +85,28 @@ class UsersFirestore (val userUUID: UUID){
             null
         }
     }
+
+    suspend fun addMusicXMLSheet(dto : MusicXMLDTO) : String?{
+        val data = hashMapOf(
+            "author" to dto.author,
+            "musicxml" to dto.stringSheet,
+            "name" to dto.name)
+        return try {
+            val documentReference = usersCollection.document(userUUID.toString())
+                .collection("folders")
+                .document(dto.folderId)
+                .collection("sheets") // Asegúrate de que la colección de partituras se llama así
+                .add(data)
+                .await()
+
+            documentReference.id // Devuelve el ID del nuevo documento
+        } catch (e: Exception) {
+            // Handle error
+            println("Error adding song: $e")
+            null
+        }
+    }
+
     // Coroutine-based function to delete a song
     suspend fun deleteFolder(folderId: String) {
         try {

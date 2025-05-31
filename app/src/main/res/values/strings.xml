@@ -12,4 +12,14 @@
     <string name="pagina_anterior">Página anterior</string>
     <string name="pagina_siguiente">Página siguiente</string>
     <string name="import_xml">Import MusicXML</string>
+    <string name="import_into">Into folder:</string>
+    <string name="import_upload_from">Upload from device storage:</string>
+    <string name="import_name_files">No files upladed yet</string>
+    <string name="import_files_btn">Import</string>
+    <string name="anonymous">Anonymous</string>
+    <string name="unknown_name">Unknown Name</string>
+    <string name="alert_dialog_title_error_parsing">Error Parsing MusicXML</string>
+    <string name="alert_dialog_msg_error_parsing">Error parsing XML to import: xml was null/empty</string>
+    <string name="import_successful">MusicXML(s) where imported successfully</string>
+    <string name="import_unsuccessful">MusicXML(s) where not imported successfully</string>
 </resources>

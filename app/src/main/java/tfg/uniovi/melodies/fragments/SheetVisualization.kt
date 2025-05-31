@@ -30,6 +30,7 @@ import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModelFactory
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.MIC_REQ_CODE
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.stopListening
+import tfg.uniovi.melodies.utils.ShowAlertDialog
 import tfg.uniovi.melodies.utils.parser.SVGParserException
 import java.util.UUID
 
@@ -107,7 +108,12 @@ class SheetVisualization : Fragment() {
                 try{
                     sheetVisualizationViewModel.parseMusicXML()
                 }catch (e : SVGParserException){
-                    showAlertDialog()
+                    ShowAlertDialog.showAlertDialog(requireContext(),
+                        "Invalid MusicXML",
+                        "MusicXML is missing attributes and/or elements, " +
+                                "no feedback will be given tap each end of the screen to navigate",
+                        "PARSING_XML",
+                        "alert dialog showed becuase xml missing attributes and/or elements")
 
                 }
 
@@ -124,17 +130,7 @@ class SheetVisualization : Fragment() {
         }
     }
 
-    private fun showAlertDialog() {
-        AlertDialog.Builder(requireContext()).setTitle("Invalid MusicXML")
-            .setMessage(
-                "MusicXML is missing attributes and/or elements, " +
-                        "no feedback will be given tap each end of the screen to navigate"
-            )
-            .setIcon(R.drawable.icon_alert)
-            .setPositiveButton(android.R.string.ok) { dialogInterface, i ->
-                Log.d("PARSE", "alert dialog showed")
-            }.show()
-    }
+
 
 
     /**

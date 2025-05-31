@@ -61,5 +61,9 @@
         android:id="@+id/importing"
         android:name="tfg.uniovi.melodies.fragments.Import"
         android:label="fragment_import"
-        tools:layout="@layout/fragment_import" />
+        tools:layout="@layout/fragment_import" >
+        <action
+            android:id="@+id/action_importing_to_home_fragment"
+            app:destination="@id/home_fragment" />
+    </fragment>
 </navigation>
