@@ -48,4 +48,10 @@ class SheetInFolderAdapter : RecyclerView.Adapter<SheetInFolderViewHolder> {
     override fun getItemCount(): Int {
         return sheetList.size
     }
+
+    fun removeItemAt(position: Int) {
+        sheetList.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
 }

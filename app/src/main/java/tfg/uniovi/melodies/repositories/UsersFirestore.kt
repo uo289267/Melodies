@@ -117,6 +117,21 @@ class UsersFirestore (val userUUID: UUID){
             println("Error deleting song: $e")
         }
     }
+    suspend fun deleteSheet(sheetId: String, folderId: String) {
+        try {
+            usersCollection.document(userUUID.toString())
+                .collection("folders")
+                .document(folderId)
+                .collection("sheets")
+                .document(sheetId)
+                .delete()
+                .await()
+        } catch (e: Exception) {
+            // Handle error
+            println("Error deleting song: $e")
+        }
+    }
+
 
     suspend fun getAllSheetsFromFolder(folderId: String): List<MusicXMLSheet> {
         return try {

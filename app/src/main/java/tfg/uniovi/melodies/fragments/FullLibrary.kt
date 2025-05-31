@@ -51,7 +51,7 @@ class FullLibrary : Fragment() {
         adapter = FolderInFullLibraryAdapter(folderList,navigationFunction,libraryViewModel, this, libraryViewModelProviderFactory)
         binding.recyclerViewFullLibrary.adapter = adapter
         binding.recyclerViewFullLibrary.layoutManager = LinearLayoutManager(context)
-        //binding.recyclerViewFullLibrary.addItemDecoration(RecyclerViewItemDecoration(requireContext(), R.drawable.divider))
+
         return binding.root
 
     }

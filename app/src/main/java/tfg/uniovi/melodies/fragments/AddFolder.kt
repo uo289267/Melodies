@@ -77,6 +77,10 @@ class AddFolder : Fragment() {
         addFolderViewModel.folderDTO.observe(viewLifecycleOwner){dto ->
             modifyFolderName(binding.folderNameInput, dto.name)
         }
+
+        binding.toolbar.setNavigationOnClickListener{
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
         return binding.root
     }
 

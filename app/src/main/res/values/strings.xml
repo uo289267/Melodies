@@ -22,4 +22,5 @@
     <string name="alert_dialog_msg_error_parsing">Error parsing XML to import: xml was null/empty</string>
     <string name="import_successful">MusicXML(s) where imported successfully</string>
     <string name="import_unsuccessful">MusicXML(s) where not imported successfully</string>
+    <string name="delete_successful">MusicXML was deleted successfully</string>
 </resources>

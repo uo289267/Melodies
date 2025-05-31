@@ -1,6 +1,7 @@
 package tfg.uniovi.melodies.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -8,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -16,11 +18,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentLibraryBinding
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.adapters.SheetInFolderAdapter
+import tfg.uniovi.melodies.fragments.adapters.touchHelpers.MyItemTouchHelper
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModelProviderFactory
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
@@ -57,6 +61,20 @@ class Library : Fragment() {
         )).get(LibraryViewModel::class.java)
 
         adapter = SheetInFolderAdapter(sheetList,navigationFunction,libraryViewModel )
+        val itemTouchHelper = ItemTouchHelper(
+            MyItemTouchHelper { position, direction ->
+                if (direction == ItemTouchHelper.START) {
+                    adapter.removeItemAt(position)
+                    // notifying vm to remove from db
+                    libraryViewModel.deleteSheetAt(position)
+                    Log.d("DELETE", "One sheet at position $position was deleted")
+                    Toast.makeText(context, getString(R.string.delete_successful), Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        )
+        itemTouchHelper.attachToRecyclerView(binding.recyclerViewLibrary)
+
 
         binding.recyclerViewLibrary.adapter = adapter
         binding.recyclerViewLibrary.layoutManager = LinearLayoutManager(context)

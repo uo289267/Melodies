@@ -51,4 +51,10 @@ class LibraryViewModel(
             _folderName.postValue(name)
         }
     }
+
+    fun deleteSheetAt(position: Int) {
+        viewModelScope.launch {
+            folderBD.deleteSheet(sheets.value!![position].id,folderId )
+        }
+    }
 }
