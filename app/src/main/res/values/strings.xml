@@ -9,5 +9,7 @@
     <string name="play_icon">play icon</string>
     <string name="error_blank_folder_name">Folder\'s name cannot be empty</string>
     <string name="too_long_folder_name">Folder\'s name cannot be longer than 30 characters\n</string>
+    <string name="pagina_anterior">Página anterior</string>
+    <string name="pagina_siguiente">Página siguiente</string>
     <string name="import_xml">Import MusicXML</string>
 </resources>

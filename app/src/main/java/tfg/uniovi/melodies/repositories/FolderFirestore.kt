@@ -13,7 +13,7 @@ import tfg.uniovi.melodies.entities.MusicXMLSheet
 class FolderFirestore { //TODO DELETE
     private val db = Firebase.firestore
     private val foldersColletion = db.collection("folders")
-
+/*
     suspend fun getFolderById(folderId: String): Folder? {
         return try {
             val document = foldersColletion.document(folderId).get().await()
@@ -28,7 +28,6 @@ class FolderFirestore { //TODO DELETE
             null
         }
     }
-    /*
     suspend fun getAllFolders(): List<Folder> {
         return try {
             val result = foldersColletion.get().await()
@@ -39,7 +38,7 @@ class FolderFirestore { //TODO DELETE
             Log.e("FIRESTORE", "Error getting folders", e)
             emptyList()
         }
-    }*/
+    }
 
 
     suspend fun addFolder(folder:Folder) : String?{
@@ -75,28 +74,34 @@ class FolderFirestore { //TODO DELETE
             println("Error getting all songs: $e")
             emptyList()
         }
-    }
-
-    private fun docToMusicXMLSheet(data: Map<String, Any>): MusicXMLSheet {
+    }*/
+/*
+    private fun docToMusicXMLSheet(data: Map<String, Any>, folderId: String): MusicXMLSheet {
         return MusicXMLSheet(
             data["name"].toString(),
             data["musicxml"].toString(),
-            data["author"].toString(), data["id"].toString())
-    }
-
-    private suspend fun getAllSheets(querySnapshot: QuerySnapshot): List<MusicXMLSheet> {
+            data["author"].toString(),
+            data["id"].toString(),
+            folderId
+        )
+    }*/
+/*
+    private suspend fun getAllSheets(querySnapshot: QuerySnapshot, folderId: String): List<MusicXMLSheet> {
         val allSheets = mutableListOf<MusicXMLSheet>()
 
         for (document in querySnapshot.documents) {
             val sheetsSnapshot = document.reference.collection("sheets").get().await()
             val sheets = sheetsSnapshot.documents.mapNotNull { sheetDoc ->
-                sheetDoc.data?.let { docToMusicXMLSheet(it) }
+                sheetDoc.data?.let { docToMusicXMLSheet(it,folderId) }
             }
             allSheets.addAll(sheets)
         }
 
         return allSheets
     }
+    */
+
+
 /*
     private fun doc2folder(doc:  DocumentSnapshot): Folder {
         return Folder(doc.data!!["name"].toString(),

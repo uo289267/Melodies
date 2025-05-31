@@ -29,12 +29,26 @@ class LibraryViewModel(
     val sheets: LiveData<List<MusicXMLSheet>>
         get() = _sheets
 
+    private val _folderName = MutableLiveData<String>()
+    val folderName: LiveData<String>
+        get() = _folderName
+
     /**
-     * Returns the sheets from a folder given its folderId
+     * Returns the sheets from a folder based on its folderId
      */
     fun loadSheets(){
         viewModelScope.launch {
             _sheets.postValue(folderBD.getAllSheetsFromFolder(folderId))
+        }
+    }
+
+    /**
+     * Loads the folder name based on its folderId
+     */
+    fun loadFolderName() {
+        viewModelScope.launch {
+            val name = folderBD.getFolderById(folderId)?.name ?: ""
+            _folderName.postValue(name)
         }
     }
 }
