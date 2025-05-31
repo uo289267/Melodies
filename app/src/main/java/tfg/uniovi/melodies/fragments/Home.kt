@@ -29,7 +29,7 @@ class Home : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-        //fab
+
         folderViewModel = ViewModelProvider(this, FolderViewModelProviderFactory(
             UUID.fromString("a5ba172c-39d8-4181-9b79-76b8f23b5d18")
         )).get(FolderViewModel::class.java)
@@ -48,10 +48,6 @@ class Home : Fragment() {
 
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-    }
 
 
 }

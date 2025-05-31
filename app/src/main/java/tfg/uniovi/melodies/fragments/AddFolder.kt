@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentAddFolderBinding
-import tfg.uniovi.melodies.fragments.adapters.SpinnerAdapter
+import tfg.uniovi.melodies.fragments.adapters.SpinnerFoldersColorsAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.AddFolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.AddFolderViewModelProviderFactory
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
@@ -111,7 +111,7 @@ class AddFolder : Fragment() {
     }
 
     private fun configureSpinner(spFolderColors: Spinner){
-        spFolderColors.adapter = SpinnerAdapter(requireContext(),colors);
+        spFolderColors.adapter = SpinnerFoldersColorsAdapter(requireContext(),colors)
         spFolderColors.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,

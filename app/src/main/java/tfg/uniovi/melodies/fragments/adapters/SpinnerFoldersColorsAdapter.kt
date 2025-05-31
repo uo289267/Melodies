@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import tfg.uniovi.melodies.R
 
-class SpinnerAdapter (context: Context, private val folderColors : List<Pair<Int,Int>>):
+class SpinnerFoldersColorsAdapter (context: Context, private val folderColors : List<Pair<Int,Int>>):
     ArrayAdapter<Pair<Int, Int>>(context,0,folderColors) {
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         return createFolderColorView(position, parent)
@@ -30,4 +30,5 @@ class SpinnerAdapter (context: Context, private val folderColors : List<Pair<Int
         textView.text = ContextCompat.getString(context, folderColors[position].second)
         return view
     }
+
 }
