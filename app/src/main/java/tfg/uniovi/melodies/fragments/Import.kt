@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -44,7 +43,7 @@ class Import : Fragment() {
                         val doc = String2MusicXML.string2doc(xmlContent)
                         importViewModel.addMusicXMLSheet(xmlContent, findNameTitle(doc), findAuthor(doc))
                     } catch (e: Exception) {
-                        ShowAlertDialog.showAlertDialog(
+                        ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(
                             requireContext(),
                             getString(R.string.alert_dialog_title_error_parsing),
                             e.message!!,
@@ -53,7 +52,7 @@ class Import : Fragment() {
                         )
                     }
                 } else {
-                    ShowAlertDialog.showAlertDialog(
+                    ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(
                         requireContext(),
                         getString(R.string.alert_dialog_title_error_parsing),
                         getString(R.string.alert_dialog_msg_error_parsing),

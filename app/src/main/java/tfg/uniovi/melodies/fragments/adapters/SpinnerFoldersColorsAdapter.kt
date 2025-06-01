@@ -8,10 +8,12 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getString
 import tfg.uniovi.melodies.R
+import tfg.uniovi.melodies.entities.Colors
 
-class SpinnerFoldersColorsAdapter (context: Context, private val folderColors : List<Pair<Int,Int>>):
-    ArrayAdapter<Pair<Int, Int>>(context,0,folderColors) {
+class SpinnerFoldersColorsAdapter (context: Context, private val folderColors : List<Triple<Int,Int, Colors>>):
+    ArrayAdapter<Triple<Int, Int, Colors>>(context,0,folderColors) {
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         return createFolderColorView(position, parent)
     }
@@ -27,7 +29,7 @@ class SpinnerFoldersColorsAdapter (context: Context, private val folderColors : 
         imageView.setImageDrawable(ContextCompat.getDrawable(context, color))
         //text name
         val textView = view.findViewById<TextView>(R.id.tv_color_name)
-        textView.text = ContextCompat.getString(context, folderColors[position].second)
+        textView.text = getString(parent.context, folderColors[position].second)
         return view
     }
 

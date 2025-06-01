@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import tfg.uniovi.melodies.entities.Colors
 import tfg.uniovi.melodies.repositories.UsersFirestore
 import java.util.UUID
 
@@ -25,14 +26,14 @@ class AddFolderViewModel (private val folderBD: UsersFirestore,
     : ViewModel() {
 
 
-    private val _folderDTO = MutableLiveData(FolderDTO(-1, ""))
+    private val _folderDTO = MutableLiveData(FolderDTO( Colors.YELLOW, ""))
     val folderDTO : LiveData<FolderDTO>
         get() = _folderDTO
 
     fun updateFolderName(newName: String) {
         _folderDTO.value = _folderDTO.value?.copy(name = newName)
     }
-    fun updateFolderColor(newColor:Int){
+    fun updateFolderColor(newColor:Colors){
         _folderDTO.value = _folderDTO.value?.copy(color = newColor)
     }
     fun createFolder(){
@@ -45,7 +46,7 @@ class AddFolderViewModel (private val folderBD: UsersFirestore,
 }
 
 data class FolderDTO(
-    var color: Int,
+    var color: Colors,
     var name: String
 )
 

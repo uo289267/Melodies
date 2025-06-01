@@ -1,7 +1,6 @@
 package tfg.uniovi.melodies.fragments
 
 import android.Manifest
-import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Base64
@@ -14,7 +13,6 @@ import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -108,7 +106,7 @@ class SheetVisualization : Fragment() {
                 try{
                     sheetVisualizationViewModel.parseMusicXML()
                 }catch (e : SVGParserException){
-                    ShowAlertDialog.showAlertDialog(requireContext(),
+                    ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(requireContext(),
                         "Invalid MusicXML",
                         "MusicXML is missing attributes and/or elements, " +
                                 "no feedback will be given tap each end of the screen to navigate",

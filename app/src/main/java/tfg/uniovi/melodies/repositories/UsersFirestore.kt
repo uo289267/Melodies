@@ -74,7 +74,7 @@ class UsersFirestore (val userUUID: UUID){
         val data = hashMapOf(
             "name" to dto.name,
             "creationTime" to Timestamp.now(),
-            "color" to dto.color)
+            "color" to dto.color.name)
         return try {
             val documentReference = usersCollection.document(userUUID.toString())
                 .collection("folders").add(data).await()

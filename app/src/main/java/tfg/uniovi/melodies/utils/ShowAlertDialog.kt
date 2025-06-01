@@ -6,8 +6,8 @@ import androidx.appcompat.app.AlertDialog
 import tfg.uniovi.melodies.R
 
 object ShowAlertDialog {
-    fun showAlertDialog(context: Context, title: String, message: String,
-                        tagForLog: String, msgForLog: String){
+    fun showAlertDialogOnlyWithPositiveButton(context: Context, title: String, message: String,
+                                              tagForLog: String, msgForLog: String){
         AlertDialog.Builder(context).setTitle(title)
             .setMessage(
                 message
@@ -15,6 +15,20 @@ object ShowAlertDialog {
             .setIcon(R.drawable.icon_alert)
             .setPositiveButton(android.R.string.ok) { dialogInterface, i ->
                 Log.d(tagForLog, msgForLog)
+            }.show()
+    }
+    fun showAlertDialogOnlyWithPositiveNNegativeButton(context: Context, title: String, message: String,
+                                              tagForLog: String, msgForPositiveBtnLog:
+                                                       String,msgForNegativeBtnLog: String ){
+        AlertDialog.Builder(context).setTitle(title)
+            .setMessage(
+                message
+            )
+            .setIcon(R.drawable.icon_alert)
+            .setPositiveButton(android.R.string.ok) { dialogInterface, i ->
+                Log.d(tagForLog, msgForPositiveBtnLog)
+            }.setNegativeButton(android.R.string.cancel){ dialogInterface, i ->
+                Log.d(tagForLog, msgForNegativeBtnLog)
             }.show()
     }
 }

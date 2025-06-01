@@ -13,7 +13,7 @@ class FolderAdapter : RecyclerView.Adapter<FolderViewHolder> {
     private val folderList : MutableList<Folder>
     private val navigateFunction: (String) -> Unit
     private val viewModel : FolderViewModel
-
+    private val onLongClickDelete: (Folder) -> Unit
     constructor(folderList: List<Folder>,
                 navigateFunction: (String) -> Unit
                 , viewModel: FolderViewModel
@@ -25,6 +25,9 @@ class FolderAdapter : RecyclerView.Adapter<FolderViewHolder> {
             list -> updateFolders(list)
         }
         this.viewModel.loadFolders()
+        this.onLongClickDelete = {folder ->
+            viewModel.deleteFolder(folder.folderId)
+        }
     }
 
     private fun updateFolders(newFolders: List<Folder>) {
@@ -42,7 +45,7 @@ class FolderAdapter : RecyclerView.Adapter<FolderViewHolder> {
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): FolderViewHolder {
         val layout = R.layout.recycler_folder_item
         val view = LayoutInflater.from(viewGroup.context).inflate(layout, viewGroup, false)
-        return FolderViewHolder(view, navigateFunction)
+        return FolderViewHolder(view, navigateFunction,onLongClickDelete )
     }
 
     override fun onBindViewHolder(viewHolder: FolderViewHolder, position: Int) {

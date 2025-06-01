@@ -36,4 +36,20 @@ class FolderViewModel(
             _folders.postValue(folderBD.getAllFolders())
         }
     }
+
+    /**
+     * Deletes the folder from the bd and the folders list
+     *
+     * @param folderId the id of the folder to be deleted
+     */
+    fun deleteFolder(folderId: String) {
+        viewModelScope.launch {
+            folderBD.deleteFolder(folderId)
+
+            val updatedList = _folders.value?.filter { it.folderId != folderId }
+            _folders.postValue(updatedList!!)
+        }
+    }
+
+
 }

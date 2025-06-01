@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentAddFolderBinding
+import tfg.uniovi.melodies.entities.Colors
 import tfg.uniovi.melodies.fragments.adapters.SpinnerFoldersColorsAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.AddFolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.AddFolderViewModelProviderFactory
@@ -37,11 +38,11 @@ class AddFolder : Fragment() {
         }
     }
     private val colors = listOf(
-        Pair(R.drawable.folder_yellow,R.string.yellow),
-        Pair(R.drawable.folder_pink,R.string.pink),
-        Pair(R.drawable.folder_blue, R.string.blue)
+        Triple(R.drawable.folder_yellow,R.string.yellow, Colors.YELLOW),
+        Triple(R.drawable.folder_pink,R.string.pink, Colors.PINK),
+        Triple(R.drawable.folder_blue, R.string.blue, Colors.BLUE)
     )
-    private var colorSelected: Int = colors[0].first
+    private var colorSelected: Triple<Int,Int,Colors> = colors[0]
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -97,7 +98,7 @@ class AddFolder : Fragment() {
         binding.btnCreateFolder.setOnClickListener{
             //call to addFolder
             val name = binding.folderNameInput.text
-            val color = colorSelected
+            val color = getString(colorSelected.second)
             Log.d("FOLDER_CREATION", "Folder: with name $name and color $color was created")
 
             //communicating to viewmodel
@@ -123,13 +124,13 @@ class AddFolder : Fragment() {
                 position: Int,
                 id: Long
             ) {
-                colorSelected = colors[position].first
+                colorSelected = colors[position]
                 //communicating to viewmodel
-                addFolderViewModel.updateFolderColor(colorSelected)
+                addFolderViewModel.updateFolderColor(colorSelected.third)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                colorSelected = colors[0].first
+                colorSelected = colors[0]
             }
         }
     }
