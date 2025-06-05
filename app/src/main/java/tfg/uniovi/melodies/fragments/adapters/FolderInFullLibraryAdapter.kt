@@ -16,7 +16,7 @@ class FolderInFullLibraryAdapter : RecyclerView.Adapter<FolderInFullLibraryViewH
     private val folderList : MutableList<Folder>
     private val navigateFunction: (SheetVisualizationDto) -> Unit
     private val viewModel : FullLibraryViewModel
-    private val libraryViewModelProviderFactory : (String) -> ViewModelProvider
+    private val libraryViewModelProviderFactory : (String) -> LibraryViewModel
     private val viewPool = RecyclerView.RecycledViewPool()
     private val lifecycleOwner : LifecycleOwner
 
@@ -25,7 +25,8 @@ class FolderInFullLibraryAdapter : RecyclerView.Adapter<FolderInFullLibraryViewH
         navigateFunction: (SheetVisualizationDto) -> Unit,
         viewModel: FullLibraryViewModel,
         lifecycleOwner: LifecycleOwner,
-        libraryViewModelProviderFactory: (String) -> ViewModelProvider){
+        libraryViewModelProviderFactory: (String) -> LibraryViewModel
+    ){
         this.folderList = folderList.toMutableList()
         this.navigateFunction = navigateFunction
         this.viewModel = viewModel
@@ -59,7 +60,9 @@ class FolderInFullLibraryAdapter : RecyclerView.Adapter<FolderInFullLibraryViewH
 
     override fun onBindViewHolder(viewHolder: FolderInFullLibraryViewHolder, position: Int) {
         val folder = folderList[position]
-        val libraryViewModel = libraryViewModelProviderFactory(folder.folderId).get(LibraryViewModel::class.java)
+        //val libraryViewModel = libraryViewModelProviderFactory(folder.folderId)[LibraryViewModel::class.java]
+        //val libraryViewModel = libraryViewModelProviderFactory(folder.folderId).getVm()
+        val libraryViewModel = libraryViewModelProviderFactory(folder.folderId)
         viewHolder.bind(folder, libraryViewModel)
         viewHolder.recyclerSongsPerFolder.setRecycledViewPool(viewPool)
     }

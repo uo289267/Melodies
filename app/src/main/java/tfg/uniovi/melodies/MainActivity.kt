@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.MIC_REQ_CODE
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.startListening
@@ -36,6 +37,14 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = findNavController(R.id.fragmentContainerView)
         bottomNavView.setupWithNavController(navHostFragment)
 
+        val userId = PreferenceManager.getUserId(this)
+        if (userId != null) {
+            // ya hay usuario guardado, navegar a pantalla principal
+            navHostFragment.navigate(R.id.home_fragment)
+        } else {
+            // mostrar pantalla de login
+            navHostFragment.navigate(R.id.logIn)
+        }
         //requestMicPermission()
 /*
         var prev = PitchDetector.getLastDetectedNote()

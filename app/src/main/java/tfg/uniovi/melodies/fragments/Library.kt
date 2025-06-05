@@ -28,8 +28,8 @@ import tfg.uniovi.melodies.fragments.adapters.touchHelpers.MyItemTouchHelper
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModelProviderFactory
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
+import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.utils.RecyclerViewItemDecoration
-import java.util.UUID
 
 /**
  * A simple [Fragment] subclass.
@@ -57,8 +57,8 @@ class Library : Fragment() {
         binding = FragmentLibraryBinding.inflate(inflater, container, false)
         val sheetList = emptyList<MusicXMLSheet>()
         libraryViewModel = ViewModelProvider(this, LibraryViewModelProviderFactory(
-            UUID.fromString("a5ba172c-39d8-4181-9b79-76b8f23b5d18"), args.folderId
-        )).get(LibraryViewModel::class.java)
+            PreferenceManager.getUserId(requireContext())!!, args.folderId
+        ))[LibraryViewModel::class.java]
 
         adapter = SheetInFolderAdapter(sheetList,navigationFunction,libraryViewModel )
         val itemTouchHelper = ItemTouchHelper(

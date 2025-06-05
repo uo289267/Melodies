@@ -26,11 +26,11 @@ import tfg.uniovi.melodies.databinding.FragmentSheetVisualizationBinding
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModelFactory
+import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.MIC_REQ_CODE
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.stopListening
 import tfg.uniovi.melodies.utils.ShowAlertDialog
 import tfg.uniovi.melodies.utils.parser.SVGParserException
-import java.util.UUID
 
 private const val VEROVIO_HTML = "file:///android_asset/verovio.html"
 
@@ -68,8 +68,8 @@ class SheetVisualization : Fragment() {
         binding = FragmentSheetVisualizationBinding.inflate(inflater, container, false)
 
         sheetVisualizationViewModel = ViewModelProvider(this, SheetVisualizationViewModelFactory(
-            UUID.fromString("a5ba172c-39d8-4181-9b79-76b8f23b5d18")
-        )).get(SheetVisualizationViewModel::class.java)
+            PreferenceManager.getUserId(requireContext())!!
+        ))[SheetVisualizationViewModel::class.java]
 
 
         setupWebView()

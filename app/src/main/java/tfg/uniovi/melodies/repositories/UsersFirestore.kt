@@ -1,199 +1,107 @@
 package tfg.uniovi.melodies.repositories
 
+import android.content.Context
 import android.util.Log
 import com.google.firebase.Firebase
-import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
-import tfg.uniovi.melodies.entities.Colors
-import tfg.uniovi.melodies.entities.Folder
-import tfg.uniovi.melodies.entities.MusicXMLSheet
-import tfg.uniovi.melodies.fragments.viewmodels.FolderDTO
-import tfg.uniovi.melodies.fragments.viewmodels.MusicXMLDTO
-import java.util.UUID
+import tfg.uniovi.melodies.preferences.PreferenceManager
+import tfg.uniovi.melodies.utils.parser.String2MusicXML
+import tfg.uniovi.melodies.utils.parser.XMLParser
+import java.io.IOException
 
-class UsersFirestore (val userUUID: UUID){
+class UsersFirestore {
     private val db = Firebase.firestore
-    private val usersCollection = db.collection("users")
 
-
-    suspend fun getFolderById(folderId: String): Folder? {
+    suspend fun userExists(userId: String): Boolean {
         return try {
-            val document = usersCollection.document(userUUID.toString())
-                            .collection("folders")
-                            .document(folderId).get().await()
-            if (document.exists()) {
-                doc2folder(document)
-            } else {
-                null
-            }
+            val snapshot = db.collection("users").document(userId).get().await()
+            snapshot.exists()
         } catch (e: Exception) {
-            println("Error getting song: $e")
+            Log.e("UserRepository", "Error checking user existence", e)
+            false
+        }
+    }
+    suspend fun setupUserDataIfNeeded(context: Context): String? {
+        val storedUserId = PreferenceManager.getUserId(context)
+        if (storedUserId != null) {
+            Log.d("UserRepository", "Usuario ya existente con ID $storedUserId")
+            return null // Ya hay usuario creado
+        }
+
+        return try {
+            val userRef = db.collection("users").document() // ID automático
+            val userId = userRef.id
+            // Crear documento de usuario (con algún dato, o vacío si no tienes más info)
+            val userData = mapOf("createdAt" to FieldValue.serverTimestamp())
+            userRef.set(userData).await()
+            // Crear carpeta "Basic Sheets"
+            val folderRef = userRef.collection("folders").document()
+            val folderData = mapOf(
+                "name" to "Basic Sheets",
+                "color" to "YELLOW",
+                "creationTime" to FieldValue.serverTimestamp()
+            )
+            folderRef.set(folderData).await()
+
+            // Obtener partituras por defecto
+            val result = db.collection("defaultSheets").get().await()
+            for (sheetDoc in result) {
+                val sheetData = sheetDoc.data
+                folderRef.collection("sheets").add(sheetData).await()
+            }
+
+            PreferenceManager.saveUserId(context, userId)
+            Log.d("UserRepository", "Partituras copiadas para usuario $userId")
+            userId
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error al configurar el usuario", e)
             null
         }
     }
 
-    suspend fun getSheetById(sheetId: String, folderId: String): MusicXMLSheet?{
-        return try{
-            val document = usersCollection.document(userUUID.toString())
-                            .collection("folders")
-                            .document(folderId)
-                            .collection("sheets")
-                            .document(sheetId).get().await()
-            if (document.exists()){
-                doc2sheet(document, folderId)
-            }else{
-                null
-            }
-        } catch (e: Exception) {
-            println("Error getting song: $e")
-            null
-        }
-    }
+    /*
+        suspend fun setupUserDataIfNeeded(context: Context) {
 
-    suspend fun getAllFolders(): List<Folder> {
-        return try {
-            val result = usersCollection.document(userUUID.toString())
-                .collection("folders").orderBy("creationTime",
-                                                            Query.Direction.ASCENDING)
-                                                            .get().await()
-            result.documents.mapNotNull { doc ->
-                doc?.let { doc2folder(it) }
-            }
-        } catch (e: Exception) {
-            Log.e("FIRESTORE", "Error getting folders", e)
-            emptyList()
-        }
-    }
-
-
-    suspend fun addFolder(dto : FolderDTO) : String?{
-        val data = hashMapOf(
-            "name" to dto.name,
-            "creationTime" to Timestamp.now(),
-            "color" to dto.color.name)
-        return try {
-            val documentReference = usersCollection.document(userUUID.toString())
-                .collection("folders").add(data).await()
-            documentReference.id // Return the new document ID
-        } catch (e: Exception) {
-            // Handle error
-            println("Error adding song: $e")
-            null
-        }
-    }
-
-    suspend fun addMusicXMLSheet(dto : MusicXMLDTO) : String?{
-        val data = hashMapOf(
-            "author" to dto.author,
-            "musicxml" to dto.stringSheet,
-            "name" to dto.name)
-        return try {
-            val documentReference = usersCollection.document(userUUID.toString())
-                .collection("folders")
-                .document(dto.folderId)
-                .collection("sheets") // Asegúrate de que la colección de partituras se llama así
-                .add(data)
-                .await()
-
-            documentReference.id // Devuelve el ID del nuevo documento
-        } catch (e: Exception) {
-            // Handle error
-            println("Error adding song: $e")
-            null
-        }
-    }
-
-    // Coroutine-based function to delete a song
-    suspend fun deleteFolder(folderId: String) {
-        try {
-            usersCollection.document(userUUID.toString())
-                .collection("folders").document(folderId).delete().await()
-        } catch (e: Exception) {
-            // Handle error
-            println("Error deleting song: $e")
-        }
-    }
-    suspend fun deleteSheet(sheetId: String, folderId: String) {
-        try {
-            usersCollection.document(userUUID.toString())
-                .collection("folders")
-                .document(folderId)
-                .collection("sheets")
-                .document(sheetId)
-                .delete()
-                .await()
-        } catch (e: Exception) {
-            // Handle error
-            println("Error deleting song: $e")
-        }
-    }
-
-
-    suspend fun getAllSheetsFromFolder(folderId: String): List<MusicXMLSheet> {
-        return try {
-            val result = usersCollection.document(userUUID.toString())
-                .collection("folders")
-                .document(folderId) // Filter with folderId
-                .collection("sheets")
-                .get()
-                .await()
-            Log.d("FIRESTORE", folderId)
-
-            result.documents.mapNotNull { doc ->
-                doc?.let { doc2sheet(it, folderId) }
+            /*val storedUserId = PreferenceManager.getUserId(context)
+            if (storedUserId != null) {
+                Log.d("UserRepository", "Usuario ya existente con ID $storedUserId")
+                return  // Ya hay usuario creado, no repetir
             }
 
-        } catch (e: Exception) {
-            // Handle error
-            println("Error getting all songs: $e")
-            emptyList()
-        }
-    }
+            val userRef = db.collection("users").document() // ID automático
+            val userId = userRef.id
 
-    private fun docToMusicXMLSheet(data: Map<String, Any>, folderId: String): MusicXMLSheet {
-        return MusicXMLSheet(
-            data["name"].toString(),
-            data["musicxml"].toString(),
-            data["author"].toString(),
-            data["id"].toString(),
-            folderId
-        )
-    }
-
-    private suspend fun getAllSheets(querySnapshot: QuerySnapshot,folderId: String ): List<MusicXMLSheet> {
-        val allSheets = mutableListOf<MusicXMLSheet>()
-
-        for (document in querySnapshot.documents) {
-            val sheetsSnapshot = document.reference.collection("sheets").get().await()
-            val sheets = sheetsSnapshot.documents.mapNotNull { sheetDoc ->
-                sheetDoc.data?.let { docToMusicXMLSheet(it, folderId) } // revisar doctomusicxml antes
-            }
-            allSheets.addAll(sheets)
-        }
-
-        return allSheets
-    }
-
-    private fun doc2folder(doc:  DocumentSnapshot): Folder {
-        return Folder(doc.data!!["name"].toString(),
-            Colors.valueOf(doc.data!!["color"].toString().uppercase()),
-            doc.data!!["creationTime"] as Timestamp,
-            doc.id)
-    }
-
-    private fun doc2sheet(doc:  DocumentSnapshot, folderId: String): MusicXMLSheet {
-        return MusicXMLSheet(
-            doc.data!!["name"].toString(),
-            doc.data!!["musicxml"].toString(),
-            doc.data!!["author"].toString(),
-            doc.id,
-            folderId
-        )
-    }
-
+            // Crear documento de usuario
+           // userRef.set(mapOf("createdAt" to FieldValue.serverTimestamp()))
+            //    .addOnSuccessListener {
+                    // Crear carpeta "Basic Sheets"
+                    val folderRef = userRef.collection("folders").document()
+                    val folderData = mapOf(
+                        "name" to "Basic Sheets",
+                        "color" to "YELLOW",
+                        "creationTime" to FieldValue.serverTimestamp()
+                    )
+                    folderRef.set(folderData).addOnSuccessListener {
+                        // Cargar partituras desde Firestore
+                        db.collection("defaultSheets").get()
+                            .addOnSuccessListener { result ->
+                                for (sheetDoc in result) {
+                                    val sheetData = sheetDoc.data
+                                    folderRef.collection("sheets").add(sheetData)
+                                }
+                                Log.d("UserRepository", "Partituras copiadas para usuario $userId")
+                                PreferenceManager.saveUserId(context, userId)
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("UserRepository", "Error cargando partituras por defecto", e)
+                            }
+                    }
+                /*}
+                .addOnFailureListener { e ->
+                    Log.e("UserRepository", "Error creando usuario", e)
+                }*/*/
+        }*/
 
 }

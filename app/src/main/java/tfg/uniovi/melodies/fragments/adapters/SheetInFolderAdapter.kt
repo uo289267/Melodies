@@ -26,12 +26,21 @@ class SheetInFolderAdapter : RecyclerView.Adapter<SheetInFolderViewHolder> {
     }
 
     fun updateSheets(newSheets: List<MusicXMLSheet>){
+        val oldSize = sheetList.size
+        sheetList.clear()
+        sheetList.addAll(newSheets)
+        //items beyond the newsize need to be removed when the oldsize is greater than the newsize
+        if(oldSize > sheetList.size)
+            notifyItemRangeRemoved(sheetList.size, oldSize - sheetList.size)
+        //all items need to be updated
+        notifyItemRangeChanged(0, sheetList.size)
+        /*
         val diffCallback = SheetDiffCallback(sheetList, newSheets)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
 
         sheetList.clear()
         sheetList.addAll(newSheets)
-        diffResult.dispatchUpdatesTo(this)
+        diffResult.dispatchUpdatesTo(this)*/
 
     }
 

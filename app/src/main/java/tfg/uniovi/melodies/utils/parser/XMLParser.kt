@@ -1,8 +1,11 @@
 package tfg.uniovi.melodies.utils.parser
 
+import android.content.Context
+import androidx.core.content.ContextCompat.getString
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.NodeList
+import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.notes.Note
 import tfg.uniovi.melodies.entities.notes.ScoreElement
 import tfg.uniovi.melodies.entities.notes.Rest
@@ -147,6 +150,25 @@ class XMLParser() {
 
     fun getTotalNumberOfNotes(): Int {
         return this.notes.size
+    }
+    fun findAuthor(context: Context, xmlDocument: Document) : String{
+        val nodeList = xmlDocument.getElementsByTagName("creator")
+        for (i in 0 until nodeList.length) {
+            val node = nodeList.item(i) as Element
+            if (node.getAttribute("type") == "composer") {
+                return node.textContent
+            }
+        }
+        return getString(context, R.string.anonymous)
+    }
+
+    fun findNameTitle(context: Context, xmlDocument: Document):String{
+        val workNodes = xmlDocument.getElementsByTagName("work-title")
+        if (workNodes.length > 0) {
+            return workNodes.item(0).textContent
+        }
+        return getString(context, R.string.unknown_name)
+
     }
 
 }

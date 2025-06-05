@@ -8,21 +8,21 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.entities.notes.ScoreElement
-import tfg.uniovi.melodies.repositories.UsersFirestore
+import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
 import tfg.uniovi.melodies.utils.parser.XMLParser
 import java.io.Serializable
-import java.util.UUID
 
-class SheetVisualizationViewModelFactory (
-    private val currentUserUUID : UUID):
+class SheetVisualizationViewModelFactory(
+    private val currentUserUUID: String
+):
     ViewModelProvider.Factory{
         override fun <T: ViewModel> create(modelClass: Class<T>): T {
-            val sheetBD = UsersFirestore(currentUserUUID)
+            val sheetBD = FoldersAndSheetsFirestore(currentUserUUID)
             return SheetVisualizationViewModel(sheetBD) as T
         }
     }
 class SheetVisualizationViewModel(
-    private val sheetBD: UsersFirestore
+    private val sheetBD: FoldersAndSheetsFirestore
 ) : ViewModel(){
     private val _musicXML = MutableLiveData<MusicXMLSheet>()
     val musicXMLSheet: LiveData<MusicXMLSheet>

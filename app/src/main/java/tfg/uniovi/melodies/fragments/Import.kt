@@ -13,17 +13,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import org.w3c.dom.Document
-import org.w3c.dom.Element
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentImportBinding
 import tfg.uniovi.melodies.entities.Folder
 import tfg.uniovi.melodies.fragments.adapters.SpinnerFoldersAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.ImportViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.ImportViewModelProviderFactory
+import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.utils.ShowAlertDialog
 import tfg.uniovi.melodies.utils.parser.String2MusicXML
-import java.util.UUID
+import tfg.uniovi.melodies.utils.parser.XMLParser
 
 class Import : Fragment() {
     private lateinit var binding : FragmentImportBinding
@@ -41,7 +40,10 @@ class Import : Fragment() {
                 if (xmlContent != null) {
                     try {
                         val doc = String2MusicXML.string2doc(xmlContent)
-                        importViewModel.addMusicXMLSheet(xmlContent, findNameTitle(doc), findAuthor(doc))
+                        val parser = XMLParser(doc)
+                        importViewModel.addMusicXMLSheet(xmlContent,
+                            parser.findNameTitle(requireContext(),doc),
+                            parser.findAuthor(requireContext(),doc))
                     } catch (e: Exception) {
                         ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(
                             requireContext(),
@@ -84,8 +86,8 @@ class Import : Fragment() {
         }
         binding.spFolder.adapter =  SpinnerFoldersAdapter(requireContext(), mutableListOf())
         importViewModel = ViewModelProvider(this, ImportViewModelProviderFactory(
-            UUID.fromString("a5ba172c-39d8-4181-9b79-76b8f23b5d18")
-        )).get(ImportViewModel::class.java)
+            PreferenceManager.getUserId(requireContext())!!
+        ))[ImportViewModel::class.java]
         importViewModel.folders.observe(viewLifecycleOwner){
             folders ->
             this.folders = folders
@@ -150,24 +152,6 @@ class Import : Fragment() {
         }
     }
 
-    private fun findAuthor(xmlDocument: Document) : String{
-        val nodeList = xmlDocument.getElementsByTagName("creator")
-        for (i in 0 until nodeList.length) {
-            val node = nodeList.item(i) as Element
-            if (node.getAttribute("type") == "composer") {
-                return node.textContent
-            }
-        }
-        return getString(R.string.anonymous)
-    }
 
-    private fun findNameTitle(xmlDocument: Document):String{
-        val workNodes = xmlDocument.getElementsByTagName("work-title")
-        if (workNodes.length > 0) {
-            return workNodes.item(0).textContent
-        }
-        return getString(R.string.unknown_name)
-
-    }
 
 }

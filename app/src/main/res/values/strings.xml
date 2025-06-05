@@ -23,4 +23,16 @@
     <string name="import_successful">MusicXML(s) where imported successfully</string>
     <string name="import_unsuccessful">MusicXML(s) where not imported successfully</string>
     <string name="delete_successful">MusicXML was deleted successfully</string>
+    <string name="welcome_to_melodies">Welcome to Melodies, in order to start please enter your user id if you have downloaded the app before.</string>
+    <string name="user_id">User Id</string>
+    <string name="first_time_using_melodies_msg">If this is your first time using Melodies, please click the following button and enjoy the app.</string>
+    <string name="log_in">Log In</string>
+    <string name="error_user_doesnt_exist">User does not exist</string>
+    <string name="error_folder_name_exists_already">Folder name already exists, pick a different folder name</string>
+    <string name="home">Home</string>
+    <string name="import_">Import</string>
+    <string name="library">Library</string>
+    <string name="profile">Profile</string>
+    <string name="user_id_label">User Id:</string>
+    <string name="log_out">Log out</string>
 </resources>

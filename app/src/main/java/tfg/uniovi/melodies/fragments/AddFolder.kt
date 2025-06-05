@@ -21,6 +21,7 @@ import tfg.uniovi.melodies.fragments.viewmodels.AddFolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.AddFolderViewModelProviderFactory
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModelProviderFactory
+import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.utils.TextWatcherAdapter
 import java.util.UUID
 
@@ -49,7 +50,7 @@ class AddFolder : Fragment() {
 
         //FolderViewModelProvider
         val owner = findNavController().getViewModelStoreOwner(R.id.navigation)
-        val factory = FolderViewModelProviderFactory( UUID.fromString("a5ba172c-39d8-4181-9b79-76b8f23b5d18"))
+        val factory = FolderViewModelProviderFactory(PreferenceManager.getUserId(requireContext())!!)
         foldersViewModel = ViewModelProvider(owner, factory)[FolderViewModel::class.java]
 
 
@@ -71,14 +72,23 @@ class AddFolder : Fragment() {
         binding.folderNameInput.addTextChangedListener(folderNameWatcher)
 
         addFolderViewModel = ViewModelProvider(this, AddFolderViewModelProviderFactory(
-            UUID.fromString("a5ba172c-39d8-4181-9b79-76b8f23b5d18")
-        )
-        ).get(AddFolderViewModel::class.java)
+            PreferenceManager.getUserId(requireContext())!!
+        )).get(AddFolderViewModel::class.java)
 
         addFolderViewModel.folderDTO.observe(viewLifecycleOwner){dto ->
             modifyFolderName(binding.folderNameInput, dto.name)
         }
 
+        addFolderViewModel.folderNameExists.observe(viewLifecycleOwner){
+            exists ->
+            if(!exists){
+                Log.e("CREATE_FOLDER", "Folder was created")
+                addFolderViewModel.createFolder()
+                findNavController().popBackStack()
+            }else{
+                binding.folderNameInput.setError(getString(R.string.error_folder_name_exists_already))
+            }
+        }
         binding.toolbar.setNavigationOnClickListener{
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
@@ -101,17 +111,28 @@ class AddFolder : Fragment() {
             val color = getString(colorSelected.second)
             Log.d("FOLDER_CREATION", "Folder: with name $name and color $color was created")
 
+            val currentFolderName = binding.folderNameInput.text.toString().trim()
+            if(currentFolderName.isNotEmpty()){
+                if(currentFolderName.length > 30)
+                    binding.folderName.setError(getString(R.string.too_long_folder_name))
+                else
+                    addFolderViewModel.checkIfFolderNameExists()
+            }else{
+                binding.folderName.setError(getString(R.string.error_blank_folder_name))
+            }
+            /*
             //communicating to viewmodel
             if(binding.folderNameInput.text.isNullOrEmpty())
                 binding.folderName.setError(getString(R.string.error_blank_folder_name))
-            else if(binding.folderNameInput.text!!.length > 30)
-                binding.folderName.setError(getString(R.string.too_long_folder_name))
             else{
-                addFolderViewModel.createFolder()
-                findNavController().popBackStack()
-            }
-
-
+                addFolderViewModel.checkIfFolderNameExists()
+                if(binding.folderNameInput.text!!.length > 30)
+                    binding.folderName.setError(getString(R.string.too_long_folder_name))
+                else{
+                    addFolderViewModel.createFolder()
+                    findNavController().popBackStack()
+                }
+            }*/
         }
     }
 
