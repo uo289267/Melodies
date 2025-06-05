@@ -20,6 +20,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import org.checkerframework.common.subtyping.qual.Bottom
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentLibraryBinding
 import tfg.uniovi.melodies.entities.MusicXMLSheet
@@ -59,6 +61,7 @@ class Library : Fragment() {
         libraryViewModel = ViewModelProvider(this, LibraryViewModelProviderFactory(
             PreferenceManager.getUserId(requireContext())!!, args.folderId
         ))[LibraryViewModel::class.java]
+
 
         adapter = SheetInFolderAdapter(sheetList,navigationFunction,libraryViewModel )
         val itemTouchHelper = ItemTouchHelper(
