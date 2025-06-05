@@ -60,4 +60,9 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("androidx.webkit:webkit:1.8.0")
+    implementation ("com.caverock:androidsvg:1.4")
+    implementation("io.coil-kt.coil3:coil-compose:3.2.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.2.0")
+
 }

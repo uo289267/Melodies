@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -13,16 +14,23 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import tfg.uniovi.melodies.databinding.ActivityMainBinding
+import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.MIC_REQ_CODE
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.startListening
 
 class MainActivity : AppCompatActivity() {
-
-
+    private lateinit var navController: NavController
+    private lateinit var bottomNavView : BottomNavigationView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -32,49 +40,80 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        val bottomNavView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        val navHostFragment = findNavController(R.id.fragmentContainerView)
-        bottomNavView.setupWithNavController(navHostFragment)
+        bottomNavView = findViewById(R.id.bottomNavigationView)
+        navController = findNavController(R.id.fragmentContainerView)
 
-        //requestMicPermission()
-/*
-        var prev = PitchDetector.getLastDetectedNote()
-        while(true) {
-            if (prev != PitchDetector.getLastDetectedNote()) {
-
-                prev = PitchDetector.getLastDetectedNote()
-                Log.d("MINE", "last Note:${prev}")
-            }
-        }*/
-
-
-        /*
-        val RECORD_AUDIO_PERMISSION_CODE = 101
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                arrayOf(Manifest.permission.RECORD_AUDIO),RECORD_AUDIO_PERMISSION_CODE);
-            //TODO it will not activate the audio after asking the permission
-        }else{
-            PitchDetector.startListening()
+        if (savedInstanceState == null) {
+            checkUserAndNavigate()
         }
-
-        var i = 1000000000
-        var prev = PitchDetector.getLastDetectedNote()
-        while(true){
-            if(prev!=PitchDetector.getLastDetectedNote()){
-
-                prev =  PitchDetector.getLastDetectedNote()
-                Log.d("MINE", "last Note:${prev}")
-            }
-            //tv.text= detector.lastNote
-            i--
-        }
-        PitchDetector.stopListening()*/
-
-
+        setupBottomNavigation()
+        controlBottomNavigationVisibility()
     }
-    // Callback cuando el usuario responde a la solicitud de permisos
+    private fun checkUserAndNavigate() {
+        val userId = PreferenceManager.getUserId(this)
+        if (userId != null) {
+            // User had logged in -> go to home
+            navController.navigate(R.id.home_fragment)
+        } else {
+            // User has not logged in -> go to login
+            navController.navigate(R.id.logIn)
+        }
+    }
 
+    private fun setupBottomNavigation() {
+        bottomNavView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.home_fragment -> {
+                    navController.popBackStack(R.id.home_fragment, false)
+                    if (navController.currentDestination?.id != R.id.home_fragment) {
+                        navController.navigate(R.id.home_fragment)
+                    }
+                    true
+                }
+                R.id.importing -> {
+                    navController.popBackStack(R.id.importing, false)
+                    if (navController.currentDestination?.id != R.id.importing) {
+                        navController.navigate(R.id.importing)
+                    }
+                    true
+                }
+                R.id.fullLibrary -> {
+                    navController.popBackStack(R.id.fullLibrary, false)
+                    if (navController.currentDestination?.id != R.id.fullLibrary) {
+                        navController.navigate(R.id.fullLibrary)
+                    }
+                    true
+                }
+                R.id.profile -> {
+                    navController.popBackStack(R.id.profile, false)
+                    if (navController.currentDestination?.id != R.id.profile) {
+                        navController.navigate(R.id.profile)
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.home_fragment -> bottomNavView.selectedItemId = R.id.home_fragment
+                R.id.importing -> bottomNavView.selectedItemId = R.id.importing
+                R.id.profile -> bottomNavView.selectedItemId = R.id.profile
+            }
+        }
+    }
+
+    private fun controlBottomNavigationVisibility() {
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            bottomNavView.visibility = when (destination.id) {
+                R.id.logIn -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+    }
+
+    // Callback cuando el usuario responde a la solicitud de permisos
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

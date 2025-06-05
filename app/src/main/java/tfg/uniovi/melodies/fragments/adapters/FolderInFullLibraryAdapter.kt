@@ -10,20 +10,23 @@ import tfg.uniovi.melodies.entities.Folder
 import tfg.uniovi.melodies.fragments.adapters.viewHolders.FolderInFullLibraryViewHolder
 import tfg.uniovi.melodies.fragments.viewmodels.FullLibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
+import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 
 class FolderInFullLibraryAdapter : RecyclerView.Adapter<FolderInFullLibraryViewHolder> {
     private val folderList : MutableList<Folder>
-    private val navigateFunction: (String) -> Unit
+    private val navigateFunction: (SheetVisualizationDto) -> Unit
     private val viewModel : FullLibraryViewModel
-    private val libraryViewModelProviderFactory : (String) -> ViewModelProvider
+    private val libraryViewModelProviderFactory : (String) -> LibraryViewModel
     private val viewPool = RecyclerView.RecycledViewPool()
     private val lifecycleOwner : LifecycleOwner
 
-    constructor(folderList: List<Folder>,
-                navigateFunction: (String) -> Unit,
-                viewModel : FullLibraryViewModel,
-                lifecycleOwner: LifecycleOwner,
-                libraryViewModelProviderFactory : (String) -> ViewModelProvider){
+    constructor(
+        folderList: List<Folder>,
+        navigateFunction: (SheetVisualizationDto) -> Unit,
+        viewModel: FullLibraryViewModel,
+        lifecycleOwner: LifecycleOwner,
+        libraryViewModelProviderFactory: (String) -> LibraryViewModel
+    ){
         this.folderList = folderList.toMutableList()
         this.navigateFunction = navigateFunction
         this.viewModel = viewModel
@@ -57,7 +60,9 @@ class FolderInFullLibraryAdapter : RecyclerView.Adapter<FolderInFullLibraryViewH
 
     override fun onBindViewHolder(viewHolder: FolderInFullLibraryViewHolder, position: Int) {
         val folder = folderList[position]
-        val libraryViewModel = libraryViewModelProviderFactory(folder.folderId).get(LibraryViewModel::class.java)
+        //val libraryViewModel = libraryViewModelProviderFactory(folder.folderId)[LibraryViewModel::class.java]
+        //val libraryViewModel = libraryViewModelProviderFactory(folder.folderId).getVm()
+        val libraryViewModel = libraryViewModelProviderFactory(folder.folderId)
         viewHolder.bind(folder, libraryViewModel)
         viewHolder.recyclerSongsPerFolder.setRecycledViewPool(viewPool)
     }

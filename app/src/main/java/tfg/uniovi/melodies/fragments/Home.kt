@@ -13,6 +13,7 @@ import tfg.uniovi.melodies.entities.Folder
 import tfg.uniovi.melodies.fragments.adapters.FolderAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModelProviderFactory
+import tfg.uniovi.melodies.preferences.PreferenceManager
 import java.util.UUID
 
 class Home : Fragment() {
@@ -29,10 +30,10 @@ class Home : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-        //fab
+
         folderViewModel = ViewModelProvider(this, FolderViewModelProviderFactory(
-            UUID.fromString("a5ba172c-39d8-4181-9b79-76b8f23b5d18")
-        )).get(FolderViewModel::class.java)
+            PreferenceManager.getUserId(requireContext())!!
+        ))[FolderViewModel::class.java]
         binding.fabAddNewFolder.setOnClickListener{
             val destination = HomeDirections.actionHomeFragmentToAddFolder()
             findNavController().navigate(destination)
@@ -48,10 +49,6 @@ class Home : Fragment() {
 
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-    }
 
 
 }

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
-    app:startDestination="@id/home_fragment">
+    app:startDestination="@id/logIn">
 
     <fragment
         android:id="@+id/home_fragment"
@@ -20,6 +20,12 @@
         <action
             android:id="@+id/action_home_fragment_to_fullLibrary"
             app:destination="@id/fullLibrary" />
+        <action
+            android:id="@+id/action_home_fragment_to_import1"
+            app:destination="@id/importing" />
+        <action
+            android:id="@+id/action_home_fragment_to_account"
+            app:destination="@id/profile" />
     </fragment>
     <fragment
         android:id="@+id/library"
@@ -42,8 +48,8 @@
         android:label="fragment_sheet_visualization"
         tools:layout="@layout/fragment_sheet_visualization" >
         <argument
-            android:name="SheetId"
-            app:argType="string" />
+            android:name="SheetIdNFolderId"
+            app:argType="tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto" />
     </fragment>
     <fragment
         android:id="@+id/fullLibrary"
@@ -53,5 +59,32 @@
         <action
             android:id="@+id/action_fullLibrary_to_sheetVisualization"
             app:destination="@id/sheetVisualization" />
+    </fragment>
+    <fragment
+        android:id="@+id/importing"
+        android:name="tfg.uniovi.melodies.fragments.Import"
+        android:label="fragment_import"
+        tools:layout="@layout/fragment_import" >
+        <action
+            android:id="@+id/action_importing_to_home_fragment"
+            app:destination="@id/home_fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/logIn"
+        android:name="tfg.uniovi.melodies.fragments.LogIn"
+        android:label="fragment_log_in"
+        tools:layout="@layout/fragment_log_in" >
+        <action
+            android:id="@+id/action_logIn_to_home_fragment"
+            app:destination="@id/home_fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/profile"
+        android:name="tfg.uniovi.melodies.fragments.Profile"
+        android:label="fragment_account"
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profile_to_logIn"
+            app:destination="@id/logIn" />
     </fragment>
 </navigation>

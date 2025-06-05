@@ -15,11 +15,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentAddFolderBinding
-import tfg.uniovi.melodies.fragments.adapters.SpinnerAdapter
+import tfg.uniovi.melodies.entities.Colors
+import tfg.uniovi.melodies.fragments.adapters.SpinnerFoldersColorsAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.AddFolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.AddFolderViewModelProviderFactory
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModelProviderFactory
+import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.utils.TextWatcherAdapter
 import java.util.UUID
 
@@ -37,18 +39,18 @@ class AddFolder : Fragment() {
         }
     }
     private val colors = listOf(
-        Pair(R.drawable.folder,R.string.yellow),
-        Pair(R.drawable.folder_pink,R.string.pink),
-        Pair(R.drawable.folder_blue, R.string.blue)
+        Triple(R.drawable.folder_yellow,R.string.yellow, Colors.YELLOW),
+        Triple(R.drawable.folder_pink,R.string.pink, Colors.PINK),
+        Triple(R.drawable.folder_blue, R.string.blue, Colors.BLUE)
     )
-    private var colorSelected: Int = colors[0].first
+    private var colorSelected: Triple<Int,Int,Colors> = colors[0]
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         //FolderViewModelProvider
         val owner = findNavController().getViewModelStoreOwner(R.id.navigation)
-        val factory = FolderViewModelProviderFactory( UUID.fromString("a5ba172c-39d8-4181-9b79-76b8f23b5d18"))
+        val factory = FolderViewModelProviderFactory(PreferenceManager.getUserId(requireContext())!!)
         foldersViewModel = ViewModelProvider(owner, factory)[FolderViewModel::class.java]
 
 
@@ -70,12 +72,25 @@ class AddFolder : Fragment() {
         binding.folderNameInput.addTextChangedListener(folderNameWatcher)
 
         addFolderViewModel = ViewModelProvider(this, AddFolderViewModelProviderFactory(
-            UUID.fromString("a5ba172c-39d8-4181-9b79-76b8f23b5d18")
-        )
-        ).get(AddFolderViewModel::class.java)
+            PreferenceManager.getUserId(requireContext())!!
+        )).get(AddFolderViewModel::class.java)
 
         addFolderViewModel.folderDTO.observe(viewLifecycleOwner){dto ->
             modifyFolderName(binding.folderNameInput, dto.name)
+        }
+
+        addFolderViewModel.folderNameExists.observe(viewLifecycleOwner){
+            exists ->
+            if(!exists){
+                Log.e("CREATE_FOLDER", "Folder was created")
+                addFolderViewModel.createFolder()
+                findNavController().popBackStack()
+            }else{
+                binding.folderNameInput.setError(getString(R.string.error_folder_name_exists_already))
+            }
+        }
+        binding.toolbar.setNavigationOnClickListener{
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
         return binding.root
     }
@@ -93,25 +108,36 @@ class AddFolder : Fragment() {
         binding.btnCreateFolder.setOnClickListener{
             //call to addFolder
             val name = binding.folderNameInput.text
-            val color = colorSelected
+            val color = getString(colorSelected.second)
             Log.d("FOLDER_CREATION", "Folder: with name $name and color $color was created")
 
+            val currentFolderName = binding.folderNameInput.text.toString().trim()
+            if(currentFolderName.isNotEmpty()){
+                if(currentFolderName.length > 30)
+                    binding.folderName.setError(getString(R.string.too_long_folder_name))
+                else
+                    addFolderViewModel.checkIfFolderNameExists()
+            }else{
+                binding.folderName.setError(getString(R.string.error_blank_folder_name))
+            }
+            /*
             //communicating to viewmodel
             if(binding.folderNameInput.text.isNullOrEmpty())
                 binding.folderName.setError(getString(R.string.error_blank_folder_name))
-            else if(binding.folderNameInput.text!!.length > 30)
-                binding.folderName.setError(getString(R.string.too_long_folder_name))
             else{
-                addFolderViewModel.createFolder()
-                findNavController().popBackStack()
-            }
-
-
+                addFolderViewModel.checkIfFolderNameExists()
+                if(binding.folderNameInput.text!!.length > 30)
+                    binding.folderName.setError(getString(R.string.too_long_folder_name))
+                else{
+                    addFolderViewModel.createFolder()
+                    findNavController().popBackStack()
+                }
+            }*/
         }
     }
 
     private fun configureSpinner(spFolderColors: Spinner){
-        spFolderColors.adapter = SpinnerAdapter(requireContext(),colors);
+        spFolderColors.adapter = SpinnerFoldersColorsAdapter(requireContext(),colors)
         spFolderColors.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,
@@ -119,13 +145,13 @@ class AddFolder : Fragment() {
                 position: Int,
                 id: Long
             ) {
-                colorSelected = colors[position].first
+                colorSelected = colors[position]
                 //communicating to viewmodel
-                addFolderViewModel.updateFolderColor(colorSelected)
+                addFolderViewModel.updateFolderColor(colorSelected.third)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                colorSelected = colors[0].first
+                colorSelected = colors[0]
             }
         }
     }

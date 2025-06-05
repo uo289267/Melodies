@@ -1,20 +1,25 @@
 package tfg.uniovi.melodies.fragments.adapters.viewHolders
 
-import android.content.Context
+import android.util.Log
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
+import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.Folder
 import tfg.uniovi.melodies.fragments.adapters.SheetInFolderAdapter
+import tfg.uniovi.melodies.fragments.adapters.touchHelpers.MyItemTouchHelper
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
+import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 import tfg.uniovi.melodies.utils.RecyclerViewItemDecoration
 
-class FolderInFullLibraryViewHolder (
+class FolderInFullLibraryViewHolder(
     private val view: View,
-    private val navigateFunction: (String)-> Unit,
+    private val navigateFunction: (SheetVisualizationDto) -> Unit,
     private val lifecycleOwner: LifecycleOwner
 ): RecyclerView.ViewHolder (view) {
     private var tvFolderTitle : TextView = view.findViewById(R.id.tv_folder_title)
@@ -31,6 +36,19 @@ class FolderInFullLibraryViewHolder (
         libraryViewModel.sheets.observe(lifecycleOwner) { list ->
             adapter.updateSheets(list)
         }
+        val itemTouchHelper = ItemTouchHelper(
+            MyItemTouchHelper { position, direction ->
+                if (direction == ItemTouchHelper.START) {
+                    adapter.removeItemAt(position)
+                    // notifying vm to remove from db
+                    libraryViewModel.deleteSheetAt(position)
+                    Log.d("DELETE", "One sheet at position $position was deleted")
+                    Toast.makeText(view.context, getString(view.context, R.string.delete_successful), Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        )
+        itemTouchHelper.attachToRecyclerView(recyclerSongsPerFolder)
         libraryViewModel.loadSheets()
 
     }

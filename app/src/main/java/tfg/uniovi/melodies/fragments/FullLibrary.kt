@@ -14,15 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentFullLibraryBinding
 import tfg.uniovi.melodies.entities.Folder
-import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.adapters.FolderInFullLibraryAdapter
-import tfg.uniovi.melodies.fragments.adapters.SheetInFolderAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.FullLibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.FullLibraryViewModelProviderFactory
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModelProviderFactory
-import tfg.uniovi.melodies.utils.RecyclerViewItemDecoration
-import java.util.UUID
+import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
+import tfg.uniovi.melodies.preferences.PreferenceManager
 
 
 class FullLibrary : Fragment() {
@@ -31,16 +29,20 @@ class FullLibrary : Fragment() {
     private val args : LibraryArgs by navArgs()
     private lateinit var adapter: FolderInFullLibraryAdapter
     private var allFolders = listOf<Folder>()
-    private val navigationFunction = {sheetId: String ->
+    private val navigationFunction = {dto: SheetVisualizationDto ->
         run{
-            val destination = FullLibraryDirections.actionFullLibraryToSheetVisualization(sheetId)
+            val destination = FullLibraryDirections.actionFullLibraryToSheetVisualization(dto)
             findNavController().navigate(destination)
         }
     }
-    private val libraryViewModelProviderFactory = {folderId: String ->
-        ViewModelProvider(this, LibraryViewModelProviderFactory(
-            UUID.fromString("a5ba172c-39d8-4181-9b79-76b8f23b5d18"), folderId))
+    private val libraryViewModelProviderFactory = { folderId: String ->
+        val factory = LibraryViewModelProviderFactory(
+            PreferenceManager.getUserId(requireContext())!!,
+            folderId
+        )
+        ViewModelProvider(this, factory).get("LibraryViewModel_$folderId", LibraryViewModel::class.java)
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -48,13 +50,11 @@ class FullLibrary : Fragment() {
         binding = FragmentFullLibraryBinding.inflate(inflater, container, false)
         val folderList = emptyList<Folder>()
         libraryViewModel = ViewModelProvider(this, FullLibraryViewModelProviderFactory(
-            UUID.fromString("a5ba172c-39d8-4181-9b79-76b8f23b5d18")
-        )
-        ).get(FullLibraryViewModel::class.java)
+            PreferenceManager.getUserId(requireContext())!!))[FullLibraryViewModel::class.java]
         adapter = FolderInFullLibraryAdapter(folderList,navigationFunction,libraryViewModel, this, libraryViewModelProviderFactory)
         binding.recyclerViewFullLibrary.adapter = adapter
         binding.recyclerViewFullLibrary.layoutManager = LinearLayoutManager(context)
-        //binding.recyclerViewFullLibrary.addItemDecoration(RecyclerViewItemDecoration(requireContext(), R.drawable.divider))
+
         return binding.root
 
     }
