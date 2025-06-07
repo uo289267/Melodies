@@ -14,11 +14,12 @@ import tfg.uniovi.melodies.fragments.adapters.FolderAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModelProviderFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
-import java.util.UUID
 
 class Home : Fragment() {
-    private lateinit var  binding: FragmentHomeBinding
+    private lateinit var binding: FragmentHomeBinding
     private lateinit var folderViewModel : FolderViewModel
+    private lateinit var adapter : FolderAdapter
+    private var allFolders = listOf<Folder>()
     private val navigationFunction = {folderId: String ->
         run{
             val destination = HomeDirections.actionHomeFragmentToLibrary(folderId)
@@ -41,10 +42,22 @@ class Home : Fragment() {
         val gridLayoutManager = GridLayoutManager(context, 4, GridLayoutManager.VERTICAL, false)
         binding.recyclerView.layoutManager = gridLayoutManager
 
-        val folderList = emptyList<Folder>()
+        folderViewModel.folders.observe(viewLifecycleOwner){
+                list ->
+            allFolders = list
+            adapter.updateFolders(list)
+            if(allFolders.isNotEmpty()){
+                binding.tvNoFolders.visibility = View.GONE
+                binding.recyclerView.visibility = View.VISIBLE
+            }else{
+                binding.tvNoFolders.visibility = View.VISIBLE
+                binding.recyclerView.visibility =View.GONE
+            }
+        }
+        folderViewModel.loadFolders()
         // Adapter
-        binding.recyclerView.adapter = FolderAdapter(folderList, navigationFunction, folderViewModel ,viewLifecycleOwner)
-
+        adapter = FolderAdapter(allFolders, navigationFunction, folderViewModel)
+        binding.recyclerView.adapter = adapter
         return binding.root
 
     }

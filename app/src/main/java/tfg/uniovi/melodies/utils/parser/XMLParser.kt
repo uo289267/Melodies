@@ -7,7 +7,7 @@ import org.w3c.dom.Element
 import org.w3c.dom.NodeList
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.notes.Note
-import tfg.uniovi.melodies.entities.notes.ScoreElement
+import tfg.uniovi.melodies.entities.notes.interfaces.ScoreElement
 import tfg.uniovi.melodies.entities.notes.Rest
 
 class XMLParser() {
@@ -65,7 +65,7 @@ class XMLParser() {
                             sharp = true
                     }
 
-                    val note = Note(noteCount++, durationMs.toLong(), name, sharp, octave)
+                    val note = Note(noteCount++, durationMs.toLong(), name, octave,sharp)
 
                     for (rest in pendingRests) {
                         rest.setFollowingNote(note)
@@ -162,7 +162,7 @@ class XMLParser() {
         return getString(context, R.string.anonymous)
     }
 
-    fun findNameTitle(context: Context, xmlDocument: Document):String{
+    fun findNameTitle(context: Context, xmlDocument: Document) : String{
         val workNodes = xmlDocument.getElementsByTagName("work-title")
         if (workNodes.length > 0) {
             return workNodes.item(0).textContent

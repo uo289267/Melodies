@@ -24,11 +24,8 @@
             android:id="@+id/ivProfileAvatar"
             android:layout_height="80dp"
             android:layout_width="match_parent"
-            android:background="@color/material_dynamic_neutral80"
             android:contentDescription="avatar"
-            android:src="@drawable/account"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true">
+            android:src="@drawable/account">
         </ImageView>
     </androidx.cardview.widget.CardView>
 
@@ -48,6 +45,7 @@
             android:layout_marginStart="35dp"
             android:layout_marginTop="45dp"
             android:text="@string/user_id_label"
+            android:maxWidth="80dp"
             android:textSize="20sp"
             android:textStyle="bold" />
 

@@ -1,32 +1,26 @@
 package tfg.uniovi.melodies.entities.notes
 
-class Note(id: Int, duration: Long,
-        private val name : Char,
-        private val sharp: Boolean,
-        private val octave : Int)
-    : ScoreElementAbstract(id, duration)
-{
-    /**
-     * Returns true if the noteToCheck and this note are the same
-     *
-     * @param noteToCheck note that needs to be checked with this note
-      */
+import tfg.uniovi.melodies.entities.notes.abstractClasses.ScoreElementAbstract
+import tfg.uniovi.melodies.entities.notes.interfaces.NoteComparable
+
+class Note(
+    id: Int,
+    duration: Long,
+    private val _name: Char,
+    private val _octave: Int,
+    private val _sharp: Boolean
+) : ScoreElementAbstract(id, duration), NoteComparable {
+
+    override val name: Char
+        get() = _name
+
+    override val octave: Int
+        get() = _octave
+
+    override val sharp: Boolean
+        get() = _sharp
+
     override fun check(noteToCheck: NoteDominant): Boolean {
-        return noteToCheck.getName().compareTo(this.name) == 0
+        return (noteToCheck.name == this.name) && (noteToCheck.octave == 6)
     }
-
-    fun getName(): Char{
-        return this.name
-    }
-
-    fun getSharp(): Boolean{
-        return this.sharp
-    }
-
-    fun getOctave(): Int{
-        return this.octave
-    }
-
-
-
 }

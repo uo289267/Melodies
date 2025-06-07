@@ -1,5 +1,8 @@
 package tfg.uniovi.melodies.entities.notes
 
+
+import tfg.uniovi.melodies.entities.notes.abstractClasses.ScoreElementAbstract
+
 class Rest(id: Int, duration: Long)
     : ScoreElementAbstract(id, duration) {
     private var followingNote : Note? = null //could be null if rest is the last note
@@ -14,7 +17,7 @@ class Rest(id: Int, duration: Long)
         if(this.followingNote == null)
             return true
         else
-            return this.followingNote!!.getName()!=noteToCheck.getName()
+            return this.followingNote!!.name!=noteToCheck.name
     }
 
     /**
@@ -24,5 +27,9 @@ class Rest(id: Int, duration: Long)
      */
     fun setFollowingNote(followingNote : Note){
         this.followingNote = followingNote
+    }
+
+    override fun toString(): String {
+        return "Rest(${getDuration()} ms)"
     }
 }

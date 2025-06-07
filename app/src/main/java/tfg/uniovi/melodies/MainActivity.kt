@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNavigation() {
+        //bottomNavView.setupWithNavController(navController)
         bottomNavView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.home_fragment -> {

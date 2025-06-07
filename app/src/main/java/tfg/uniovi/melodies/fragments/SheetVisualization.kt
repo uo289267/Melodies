@@ -18,6 +18,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.navArgs
 import com.caverock.androidsvg.SVG
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -28,7 +29,9 @@ import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModelFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.MIC_REQ_CODE
+import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.startListening
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.stopListening
+import tfg.uniovi.melodies.tools.pitchdetector.SheetChecker
 import tfg.uniovi.melodies.utils.ShowAlertDialog
 import tfg.uniovi.melodies.utils.parser.SVGParserException
 
@@ -42,6 +45,7 @@ class SheetVisualization : Fragment() {
     private lateinit var musicXMLSheet: MusicXMLSheet
     private var currentPage = 1
     private var totalPages = 1
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,6 +109,7 @@ class SheetVisualization : Fragment() {
                 binding.toolbar.title = it.name
                 try{
                     sheetVisualizationViewModel.parseMusicXML()
+                    //sheetVisualizationViewModel.startNoteChecking()
                 }catch (e : SVGParserException){
                     ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(requireContext(),
                         "Invalid MusicXML",
@@ -117,19 +122,64 @@ class SheetVisualization : Fragment() {
 
             }
         }
-        sheetVisualizationViewModel.svg.observe(viewLifecycleOwner){ svg ->
-            renderCurrentPage() //TODO is this oke
-
+        /*
+        sheetVisualizationViewModel.parsingFinished.observe(viewLifecycleOwner) { finished ->
+            if (finished) {
+                sheetVisualizationViewModel.startNoteChecking()
+            }
+        }*/
+        /*sheetVisualizationViewModel.parsingFinished.observe(viewLifecycleOwner) { finished ->
+            if (finished) {
+                if (sheetVisualizationViewModel.svg.value != null) {
+                    sheetVisualizationViewModel.startNoteChecking()
+                } else {
+                    sheetVisualizationViewModel.svg.observe(viewLifecycleOwner) { svg ->
+                        if (svg != null) {
+                            sheetVisualizationViewModel.startNoteChecking()
+                        }
+                    }
+                }
+            }
         }
 
-        sheetVisualizationViewModel.correctlyPlayedNotesCounter.observe(viewLifecycleOwner){ newCorrect ->
-            //highlightNoteByIndex(,newCorrect,"green") svg as attribute?
-
+        sheetVisualizationViewModel.noteCheckingState.observe(viewLifecycleOwner) { state ->
+            Log.d("CHECKER", "Changed to state $state")
         }
+        sheetVisualizationViewModel.svg.observe(viewLifecycleOwner) { svg ->
+            try {
+                binding.sheetImageView.setSVG(SVG.getFromString(svg))
+            } catch (e: Exception) {
+                Log.e("SVG_OBSERVER", "Failed to load SVG", e)
+            }
+        }*/
+        sheetVisualizationViewModel.svg.observe(viewLifecycleOwner) { svg ->
+            try {
+                binding.sheetImageView.setSVG(SVG.getFromString(svg))
+                binding.sheetImageView.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
+            } catch (e: Exception) {
+                Log.e("SVG_OBSERVER", "Failed to load SVG", e)
+            }
+
+            // Si ya se ha terminado el parsing, lanzamos el chequeo de notas
+            if (sheetVisualizationViewModel.parsingFinished.value == true) {
+                sheetVisualizationViewModel.startNoteChecking()
+            }
+        }
+
+        // Estado del parseo: si svg ya está cargado, arrancamos chequeo
+        sheetVisualizationViewModel.parsingFinished.observe(viewLifecycleOwner) { finished ->
+            if (finished && sheetVisualizationViewModel.svg.value != null) {
+                sheetVisualizationViewModel.startNoteChecking()
+            }
+        }
+
+        // Solo para debug u otros usos
+        sheetVisualizationViewModel.noteCheckingState.observe(viewLifecycleOwner) { state ->
+            Log.d("CHECKER", "Changed to state $state")
+        }
+
     }
-
-
-
 
     /**
      * Changes the visibility of the Bottom Navigation
@@ -176,33 +226,7 @@ class SheetVisualization : Fragment() {
 
     }
 
-    /**
-     * Loads MUSICXML and gives it to VEROVIO
-     */
 
-    private fun highlightNoteByIndex(svg: String, index: Int, color: String): String {
-        // Find the notes
-        val regex = Regex("""<g[^>]*class="[^"]*note[^"]*"[^>]*>.*?</g>""", RegexOption.DOT_MATCHES_ALL)
-        val matches = regex.findAll(svg).toList()
-
-        if (index >= matches.size) {
-            Log.d("SheetVisualizer","Índice fuera de rango: ${matches.size} notas encontradas")
-            return svg
-        }
-
-        val targetGroup = matches[index].value
-
-        // Añade o reemplaza fill="color" en los elementos internos
-        val modifiedGroup = targetGroup.replace(
-            Regex("""(fill="[^"]*")"""),
-            """fill="$color""""
-        ).ifEmpty {
-            // Si no tiene atributo fill, lo añadimos a cada elemento gráfico
-            targetGroup.replace("<path", """<path fill="$color"""")
-        }
-
-        return svg.replace(targetGroup, modifiedGroup)
-    }
 
     /**
      * Renders current page and shows its SVG in the ImageView
@@ -211,11 +235,18 @@ class SheetVisualization : Fragment() {
         binding.webView.evaluateJavascript("renderPageToDom($currentPage);") { rawSvg ->
             val svgClean = cleanSvg(rawSvg)
             binding.sheetImageView.setSVG(SVG.getFromString(svgClean)) // TODO DA NULL AL GIRAR
+            // Solo actualiza si el SVG ha cambiado
+            if (sheetVisualizationViewModel.svg.value != svgClean) {
+                sheetVisualizationViewModel.updateSVGValue(svgClean)
+            }
+
+            try {
+                binding.sheetImageView.setSVG(SVG.getFromString(svgClean))
+            } catch (e: Exception) {
+                Log.e("SVG_RENDER", "Failed to render SVG", e)
+            }
         }
-    }
-    private fun countNotesInSvg(svg: String): Int {
-        val regex = Regex("""<g[^>]*class="[^"]*note[^"]*"[^>]*>.*?</g>""")
-        return regex.findAll(svg).count()
+
     }
 
     private fun cleanSvg(svgRaw: String): String {
@@ -253,7 +284,8 @@ class SheetVisualization : Fragment() {
     private fun requestMicPermission() {
         if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
             //Pitch detector start listening and processing audio
-            //TODO startListening(lifecycle.coroutineScope)
+            //TODO
+        startListening(lifecycle.coroutineScope)
         }
         else {
             ActivityCompat.requestPermissions(

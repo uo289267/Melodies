@@ -20,8 +20,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import org.checkerframework.common.subtyping.qual.Bottom
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentLibraryBinding
 import tfg.uniovi.melodies.entities.MusicXMLSheet
@@ -63,7 +61,11 @@ class Library : Fragment() {
         ))[LibraryViewModel::class.java]
 
 
-        adapter = SheetInFolderAdapter(sheetList,navigationFunction,libraryViewModel )
+        val onLongClickRename = {sheetIdNFolderId : SheetVisualizationDto, newName : String ->
+            libraryViewModel.renameSheet(sheetIdNFolderId.sheetId, sheetIdNFolderId.folderId, newName)
+            libraryViewModel.loadSheets()
+        }
+        adapter = SheetInFolderAdapter(sheetList,navigationFunction,onLongClickRename)
         val itemTouchHelper = ItemTouchHelper(
             MyItemTouchHelper { position, direction ->
                 if (direction == ItemTouchHelper.START) {
@@ -97,7 +99,13 @@ class Library : Fragment() {
         libraryViewModel.sheets.observe(viewLifecycleOwner) { list ->
             allSheetsInFolder = list
             adapter.updateSheets(allSheetsInFolder)
-
+            if(allSheetsInFolder.isNotEmpty()){
+                binding.tvNoSongs.visibility = View.GONE
+                binding.recyclerViewLibrary.visibility = View.VISIBLE
+            }else{
+                binding.tvNoSongs.visibility = View.VISIBLE
+                binding.recyclerViewLibrary.visibility =View.GONE
+            }
         }
         libraryViewModel.loadSheets()
         libraryViewModel.folderName.observe(viewLifecycleOwner) { name ->
@@ -113,25 +121,20 @@ class Library : Fragment() {
 
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.library, menu)
+                menuInflater.inflate(R.menu.library_search_menu, menu)
 
                 val searchItem = menu.findItem(R.id.app_bar_search)
                 val searchView = searchItem.actionView as SearchView
 
-                searchView.queryHint = "Search ..."
+                searchView.queryHint = getString(R.string.search_hint)
 
                 searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String?): Boolean {
-                        // Handle search submit
-                        return true
+                        return handleSheetsForSearch(query)
                     }
 
                     override fun onQueryTextChange(newText: String?): Boolean {
-                        val filteredList = allSheetsInFolder.filter { sheet ->
-                            sheet.name.contains(newText.orEmpty(), ignoreCase = true)
-                        }
-                        adapter.updateSheets(filteredList)
-                        return true
+                        return handleSheetsForSearch(newText)
                     }
                 })
             }
@@ -140,6 +143,15 @@ class Library : Fragment() {
                 return false
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    private fun handleSheetsForSearch(newText: String?): Boolean {
+        val filteredList = allSheetsInFolder.filter { sheet ->
+            sheet.name.contains(newText.orEmpty(), ignoreCase = true) ||
+                    sheet.author.contains(newText.orEmpty(), ignoreCase = true)
+        }
+        adapter.updateSheets(filteredList)
+        return true
     }
 
 

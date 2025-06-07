@@ -16,13 +16,13 @@
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/arrow_back"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:title="New Folder" />
+        app:title="@string/new_folder" />
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/folder_name"
         android:layout_marginTop="150dp"
         android:layout_width="400dp"
         android:layout_height="wrap_content"
-        android:hint="Folder's Name"
+        android:hint="@string/folder_s_name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -48,7 +48,7 @@
         android:id="@+id/btn_create_folder"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:text="Create"
+        android:text="@string/create"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

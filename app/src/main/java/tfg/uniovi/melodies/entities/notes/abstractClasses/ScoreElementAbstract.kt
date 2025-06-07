@@ -1,9 +1,11 @@
-package tfg.uniovi.melodies.entities.notes
+package tfg.uniovi.melodies.entities.notes.abstractClasses
+
+import tfg.uniovi.melodies.entities.notes.interfaces.ScoreElement
 
 abstract class ScoreElementAbstract (
     private val id : Int,
     private val duration : Long
-    ) : ScoreElement{
+    ) : ScoreElement {
         override fun getDuration():Long{
             return this.duration
         }

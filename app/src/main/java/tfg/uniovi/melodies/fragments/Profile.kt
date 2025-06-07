@@ -20,6 +20,8 @@ import tfg.uniovi.melodies.databinding.FragmentProfileBinding
 import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.utils.ShowAlertDialog
 
+private const val LOGOUT_TAG = "LOGOUT"
+
 /**
  * A simple [Fragment] subclass.
  * Use the [Profile.newInstance] factory method to
@@ -37,27 +39,27 @@ class Profile : Fragment() {
         binding.tvUserId.text = userId
         binding.btnCopy.setOnClickListener {
             copyToClipBoard("PROFILE", userId,
-                "User Id copied in clipboard")
+                getString(R.string.text_copied_in_clipboard))
         }
         val apiUrl= "https://anonymous-animals.azurewebsites.net/avatar/$userId"
         binding.ivProfileAvatar.load(apiUrl)
         binding.btnLogOut.setOnClickListener{
             AlertDialog.Builder(requireContext()).setTitle("Log out?")
                 .setMessage(
-                    "Are you sure you want to log out?"
+                    getString(R.string.log_out_question)
                 )
                 .setIcon(R.drawable.icon_alert)
-                .setPositiveButton(android.R.string.ok) { dialogInterface, i ->
+                .setPositiveButton(android.R.string.ok) { _, _ ->
                     doLogout(userId)
-                }.setNegativeButton(android.R.string.cancel){ dialogInterface, i ->
-                    Log.d("LOGOUT", "$userId did not log out")
+                }.setNegativeButton(android.R.string.cancel){ _, _ ->
+                    Log.d(LOGOUT_TAG, "$userId did not log out")
                 }.show()
         }
         return binding.root
     }
 
     private fun doLogout(userId: String) {
-        Log.d("LOGOUT", "$userId logged out")
+        Log.d(LOGOUT_TAG, "$userId logged out")
         PreferenceManager.clearUserId(requireContext())
         // Reinicia la actividad
         val intent = Intent(requireContext(), MainActivity::class.java)

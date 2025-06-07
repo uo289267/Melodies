@@ -61,7 +61,7 @@ class LogIn : Fragment() {
         logInViewModel.userExists.observe(viewLifecycleOwner){ exists ->
             if(exists){
                 Log.e("LOGIN", "User exists")
-                Toast.makeText(requireContext(), "Log in successful", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.log_in_successfull), Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_logIn_to_home_fragment)
                 PreferenceManager.saveUserId(requireContext(), logInViewModel.userId.value!!)
             }

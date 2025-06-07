@@ -105,6 +105,21 @@ class FoldersAndSheetsFirestore (val userId: String){
             null
         }
     }
+    suspend fun setNewSheetName(sheetId: String, folderId: String, newName: String) {
+       try{
+            val documentReference = usersCollection.document(userId)
+                .collection("folders")
+                .document(folderId)
+                .collection("sheets")
+                .document(sheetId)
+            documentReference
+                .update("name", newName)
+                .await()
+        } catch (e: Exception) {
+            // Handle error
+            println("Error renaming song $sheetId: $e")
+        }
+    }
 
     // Coroutine-based function to delete a song
     suspend fun deleteFolder(folderId: String) {
@@ -193,7 +208,6 @@ class FoldersAndSheetsFirestore (val userId: String){
     private fun doc2folder(doc:  DocumentSnapshot): Folder {
         return Folder(doc.data!!["name"].toString(),
             Colors.valueOf(doc.data!!["color"].toString().uppercase()),
-            doc.data!!["creationTime"] as Timestamp,
             doc.id)
     }
 
@@ -206,6 +220,8 @@ class FoldersAndSheetsFirestore (val userId: String){
             folderId
         )
     }
+
+
 
 
 }

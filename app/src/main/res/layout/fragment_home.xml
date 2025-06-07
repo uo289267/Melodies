@@ -15,7 +15,9 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="invisible"
+        />
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_new_folder"
         android:layout_width="wrap_content"
@@ -23,8 +25,19 @@
         android:layout_marginEnd="36dp"
         android:layout_marginBottom="36dp"
         android:clickable="true"
-        android:contentDescription="Add Folder"
+        android:contentDescription="@string/add_folder"
         android:src="@drawable/baseline_add_24"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+
+        />
+    <TextView
+        android:id="@+id/tv_no_folders"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="@string/no_sheets_have_been_imported_yet"
+        android:textAlignment="center"
+        android:textStyle="italic"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

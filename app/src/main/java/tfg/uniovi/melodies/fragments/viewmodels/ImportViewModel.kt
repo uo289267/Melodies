@@ -53,6 +53,9 @@ class ImportViewModel(
             _musicXMLSheetDtos.value = currentList
         }
     }
+    fun cleanMusicXMLSheets(){
+        _musicXMLSheetDtos.value = listOf<MusicXMLDTO>().toMutableList()
+    }
 
 
     fun updateFolderChosen(folderChosen: Folder) {

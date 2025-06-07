@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/arrow_back"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:title="Library"
+        app:title="@string/library"
         app:layout_constraintBottom_toTopOf="@+id/recycler_view_library"
         />
 
@@ -25,6 +25,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        android:visibility="invisible"
+        />
+    <TextView
+        android:id="@+id/tv_no_songs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        android:text="@string/no_sheets_have_been_imported_yet"
+        android:textAlignment="center"
+        android:textStyle="italic"
         />
 
 

@@ -25,12 +25,13 @@ import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.utils.TextWatcherAdapter
 import java.util.UUID
 
+private const val CREATE_FOLDER_TAG = "CREATE_FOLDER"
+
 class AddFolder : Fragment() {
 
     private lateinit var  binding: FragmentAddFolderBinding
     private lateinit var foldersViewModel: FolderViewModel
     private lateinit var addFolderViewModel: AddFolderViewModel
-    private val folderViewModel: FolderViewModel by viewModels()
 
     private val folderNameWatcher = object : TextWatcherAdapter() {
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -82,11 +83,11 @@ class AddFolder : Fragment() {
         addFolderViewModel.folderNameExists.observe(viewLifecycleOwner){
             exists ->
             if(!exists){
-                Log.e("CREATE_FOLDER", "Folder was created")
+                Log.e(CREATE_FOLDER_TAG, "Folder was created")
                 addFolderViewModel.createFolder()
                 findNavController().popBackStack()
             }else{
-                binding.folderNameInput.setError(getString(R.string.error_folder_name_exists_already))
+                binding.folderName.setError(getString(R.string.error_folder_name_exists_already))
             }
         }
         binding.toolbar.setNavigationOnClickListener{
@@ -109,7 +110,7 @@ class AddFolder : Fragment() {
             //call to addFolder
             val name = binding.folderNameInput.text
             val color = getString(colorSelected.second)
-            Log.d("FOLDER_CREATION", "Folder: with name $name and color $color was created")
+            Log.d(CREATE_FOLDER_TAG, "Folder: with name $name and color $color was created")
 
             val currentFolderName = binding.folderNameInput.text.toString().trim()
             if(currentFolderName.isNotEmpty()){
@@ -120,19 +121,6 @@ class AddFolder : Fragment() {
             }else{
                 binding.folderName.setError(getString(R.string.error_blank_folder_name))
             }
-            /*
-            //communicating to viewmodel
-            if(binding.folderNameInput.text.isNullOrEmpty())
-                binding.folderName.setError(getString(R.string.error_blank_folder_name))
-            else{
-                addFolderViewModel.checkIfFolderNameExists()
-                if(binding.folderNameInput.text!!.length > 30)
-                    binding.folderName.setError(getString(R.string.too_long_folder_name))
-                else{
-                    addFolderViewModel.createFolder()
-                    findNavController().popBackStack()
-                }
-            }*/
         }
     }
 
