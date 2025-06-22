@@ -4,7 +4,7 @@ tk.setOptions({
     scaleToPageSize: true,
     landscape: true,
     adjustPageWidth: true,
-    scale: 200
+    scale: 180
 });
 
 function loadMusicXmlFromBase64(base64) {

@@ -57,7 +57,12 @@ class XMLParser() {
                     val alter = pitchElement.getElementsByTagName("alter").item(0)
 
                     val name = stepElement.textContent[0]
-                    val octave = octaveElement.textContent.toInt()
+                    var octave = octaveElement.textContent.toInt()
+                    //From standard 4 to 5 as flute plays in 4 or 6 TODO
+                    if(octave == 4)
+                        octave = 5
+                    else if(octave == 5)
+                        octave = 6
                     var sharp = false
                     if (alter != null) {
                         val alterElement = alter as Element

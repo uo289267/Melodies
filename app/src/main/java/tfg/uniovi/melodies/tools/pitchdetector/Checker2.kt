@@ -3,7 +3,6 @@ package tfg.uniovi.melodies.tools.pitchdetector
 
 
 import android.util.Log
-import tfg.uniovi.melodies.entities.notes.Note
 import tfg.uniovi.melodies.entities.notes.NoteDominant
 import tfg.uniovi.melodies.entities.notes.interfaces.ScoreElement
 
@@ -107,18 +106,14 @@ class SheetChecker2() {
                                          allowSameNote: Boolean = false): Boolean? {
         val startTime = System.currentTimeMillis()
 
-        var expectedNoteName = "Z"
-        if (noteToCheck is Note) {
-            expectedNoteName = noteToCheck.name.toString() + noteToCheck.octave.toString()
-        }
 
-        Log.d("SHEET_CHECKER", "Esperando inicio de nota: $expectedNoteName (permitir repetida: $allowSameNote)")
+        Log.d("SHEET_CHECKER", "Esperando inicio de nota: $noteToCheck (permitir repetida: $allowSameNote)")
 
         // Si permitimos la misma nota y ya está sonando la correcta, continuar inmediatamente
         if (allowSameNote) {
             val currentNote = PitchDetector.getLastDetectedNote()
             if (currentNote.isNotEmpty() && currentNote != "Desconocido") {
-                val isCurrentCorrect = noteToCheck.check(NoteDominant(notaBase(currentNote), octave(currentNote)))
+                val isCurrentCorrect = noteToCheck.peek(NoteDominant(baseNote(currentNote), octave(currentNote)))
                 if (isCurrentCorrect) {
                     Log.d("SHEET_CHECKER", "Nota esperada ya está sonando: $currentNote")
                     return true
@@ -133,10 +128,10 @@ class SheetChecker2() {
             val finalOnset = detectedOnset ?: detectOnsetByAmplitude()
 
             finalOnset?.let { detectedNote ->
-                Log.d("SHEET_CHECKER", "Onset detectado: $detectedNote, Esperado: $expectedNoteName")
+                Log.d("SHEET_CHECKER", "Onset detectado: $detectedNote, Esperado: $noteToCheck")
 
                 // Verificar si la nota detectada coincide con la esperada
-                val isCorrect = noteToCheck.check(NoteDominant(notaBase(detectedNote), octave(detectedNote)))
+                val isCorrect = noteToCheck.peek(NoteDominant(baseNote(detectedNote), octave(detectedNote)))
                 return isCorrect
             }
 
@@ -144,7 +139,7 @@ class SheetChecker2() {
             Thread.sleep(50)
         }
 
-        Log.d("SHEET_CHECKER", "Timeout esperando nota: $expectedNoteName")
+        Log.d("SHEET_CHECKER", "Timeout esperando nota: $noteToCheck")
         return null // Timeout
     }
 
@@ -198,10 +193,9 @@ class SheetChecker2() {
             else{
                 val listOfNotes = mutableListOf<String>()
                 val start = System.currentTimeMillis()
-                val durationMs = noteToCheck.getDuration()
+                val durationMs = noteToCheck.getDuration()*0.95
 
                 Log.d("SHEET_CHECKER", "Verificando nota durante ${durationMs}ms...")
-
 
                 while (System.currentTimeMillis() - start < durationMs) {
                     val note = PitchDetector.getLastDetectedNote()
@@ -222,7 +216,7 @@ class SheetChecker2() {
                 Log.d("SHEET_CHECKER", "Nota dominante: $dominantNote, Esperada: $noteToCheck")
 
                 val result = dominantNote?.let {
-                    noteToCheck.check(NoteDominant(notaBase(it), octave(it)))
+                    noteToCheck.check(NoteDominant(baseNote(it), octave(it)))
                 }
 
                 Log.d("SHEET_CHECKER", "=== RESULTADO FINAL: ${result ?: "null"} ===")
@@ -235,7 +229,7 @@ class SheetChecker2() {
 
     /**
      * Método original mantenido para compatibilidad
-     */
+     *//*
     fun isNotePlayedCorrectly(noteToCheck: ScoreElement,
                               dominancePercentage: Double = 0.95): Boolean? {
 
@@ -266,12 +260,12 @@ class SheetChecker2() {
 
         return dominantNote?.let { noteToCheck.check(NoteDominant(notaBase(it), octave(it))) }
     }
-
-    fun notaBase(nota: String): Char {
+*/
+    private fun baseNote(nota: String): Char {
         return nota[0]
     }
 
     fun octave(nota: String): Int {
-        return Regex("\\d+").find(nota)?.value?.toInt() ?: 4 // Default octave 4 si no se encuentra
+        return Regex("\\d+").find(nota)?.value?.toInt() ?: 5
     }
 }

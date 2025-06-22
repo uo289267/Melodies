@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
@@ -16,15 +17,21 @@ import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnAttach
+import androidx.core.view.doOnNextLayout
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.coroutineScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.caverock.androidsvg.SVG
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.time.delay
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentSheetVisualizationBinding
 import tfg.uniovi.melodies.entities.MusicXMLSheet
+import tfg.uniovi.melodies.fragments.viewmodels.NoteCheckingState
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModelFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
@@ -103,13 +110,15 @@ class SheetVisualization : Fragment() {
                 ) { _ ->
                     binding.webView.evaluateJavascript("getPageCount();") { pageCount ->
                         totalPages = pageCount.toIntOrNull() ?: 1
+                        sheetVisualizationViewModel.setTotalPages(totalPages)
+
                         renderCurrentPage()
+
                     }
                 }
                 binding.toolbar.title = it.name
                 try{
                     sheetVisualizationViewModel.parseMusicXML()
-                    //sheetVisualizationViewModel.startNoteChecking()
                 }catch (e : SVGParserException){
                     ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(requireContext(),
                         "Invalid MusicXML",
@@ -122,61 +131,54 @@ class SheetVisualization : Fragment() {
 
             }
         }
-        /*
-        sheetVisualizationViewModel.parsingFinished.observe(viewLifecycleOwner) { finished ->
-            if (finished) {
-                sheetVisualizationViewModel.startNoteChecking()
-            }
-        }*/
-        /*sheetVisualizationViewModel.parsingFinished.observe(viewLifecycleOwner) { finished ->
-            if (finished) {
-                if (sheetVisualizationViewModel.svg.value != null) {
-                    sheetVisualizationViewModel.startNoteChecking()
-                } else {
-                    sheetVisualizationViewModel.svg.observe(viewLifecycleOwner) { svg ->
-                        if (svg != null) {
-                            sheetVisualizationViewModel.startNoteChecking()
-                        }
-                    }
-                }
-            }
-        }
 
-        sheetVisualizationViewModel.noteCheckingState.observe(viewLifecycleOwner) { state ->
-            Log.d("CHECKER", "Changed to state $state")
-        }
         sheetVisualizationViewModel.svg.observe(viewLifecycleOwner) { svg ->
             try {
-                binding.sheetImageView.setSVG(SVG.getFromString(svg))
-            } catch (e: Exception) {
-                Log.e("SVG_OBSERVER", "Failed to load SVG", e)
-            }
-        }*/
-        sheetVisualizationViewModel.svg.observe(viewLifecycleOwner) { svg ->
-            try {
+                if(currentPage==1)
+                    sheetVisualizationViewModel.updateCurrentPage(currentPage)
                 binding.sheetImageView.setSVG(SVG.getFromString(svg))
                 binding.sheetImageView.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.GONE
             } catch (e: Exception) {
                 Log.e("SVG_OBSERVER", "Failed to load SVG", e)
             }
-
-            // Si ya se ha terminado el parsing, lanzamos el chequeo de notas
-            if (sheetVisualizationViewModel.parsingFinished.value == true) {
-                sheetVisualizationViewModel.startNoteChecking()
-            }
         }
-
-        // Estado del parseo: si svg ya está cargado, arrancamos chequeo
         sheetVisualizationViewModel.parsingFinished.observe(viewLifecycleOwner) { finished ->
-            if (finished && sheetVisualizationViewModel.svg.value != null) {
-                sheetVisualizationViewModel.startNoteChecking()
+            if (finished) {
+                binding.sheetImageView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver
+                .OnGlobalLayoutListener {
+                    override fun onGlobalLayout() {
+                        // Remove listener to avoid multiple calls
+                        binding.sheetImageView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                        sheetVisualizationViewModel.startNoteChecking()
+                    }
+                })
             }
         }
 
+        sheetVisualizationViewModel.currentPage.observe(viewLifecycleOwner){ newCurrentPage ->
+            this.currentPage = newCurrentPage
+            if(currentPage!=1)
+                renderCurrentPage()
+        }
+        sheetVisualizationViewModel.shouldNavigateToNextPage.observe(viewLifecycleOwner){ should ->
+            if(should){
+                currentPage++
+                sheetVisualizationViewModel.updateCurrentPage(currentPage)
+            }
+        }
+
+        val returnToHome = {findNavController().navigate(R.id.home_fragment)}
         // Solo para debug u otros usos
         sheetVisualizationViewModel.noteCheckingState.observe(viewLifecycleOwner) { state ->
             Log.d("CHECKER", "Changed to state $state")
+            if( state == NoteCheckingState.FINISHED){
+            ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(requireContext(),
+                                                                    "Finished!",
+                "Congratulations you finished practicing ${musicXMLSheet.name}",
+                        "CHECKER", "${musicXMLSheet.name} was finished",returnToHome)
+
+        }
         }
 
     }
@@ -240,6 +242,7 @@ class SheetVisualization : Fragment() {
                 sheetVisualizationViewModel.updateSVGValue(svgClean)
             }
 
+
             try {
                 binding.sheetImageView.setSVG(SVG.getFromString(svgClean))
             } catch (e: Exception) {
@@ -267,13 +270,14 @@ class SheetVisualization : Fragment() {
         binding.prevButton.setOnClickListener {
             if (currentPage > 1) {
                 currentPage--
-                renderCurrentPage()
+                sheetVisualizationViewModel.updateCurrentPage(currentPage)
+            // svg should be updated by now and you can calculate the num of notes in svg page
             }
         }
         binding.nextButton.setOnClickListener {
             if (currentPage < totalPages) {
                 currentPage++
-                renderCurrentPage()
+                sheetVisualizationViewModel.updateCurrentPage(currentPage)
             }
         }
     }

@@ -18,6 +18,11 @@ class Rest(id: Int, duration: Long)
             return true
         else
             return this.followingNote!!.name!=noteToCheck.name
+                    || this.followingNote!!.octave!=noteToCheck.octave
+    }
+
+    override fun peek(noteToCheck: NoteDominant): Boolean {
+        return true
     }
 
     /**
