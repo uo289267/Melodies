@@ -17,9 +17,6 @@ import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.doOnAttach
-import androidx.core.view.doOnNextLayout
-import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.coroutineScope
@@ -27,7 +24,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.caverock.androidsvg.SVG
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.time.delay
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentSheetVisualizationBinding
 import tfg.uniovi.melodies.entities.MusicXMLSheet
@@ -38,7 +34,6 @@ import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.MIC_REQ_CODE
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.startListening
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.stopListening
-import tfg.uniovi.melodies.tools.pitchdetector.SheetChecker
 import tfg.uniovi.melodies.utils.ShowAlertDialog
 import tfg.uniovi.melodies.utils.parser.SVGParserException
 
@@ -50,9 +45,8 @@ class SheetVisualization : Fragment() {
     private lateinit var binding: FragmentSheetVisualizationBinding
     private lateinit var sheetVisualizationViewModel: SheetVisualizationViewModel
     private lateinit var musicXMLSheet: MusicXMLSheet
-    private var currentPage = 1
+    //private var currentPage = 1
     private var totalPages = 1
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,7 +76,6 @@ class SheetVisualization : Fragment() {
             PreferenceManager.getUserId(requireContext())!!
         ))[SheetVisualizationViewModel::class.java]
 
-
         setupWebView()
         setupNavigationButtons()
         return binding.root
@@ -95,27 +88,12 @@ class SheetVisualization : Fragment() {
         }
         viewModelSetUp()
         toolBarSetUp()
-
     }
-
 
     private fun viewModelSetUp() {
         sheetVisualizationViewModel.musicXMLSheet.observe(viewLifecycleOwner) { musicxml ->
             this.musicXMLSheet = musicxml
             musicxml?.let {
-                val encondedXML =
-                    Base64.encodeToString(it.stringSheet.toByteArray(), Base64.NO_WRAP)
-                binding.webView.evaluateJavascript(
-                    "loadMusicXmlFromBase64('$encondedXML');"
-                ) { _ ->
-                    binding.webView.evaluateJavascript("getPageCount();") { pageCount ->
-                        totalPages = pageCount.toIntOrNull() ?: 1
-                        sheetVisualizationViewModel.setTotalPages(totalPages)
-
-                        renderCurrentPage()
-
-                    }
-                }
                 binding.toolbar.title = it.name
                 try{
                     sheetVisualizationViewModel.parseMusicXML()
@@ -125,8 +103,18 @@ class SheetVisualization : Fragment() {
                         "MusicXML is missing attributes and/or elements, " +
                                 "no feedback will be given tap each end of the screen to navigate",
                         "PARSING_XML",
-                        "alert dialog showed becuase xml missing attributes and/or elements")
-
+                        "alert dialog showed because xml missing attributes and/or elements")
+                }
+                val encondedXML =
+                    Base64.encodeToString(it.stringSheet.toByteArray(), Base64.NO_WRAP)
+                binding.webView.evaluateJavascript(
+                    "loadMusicXmlFromBase64('$encondedXML');"
+                ) { _ ->
+                    binding.webView.evaluateJavascript("getPageCount();") { pageCount ->
+                        totalPages = pageCount.toIntOrNull() ?: 1
+                        sheetVisualizationViewModel.setTotalPages(totalPages)
+                        sheetVisualizationViewModel.moveForward()
+                    }
                 }
 
             }
@@ -134,15 +122,16 @@ class SheetVisualization : Fragment() {
 
         sheetVisualizationViewModel.svg.observe(viewLifecycleOwner) { svg ->
             try {
-                if(currentPage==1)
-                    sheetVisualizationViewModel.updateCurrentPage(currentPage)
+                Log.d("PAGING", "SVG CHANGED")
                 binding.sheetImageView.setSVG(SVG.getFromString(svg))
                 binding.sheetImageView.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.GONE
+                sheetVisualizationViewModel.updateCurrentPage()
             } catch (e: Exception) {
                 Log.e("SVG_OBSERVER", "Failed to load SVG", e)
             }
         }
+/*
         sheetVisualizationViewModel.parsingFinished.observe(viewLifecycleOwner) { finished ->
             if (finished) {
                 binding.sheetImageView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver
@@ -154,33 +143,38 @@ class SheetVisualization : Fragment() {
                     }
                 })
             }
-        }
+        }*/
 
-        sheetVisualizationViewModel.currentPage.observe(viewLifecycleOwner){ newCurrentPage ->
-            this.currentPage = newCurrentPage
-            if(currentPage!=1)
+
+        sheetVisualizationViewModel.currentPage.observe(viewLifecycleOwner) { newCurrentPage ->
+            if(newCurrentPage!=0)
                 renderCurrentPage()
         }
-        sheetVisualizationViewModel.shouldNavigateToNextPage.observe(viewLifecycleOwner){ should ->
-            if(should){
-                currentPage++
-                sheetVisualizationViewModel.updateCurrentPage(currentPage)
+
+        sheetVisualizationViewModel.shouldNavigateToNextPage.observe(viewLifecycleOwner) { should ->
+            if (should) {
+                val currentPage = sheetVisualizationViewModel.currentPage.value?:1
+                Log.d("NAVIGATION", "Auto-navigating from page $currentPage to ${currentPage + 1}")
+                //sheetVisualizationViewModel.updateCurrentPage(currentPage++)
+                sheetVisualizationViewModel.moveForward()
             }
         }
 
-        val returnToHome = {findNavController().navigate(R.id.home_fragment)}
-        // Solo para debug u otros usos
+        val returnToHome = { findNavController().navigate(R.id.home_fragment) }
+
         sheetVisualizationViewModel.noteCheckingState.observe(viewLifecycleOwner) { state ->
             Log.d("CHECKER", "Changed to state $state")
-            if( state == NoteCheckingState.FINISHED){
-            ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(requireContext(),
-                                                                    "Finished!",
-                "Congratulations you finished practicing ${musicXMLSheet.name}",
-                        "CHECKER", "${musicXMLSheet.name} was finished",returnToHome)
-
+            if (state == NoteCheckingState.FINISHED) {
+                ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(
+                    requireContext(),
+                    "Finished!",
+                    "Congratulations you finished practicing ${musicXMLSheet.name}",
+                    "CHECKER",
+                    "${musicXMLSheet.name} was finished",
+                    returnToHome
+                )
+            }
         }
-        }
-
     }
 
     /**
@@ -212,44 +206,41 @@ class SheetVisualization : Fragment() {
      */
     private fun setupWebView() {
         binding.webView.settings.javaScriptEnabled = true
-        //TODO REMOVE
+        WebView.setWebContentsDebuggingEnabled(true)
         binding.webView.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
                 Log.d("JS_CONSOLE", "${consoleMessage?.message()} -- From line ${consoleMessage?.lineNumber()} of ${consoleMessage?.sourceId()}")
                 return true
             }
         }
+
         binding.webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 sheetVisualizationViewModel.loadMusicSheet(args.sheetIdNFolderId)
             }
         }
+
         binding.webView.loadUrl(VEROVIO_HTML)
-
     }
-
-
 
     /**
      * Renders current page and shows its SVG in the ImageView
      */
     private fun renderCurrentPage() {
+        val currentPage = sheetVisualizationViewModel.currentPage.value
+        Log.d("RENDER", "Rendering page: $currentPage")
         binding.webView.evaluateJavascript("renderPageToDom($currentPage);") { rawSvg ->
-            val svgClean = cleanSvg(rawSvg)
-            binding.sheetImageView.setSVG(SVG.getFromString(svgClean)) // TODO DA NULL AL GIRAR
-            // Solo actualiza si el SVG ha cambiado
-            if (sheetVisualizationViewModel.svg.value != svgClean) {
-                sheetVisualizationViewModel.updateSVGValue(svgClean)
+                try {
+                    val svgClean = cleanSvg(rawSvg)
+                    Log.d("PAINTING", "SVG NEEDS TO PAINTED")
+                    // Solo actualizar el SVG en el ViewModel si realmente cambió
+                    if (sheetVisualizationViewModel.svg.value != svgClean) {
+                        sheetVisualizationViewModel.updateSVGValue(svgClean)
+                    }
+                } catch (e: Exception) {
+                    Log.e("SVG_RENDER", "Failed to render SVG", e)
+                }
             }
-
-
-            try {
-                binding.sheetImageView.setSVG(SVG.getFromString(svgClean))
-            } catch (e: Exception) {
-                Log.e("SVG_RENDER", "Failed to render SVG", e)
-            }
-        }
-
     }
 
     private fun cleanSvg(svgRaw: String): String {
@@ -267,31 +258,23 @@ class SheetVisualization : Fragment() {
      * Configures buttons to next and previous pages
      */
     private fun setupNavigationButtons() {
+
         binding.prevButton.setOnClickListener {
-            if (currentPage > 1) {
-                currentPage--
-                sheetVisualizationViewModel.updateCurrentPage(currentPage)
-            // svg should be updated by now and you can calculate the num of notes in svg page
-            }
+            sheetVisualizationViewModel.moveBack()
         }
+
         binding.nextButton.setOnClickListener {
-            if (currentPage < totalPages) {
-                currentPage++
-                sheetVisualizationViewModel.updateCurrentPage(currentPage)
-            }
+            sheetVisualizationViewModel.moveForward()
         }
     }
 
     /**
-        Requests mic permissions to start the pitch detection
+     * Requests mic permissions to start the pitch detection
      */
     private fun requestMicPermission() {
         if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-            //Pitch detector start listening and processing audio
-            //TODO
-        startListening(lifecycle.coroutineScope)
-        }
-        else {
+            startListening(lifecycle.coroutineScope)
+        } else {
             ActivityCompat.requestPermissions(
                 requireActivity(),
                 arrayOf(Manifest.permission.RECORD_AUDIO),

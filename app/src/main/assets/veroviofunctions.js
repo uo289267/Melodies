@@ -19,8 +19,18 @@ function loadMusicXmlFromBase64(base64) {
 }
 
 function renderPageToDom(page) {
-    const svg = tk.renderToSVG(page, {});
-    return svg;
+
+    try {
+        const svg = tk.renderToSVG(page, {});
+        console.log(typeof svg)
+        console.log("Verovio svg rendering good", svg);
+        console.log(typeof svg)
+        return svg;
+    } catch (e) {
+        console.log("Verovio svg rendering error", e);
+        return "";
+    }
+
 }
 
 function getPageCount() {

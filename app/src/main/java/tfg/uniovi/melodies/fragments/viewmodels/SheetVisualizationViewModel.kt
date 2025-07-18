@@ -1,6 +1,5 @@
 package tfg.uniovi.melodies.fragments.viewmodels
 
-
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -21,11 +20,12 @@ class SheetVisualizationViewModelFactory(
     private val currentUserUUID: String
 ):
     ViewModelProvider.Factory{
-        override fun <T: ViewModel> create(modelClass: Class<T>): T {
-            val sheetBD = FoldersAndSheetsFirestore(currentUserUUID)
-            return SheetVisualizationViewModel(sheetBD) as T
-        }
+    override fun <T: ViewModel> create(modelClass: Class<T>): T {
+        val sheetBD = FoldersAndSheetsFirestore(currentUserUUID)
+        return SheetVisualizationViewModel(sheetBD) as T
     }
+}
+
 class SheetVisualizationViewModel(
     private val sheetBD: FoldersAndSheetsFirestore
 ) : ViewModel(){
@@ -40,29 +40,26 @@ class SheetVisualizationViewModel(
     private val _parsingFinished = MutableLiveData(false)
     val parsingFinished: LiveData<Boolean> get() = _parsingFinished
 
-    //private val sheetChecker: SheetChecker = SheetChecker() TODO
     private val sheetChecker: SheetChecker2 = SheetChecker2()
-    private var currentNoteIndex = 3
+    private var currentNoteIndex = 0  // Índice global absoluto
     private var isCheckingNotes = false
     private var _noteList : MutableList<ScoreElement> = mutableListOf()
 
-    //private var currentPage = 1
     private var totalPages = 1
-    private var notesInCurrentPage : Int = 0 // Page -> Range of index Notes
-    private var notesPerPage = mutableMapOf<Int, IntRange>()
-    private var lastProcessedNoteIndex = 0  // Último índice de nota procesado globalmente
+    private var notesPerPage = mutableMapOf<Int, Pair<Int, Int>>() // Página -> (startIndex, endIndex)
 
-
-    private val _currentPage = MutableLiveData(1)
+    private val _currentPage = MutableLiveData(0)
     val currentPage: LiveData<Int>
         get() = _currentPage
-
 
     private val _shouldNavigateToNextPage = MutableLiveData(false)
     val shouldNavigateToNextPage: LiveData<Boolean> get() = _shouldNavigateToNextPage
 
     private val _noteCheckingState = MutableLiveData<NoteCheckingState>()
     val noteCheckingState: LiveData<NoteCheckingState> get() = _noteCheckingState
+
+
+    private var isCurrentPageAllSetUp = false
     /**
      * Loads the musicxml given the sheedId and the folderId where the sheet resides
      */
@@ -70,7 +67,6 @@ class SheetVisualizationViewModel(
         viewModelScope.launch {
             _musicXML.postValue(sheetBD.getSheetById(dto.sheetId, dto.folderId))
         }
-
     }
 
     fun parseMusicXML(){
@@ -78,236 +74,177 @@ class SheetVisualizationViewModel(
             val parser = XMLParser(it.musicxml)
             parser.parseAllNotes()
             _noteList = parser.getAllNotes().toMutableList()
-            viewModelScope.launch {
-                delay(500)
-            }
-            _parsingFinished.postValue(true)
-
+            currentNoteIndex = 0 // Reset al parsear
+            //_parsingFinished.postValue(true)
         }
     }
 
     fun setTotalPages(pages: Int) {
         totalPages = pages
-        calculateNotesInPage()
-    }
-    fun updateCurrentPage(page: Int){
-        val previousPage = _currentPage.value ?: 1
-        _shouldNavigateToNextPage.postValue(false)
-        // Si vamos a una página nueva, actualizamos el mapeo
-        calculateNotesInPage()
-        //if (page != previousPage) {
-            updatePageMapping(previousPage, page)
-        //}
-        _currentPage.value = page
-
-        //voy para atrás
-        if(previousPage > page)
-            adjustNoteIndexForPage(page)
-    }
-    /**
-     * Actualiza el mapeo de páginas cuando navegamos
-     */
-    private fun updatePageMapping(fromPage: Int, toPage: Int) {
-        // Si estamos creando el mapeo para la página de origen por primera vez
-        if (!notesPerPage.containsKey(fromPage)) {
-            val startIndex = if (fromPage == 1) 0 else lastProcessedNoteIndex
-            val endIndex = startIndex + notesInCurrentPage - 1
-
-            notesPerPage[fromPage] = startIndex..endIndex
-            lastProcessedNoteIndex = endIndex + 1
-
-            Log.d("PAGE_MAPPING", "Página $fromPage mapeada: ${startIndex}..${endIndex}")
-        }
-
-        // Si vamos hacia adelante y la página destino no existe, prepararla
-        if (toPage > fromPage && !notesPerPage.containsKey(toPage)) {
-            // La página destino se mapeará cuando se calcule notesInCurrentPage
-            Log.d("PAGE_MAPPING", "Preparando mapeo para página $toPage")
-        }
-
-        // Si vamos hacia atrás, no necesitamos actualizar nada más
+        Log.d("PAGES", "Total pages set to: $totalPages")
     }
 
-    /**
-     * Ajusta el currentNoteIndex basado en la página actual
-     */
-    private fun adjustNoteIndexForPage(page: Int) {
-        val pageRange = notesPerPage[page]
-        if (pageRange != null) {
-            // Si ya conocemos el rango de esta página, empezamos desde su inicio
-            currentNoteIndex = pageRange.first
-            Log.d("NOTE_INDEX", "Ajustado índice para página $page: ${currentNoteIndex}")
-        } else {
-            // Si no conocemos el rango, empezamos desde lastProcessedNoteIndex
-            currentNoteIndex = lastProcessedNoteIndex
-            Log.d("NOTE_INDEX", "Índice temporal para página $page: ${currentNoteIndex}")
+    fun updateCurrentPage(){
+        if(!isCurrentPageAllSetUp){
+            isCurrentPageAllSetUp = true
+            // Calcular notas en la página actual después de que se haya renderizado
+            calculateNotesInCurrentPage()
+            currentNoteIndex= notesPerPage[currentPage.value]?.first ?: currentNoteIndex
+            _shouldNavigateToNextPage.postValue(false)
+            if(noteCheckingState.value!= NoteCheckingState.CHECKING)
+                checkNextNote()
         }
     }
 
-
     /**
-     * Calculates the number of notes and rests that are in the rendered page currently shown
+     * Calcula y mapea las notas de la página actual
      */
-    private fun calculateNotesInPage(){
-        if(_svg.value!=null){
+    private fun calculateNotesInCurrentPage() {
+        val page = currentPage.value?:1
+        if (_svg.value != null) {
             val regex = Regex("""<g\b[^>]*\bclass="(note|rest)"[^>]*>""")
-            this.notesInCurrentPage = regex.findAll(_svg.value!!).count()
+            val notesInPage = regex.findAll(_svg.value!!).count()
 
-            // Actualizar el mapeo para la página actual si no existe
-            val currentPageValue = _currentPage.value ?: 1
-            if (!notesPerPage.containsKey(currentPageValue)) {
-                val startIndex = lastProcessedNoteIndex
-                val endIndex = startIndex + notesInCurrentPage - 1
+            // Si es la primera vez que visitamos esta página, mapearla
+            if (!notesPerPage.containsKey(page)) {
+                val startIndex = (notesPerPage[page-1]?.second ?: -1) +1
+                val endIndex = startIndex + notesInPage - 1
+                notesPerPage[page] = Pair(startIndex, endIndex)
 
-                notesPerPage[currentPageValue] = startIndex..endIndex
-
-                // Solo actualizar lastProcessedNoteIndex si vamos hacia adelante
-                if (currentPageValue > (notesPerPage.keys.maxOrNull() ?: 0)) {
-                    lastProcessedNoteIndex = endIndex + 1
-                }
-
-                Log.d("PAGE_MAPPING", "Página $currentPageValue mapeada: ${startIndex}..${endIndex}, notas: $notesInCurrentPage")
+                Log.d("PAGE_MAPPING", "Página $page mapeada: notas $startIndex-$endIndex (total: $notesInPage)")
             }
         }
     }
-/*
-    fun navigateToPage(page: Int) {
-        if (page in 1..totalPages && page != currentPage) {
-            currentPage = page
-            _currentPage.postValue(currentPage)
 
-            // Ajustar currentNoteIndex a la primera nota de la página
-            val pageRange = notesPerPage[currentPage]
-            if (pageRange != null && pageRange.first < _noteList.size) {
-                currentNoteIndex = pageRange.first
-                Log.d("PAGE_NAV", "Navegando a página $currentPage, primera nota: $currentNoteIndex")
-            }
+    fun moveForward(){
+        Log.d("PAGING", "MOVE FORWARD")
+        //_shouldNavigateToNextPage.value = false
+        val currentPage = _currentPage.value!!
+        val pageToBeUpdated = currentPage + 1 //pasamos a la sgte página
+        if(pageToBeUpdated <= totalPages){// la pág a la que pasamos está dentro de las págs existentes
+            //calculateNotesInCurrentPage(pageToBeUpdated)
+            isCurrentPageAllSetUp=false
+            _currentPage.value= pageToBeUpdated
+
+            //currentNoteIndex = notesPerPage[pageToBeUpdated]!!.first
+            //checkNextNote()
         }
-    }*/
+        else
+            Log.d("PAGING", "Se intentó ir de ${_currentPage.value} a " +
+                    "$pageToBeUpdated when there are $totalPages num of pages")
+    }
+
+    fun moveBack(){
+        //_shouldNavigateToNextPage.value = false
+        val currentPage = _currentPage.value!!
+        val pageToBeUpdated = currentPage - 1
+        if(pageToBeUpdated > 1){
+            _currentPage.value= pageToBeUpdated
+            isCurrentPageAllSetUp=false
+           // currentNoteIndex= notesPerPage[pageToBeUpdated]!!.first
+        }
+
+        else
+            Log.d("PAGING", "Se intentó ir de ${_currentPage.value} a " +
+                    "$pageToBeUpdated when there are $totalPages num of pages")
+    }
+
+
     fun startNoteChecking() {
         if (!isCheckingNotes) {
             Log.d("CHECK", "STARTED NOTE CHECKING")
             isCheckingNotes = true
-            // Asegurar que empezamos desde la primera nota de la página actual
-            val currentPageValue = _currentPage.value ?: 1
-            val pageRange = notesPerPage[currentPageValue]
-            currentNoteIndex = pageRange?.first ?: 0
+            currentNoteIndex = 0 // Empezar desde la primera nota
             checkNextNote()
         }
     }
+
     private fun checkNextNote() {
-        if (currentNoteIndex < _noteList.size) {
-            val currentNote = _noteList[currentNoteIndex]
-            val isRepeatedNote =
-                if (currentNoteIndex > 0) {
+
+        viewModelScope.launch {
+            _noteCheckingState.postValue(NoteCheckingState.CHECKING)
+        while (currentNoteIndex < _noteList.size) {
+            if(_shouldNavigateToNextPage.value == false || isCurrentPageAllSetUp){
+                val currentNote = _noteList[currentNoteIndex]
+                val isRepeatedNote = if (currentNoteIndex > 0) {
                     val previousNote = _noteList[currentNoteIndex - 1]
-                    // Comparar si son iguales (necesitarás implementar equals en tus clases Note)
                     areNotesEqual(currentNote, previousNote)
                 } else {
                     false
                 }
-            _noteCheckingState.postValue(NoteCheckingState.CHECKING)
 
-            viewModelScope.launch {
-                //val isCorrect = sheetChecker.isNotePlayedCorrectly(currentNote)
-                // Usar el nuevo método que maneja notas repetidas
-                val isCorrect = sheetChecker.isNotePlayedCorrectlyWithOnset(
-                    noteToCheck = currentNote,
-                    dominancePercentage = 0.95, // 95% de dominancia
-                    onsetTimeoutMs = 15000L,     // 15 segundos máximo esperando onset
-                    isRepeatedNote = isRepeatedNote
-                )
-                when (isCorrect) {
-                    true -> {
-                        /*highlightNoteByIndex(currentNoteIndex, "#00FF00")
-                        //_noteCheckingState.postValue(NoteCheckingState.NoteCorrect(currentNoteIndex))
-                        currentNoteIndex++
-                        delay(200)
-                        checkNextNote()*/
-                        // Usar índice relativo dentro de la página para highlighting
-                        val relativeIndex = getRelativeNoteIndex(currentNoteIndex)
-                        highlightNoteByIndex(relativeIndex, "#00FF00")
+                Log.d("CHECK", "Checking note index: $currentNoteIndex")
 
-                        currentNoteIndex+=1
 
-                        // Verificar si hemos completado la página actual
-                        if (hasCompletedCurrentPage()) {
-                            handlePageCompletion()
-                        } else {
-                            delay(200)
-                            checkNextNote()
+                    val isCorrect = sheetChecker.isNotePlayedCorrectlyWithOnset(
+                        noteToCheck = currentNote,
+                        dominancePercentage = 0.95,
+                        onsetTimeoutMs = 15000L,
+                        isRepeatedNote = isRepeatedNote
+                    )
+                    val relativeIndex = currentNoteIndex - (notesPerPage[_currentPage.value]?.first ?: 0)
+                    Log.d("PAGING", "Absolute Index: $currentNoteIndex and relative Index: $relativeIndex")
+                    when (isCorrect) {
+                        true -> {
+                            highlightNoteByIndex(relativeIndex, "#00FF00")
+
+                            Log.d("CHECK", "Note $currentNoteIndex correct, relative index: $relativeIndex")
+
+                            // Verificar si necesitamos cambFiar de página
+                            if (needsPageChange()) {
+                                handlePageCompletion()
+                                currentNoteIndex++
+                            } else {
+                                delay(200)
+                                currentNoteIndex++
+                               // checkNextNote()
+                            }
                         }
-                    }
-                    false -> {
-                        highlightNoteByIndex(currentNoteIndex, "#FF0000")
-                        //_noteCheckingState.postValue(NoteCheckingState.NoteIncorrect(currentNoteIndex))
-                        delay(200)
-                        checkNextNote()
-                    }
-                    null -> {
-                        highlightNoteByIndex(currentNoteIndex, "#FF0000")
-                        //_noteCheckingState.postValue(NoteCheckingState.NoNoteDetected)
-                        checkNextNote()
+                        false -> {
+                            highlightNoteByIndex(relativeIndex, "#FF0000")
+                            delay(200)
+                            //checkNextNote()
+                        }
+                        null -> {
+                            highlightNoteByIndex(relativeIndex, "#FF0000")
+                            //checkNextNote()
+                        }
                     }
                 }
             }
-        } else {
-            isCheckingNotes = false
             _noteCheckingState.postValue(NoteCheckingState.FINISHED)
+            Log.d("CHECK", "All notes finished!")
         }
     }
-    private fun hasCompletedCurrentPage(): Boolean {
-        val currentPageValue = _currentPage.value ?: 1
-        val pageRange = notesPerPage[currentPageValue]
 
-        return if (pageRange != null) {
-            currentNoteIndex > pageRange.last
-        } else {
-            // Si no tenemos el rango, usar el conteo de notas de la página
-            val pageStartIndex = if (currentPageValue == 1) 0 else lastProcessedNoteIndex - notesInCurrentPage
-            currentNoteIndex >= pageStartIndex + notesInCurrentPage
-        }
+    /**
+     * Verifica si necesitamos cambiar de página basado en el índice actual
+     */
+    private fun needsPageChange(): Boolean {
+        return currentNoteIndex == notesPerPage[_currentPage.value]?.second
     }
 
     /**
      * Maneja la completación de una página
      */
     private fun handlePageCompletion() {
-        viewModelScope.launch {
-            val currentPageValue = _currentPage.value ?: 1
-
-            if (currentPageValue < totalPages) {
-                // Hay más páginas, navegar automáticamente
-                Log.d("PAGE_COMPLETION", "Página $currentPageValue completada, navegando a ${currentPageValue + 1}")
-                _shouldNavigateToNextPage.postValue(true)
-
-                //delay(1000) // Pausa antes de cambiar de página
-
-                // La navegación real se manejará desde el Fragment
-                delay(500) // Tiempo para que se renderice la nueva página
-                checkNextNote()
-            } else {
-                // Hemos terminado todas las páginas
-                isCheckingNotes = false
-                _noteCheckingState.postValue(NoteCheckingState.FINISHED)
-            }
-        }
-    }
-    /**
-     * Obtiene el índice relativo de la nota dentro de la página actual
-     */
-    private fun getRelativeNoteIndex(globalIndex: Int): Int {
         val currentPageValue = _currentPage.value ?: 1
-        val pageRange = notesPerPage[currentPageValue]
 
-        return if (pageRange != null) {
-            globalIndex - pageRange.first
+        if (currentPageValue < totalPages) {
+            Log.d("PAGE_COMPLETION", "Página $currentPageValue completada, navegando a ${currentPageValue + 1}")
+            _shouldNavigateToNextPage.postValue(true)
+
+            //checkNextNote()
         } else {
-            // Fallback: usar el índice basado en el conteo de notas
-            val pageStartIndex = if (currentPageValue == 1) 0 else lastProcessedNoteIndex - notesInCurrentPage
-            globalIndex - pageStartIndex
+            // Hemos terminado todas las páginas
+            isCheckingNotes = false
+            _noteCheckingState.postValue(NoteCheckingState.FINISHED)
+            Log.d("PAGE_COMPLETION", "Todas las páginas completadas!")
         }
+
     }
+
+
 
     private fun areNotesEqual(note1: ScoreElement, note2: ScoreElement): Boolean {
         if (note1 is Note && note2 is Note) {
@@ -320,29 +257,30 @@ class SheetVisualizationViewModel(
         val regex = Regex("""<g\s+[^>]*class="(note|rest)"[^>]*>""")
         val matches = regex.findAll(_svg.value!!).toList()
 
-        if (index >= matches.size) {
-            Log.d("SheetVisualizer", "Índice fuera de rango: ${matches.size} notas encontradas")
-        } else {
-            val targetGroup = matches[index].value
+        if (index >= matches.size || index < 0) {
+            Log.w("SheetVisualizer", "Índice fuera de rango: $index, notas disponibles: ${matches.size}")
+            return
+        }
 
-            val cleanedGroup = targetGroup
-                .replace(Regex("""\s*color="#[0-9A-Fa-f]{6}""""), "")
-                .replace(Regex("""\s*fill="#[0-9A-Fa-f]{6}""""), "")
+        val targetGroup = matches[index].value
 
-            val modifiedGroup = cleanedGroup.replaceFirst(
-                Regex(""">"""),
-                """ color="$color" fill="$color">"""
-            )
+        val cleanedGroup = targetGroup
+            .replace(Regex("""\s*color="#[0-9A-Fa-f]{6}""""), "")
+            .replace(Regex("""\s*fill="#[0-9A-Fa-f]{6}""""), "")
+
+        val modifiedGroup = cleanedGroup.replaceFirst(
+            Regex(""">"""),
+            """ color="$color" fill="$color">"""
+        )
         _svg.postValue(_svg.value!!.replace(targetGroup, modifiedGroup))
     }
-}
-
 
     fun updateSVGValue(svgClean: String) {
         _svg.postValue(svgClean)
     }
-}
 
+
+}
 
 enum class NoteCheckingState {
     CHECKING, FINISHED
@@ -352,4 +290,3 @@ class SheetVisualizationDto (
     val sheetId : String,
     val folderId : String
 ): Serializable
-
