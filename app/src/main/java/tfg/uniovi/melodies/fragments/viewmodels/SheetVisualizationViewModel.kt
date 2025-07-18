@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.entities.MusicXMLSheet
@@ -161,7 +162,7 @@ class SheetVisualizationViewModel(
 
     private fun checkNextNote() {
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             _noteCheckingState.postValue(NoteCheckingState.CHECKING)
         while (currentNoteIndex < _noteList.size) {
             if(_shouldNavigateToNextPage.value == false || isCurrentPageAllSetUp){
