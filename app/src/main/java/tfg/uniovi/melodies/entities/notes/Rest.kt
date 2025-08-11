@@ -2,9 +2,13 @@ package tfg.uniovi.melodies.entities.notes
 
 
 import tfg.uniovi.melodies.entities.notes.abstractClasses.ScoreElementAbstract
-
-class Rest(id: Int, duration: Long)
-    : ScoreElementAbstract(id, duration) {
+/**
+ * Represents a rest/silence in a score.
+ * Stores its duration
+ *
+ * @param duration The duration of the note in milliseconds.*/
+class Rest(duration: Long)
+    : ScoreElementAbstract(duration) {
     private var followingNote : Note? = null //could be null if rest is the last note
 
     /**
@@ -13,8 +17,8 @@ class Rest(id: Int, duration: Long)
      *
      * @param noteToCheck note to check if corresponds with following note with pitch after this rest
      */
-    override fun check(noteToCheck: NoteDominant): Boolean {
-        if(this.followingNote == null)
+    override fun check(noteToCheck: NoteDominant?): Boolean {
+        if(this.followingNote == null || noteToCheck == null)
             return true
         else
             return this.followingNote!!.name!=noteToCheck.name

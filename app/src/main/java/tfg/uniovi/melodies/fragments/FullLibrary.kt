@@ -29,7 +29,11 @@ import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModelProviderFactory
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 import tfg.uniovi.melodies.preferences.PreferenceManager
 
-
+/**
+ * Fragment that displays the full music library organized by folders.
+ * Provides search functionality to filter folders and sheets,
+ * and navigation to the sheet visualization screen.
+ */
 class FullLibrary : Fragment() {
     private lateinit var binding: FragmentFullLibraryBinding
     private lateinit var fullLibraryViewModel: FullLibraryViewModel
@@ -93,7 +97,10 @@ class FullLibrary : Fragment() {
         fullLibraryViewModel.loadFolders()
         searchMenuSetUp()
     }
-
+    /**
+     * Configures the search menu in the toolbar.
+     * Adds a MenuProvider that handles search text changes and submission.
+     */
     private fun searchMenuSetUp() {
         val menuHost: MenuHost = requireActivity()
 
@@ -120,7 +127,13 @@ class FullLibrary : Fragment() {
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
-
+    /**
+     * Filters the list of folders based on the search query.
+     * Matches folder names, sheet names, or sheet authors.
+     *
+     * @param query The search text entered by the user. May be null or empty.
+     * @return Always returns true to indicate the query was handled.
+     */
     private fun handleFoldersForSearch(query: String?): Boolean {
         val filteredFolders = allFolders.filter { folder ->
             val searchText = query.orEmpty().trim()

@@ -14,7 +14,19 @@ import tfg.uniovi.melodies.fragments.adapters.FolderAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModelProviderFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
-
+/**
+ * Home fragment responsible for displaying the list of folders belonging to the current user.
+ *
+ * - Retrieves the user's folders from the FolderViewModel.
+ * - Displays them in a RecyclerView with a GridLayout.
+ * - Allows navigation to the AddFolder fragment for creating a new folder.
+ * - Navigates to the Library fragment when a folder is selected.
+ *
+ * Uses:
+ *  - [FolderViewModel] to manage folder data.
+ *  - [FolderAdapter] to display folders in the UI.
+ *  - [PreferenceManager] to get the current user ID.
+ */
 class Home : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var folderViewModel : FolderViewModel

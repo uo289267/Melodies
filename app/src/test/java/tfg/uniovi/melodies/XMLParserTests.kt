@@ -19,9 +19,9 @@ class XMLParserTests {
         val notes = parser.getAllNotes()
         assertEquals(1, notes.size)
         val note = notes[0] as Note
-        assertEquals('C', note.getName())
-        assertEquals(4, note.getOctave())
-        assertEquals(false, note.getSharp())
+        assertEquals('C', note.name)
+        assertEquals(4, note.octave)
+        assertEquals(false, note.sharp)
 
     }
 
@@ -34,14 +34,14 @@ class XMLParserTests {
         assertEquals(2, notes.size)
         //first note C4
         val note = notes[0] as Note
-        assertEquals('C', note.getName())
-        assertEquals(4, note.getOctave())
-        assertEquals(false, note.getSharp())
+        assertEquals('C', note.name)
+        assertEquals(4, note.octave)
+        assertEquals(false, note.sharp)
         //second note G5
         val note2 = notes[1] as Note
-        assertEquals('G', note2.getName())
-        assertEquals(5, note2.getOctave())
-        assertEquals(false, note2.getSharp())
+        assertEquals('G', note2.name)
+        assertEquals(5, note2.octave)
+        assertEquals(false, note2.sharp)
     }
 
     @Test
@@ -52,9 +52,9 @@ class XMLParserTests {
         val notes = parser.getAllNotes()
         assertEquals(1, notes.size)
         val note = notes[0] as Note
-        assertEquals('A', note.getName())
-        assertEquals(3, note.getOctave())
-        assertEquals(true, note.getSharp())
+        assertEquals('A', note.name)
+        assertEquals(3, note.octave)
+        assertEquals(true, note.sharp)
     }
 
     @Test

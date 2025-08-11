@@ -206,8 +206,8 @@ class SheetVisualization : Fragment() {
      */
     private fun setupWebView() {
         binding.webView.settings.javaScriptEnabled = true
-        WebView.setWebContentsDebuggingEnabled(true)
-        binding.webView.webChromeClient = object : WebChromeClient() {
+        WebView.setWebContentsDebuggingEnabled(true) //TODO remove
+        binding.webView.webChromeClient = object : WebChromeClient() { //TODO remove
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
                 Log.d("JS_CONSOLE", "${consoleMessage?.message()} -- From line ${consoleMessage?.lineNumber()} of ${consoleMessage?.sourceId()}")
                 return true

@@ -164,18 +164,17 @@ class SheetVisualizationViewModel(
 
         viewModelScope.launch(Dispatchers.Default) {
             _noteCheckingState.postValue(NoteCheckingState.CHECKING)
-        while (currentNoteIndex < _noteList.size) {
-            if(_shouldNavigateToNextPage.value == false || isCurrentPageAllSetUp){
-                val currentNote = _noteList[currentNoteIndex]
-                val isRepeatedNote = if (currentNoteIndex > 0) {
-                    val previousNote = _noteList[currentNoteIndex - 1]
-                    areNotesEqual(currentNote, previousNote)
-                } else {
-                    false
-                }
+            while (currentNoteIndex < _noteList.size) {
+                if(_shouldNavigateToNextPage.value == false || isCurrentPageAllSetUp){
+                    val currentNote = _noteList[currentNoteIndex]
+                    val isRepeatedNote = if (currentNoteIndex > 0) {
+                        val previousNote = _noteList[currentNoteIndex - 1]
+                        areNotesEqual(currentNote, previousNote)
+                    } else {
+                        false
+                    }
 
-                Log.d("CHECK", "Checking note index: $currentNoteIndex")
-
+                    Log.d("CHECK", "Checking note index: $currentNoteIndex")
 
                     val isCorrect = sheetChecker.isNotePlayedCorrectlyWithOnset(
                         noteToCheck = currentNote,
@@ -191,28 +190,25 @@ class SheetVisualizationViewModel(
 
                             Log.d("CHECK", "Note $currentNoteIndex correct, relative index: $relativeIndex")
 
-                            // Verificar si necesitamos cambFiar de página
+                            // Verificar si necesitamos cambiar de página
                             if (needsPageChange()) {
                                 handlePageCompletion()
                                 currentNoteIndex++
                             } else {
                                 delay(200)
                                 currentNoteIndex++
-                               // checkNextNote()
                             }
                         }
                         false -> {
                             highlightNoteByIndex(relativeIndex, "#FF0000")
                             delay(200)
-                            //checkNextNote()
                         }
                         null -> {
                             highlightNoteByIndex(relativeIndex, "#FF0000")
-                            //checkNextNote()
                         }
                     }
+                    }
                 }
-            }
             _noteCheckingState.postValue(NoteCheckingState.FINISHED)
             Log.d("CHECK", "All notes finished!")
         }

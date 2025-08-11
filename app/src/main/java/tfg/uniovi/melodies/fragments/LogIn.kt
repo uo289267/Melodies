@@ -17,11 +17,11 @@ import tfg.uniovi.melodies.fragments.viewmodels.LogInViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LogInViewModelProviderFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.utils.TextWatcherAdapter
-
 /**
- * A simple [Fragment] subclass.
- * Use the [LogIn.newInstance] factory method to
- * create an instance of this fragment.
+ * Fragment responsible for handling user login.
+ * Allows users to enter an existing user ID or create a new user.
+ * Observes ViewModel for login status and navigates accordingly.
+ * Also manages visibility of the bottom navigation menu during login.
  */
 class LogIn : Fragment() {
     private lateinit var  binding: FragmentLogInBinding
@@ -94,7 +94,12 @@ class LogIn : Fragment() {
             navView.visibility = visibility
         }
     }
-
+    /**
+     * Updates the user ID EditText field with a new value without triggering the text watcher.
+     *
+     * @param etName The EditText view for the user ID input.
+     * @param newName The new user ID string to set in the EditText.
+     */
     private fun modifyUserIdEditText(etName: EditText, newName:String){
         etName.apply {
             removeTextChangedListener(userIdInputWatcher)

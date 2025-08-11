@@ -32,9 +32,9 @@ import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.utils.RecyclerViewItemDecoration
 
 /**
- * A simple [Fragment] subclass.
- * Use the [Library.newInstance] factory method to
- * create an instance of this fragment.
+ * Fragment that displays all MusicXML sheets within a selected folder.
+ * Provides functionalities such as viewing, renaming, deleting sheets,
+ * and searching within the folder's sheets.
  */
 class Library : Fragment() {
 
@@ -115,7 +115,10 @@ class Library : Fragment() {
 
         searchMenuSetUp()
     }
-
+    /**
+     * Sets up the search menu with a SearchView to filter sheets by name or author.
+     * Adds the menu provider to the hosting activity.
+     */
     private fun searchMenuSetUp() {
         val menuHost: MenuHost = requireActivity()
 
@@ -144,7 +147,12 @@ class Library : Fragment() {
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
-
+    /**
+     * Filters the sheets list based on the search query entered by the user.
+     *
+     * @param newText The current text query input by the user.
+     * @return Boolean Always returns true to indicate the query was handled.
+     */
     private fun handleSheetsForSearch(newText: String?): Boolean {
         val filteredList = allSheetsInFolder.filter { sheet ->
             sheet.name.contains(newText.orEmpty(), ignoreCase = true) ||

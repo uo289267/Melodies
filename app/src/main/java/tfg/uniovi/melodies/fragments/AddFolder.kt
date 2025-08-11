@@ -27,6 +27,11 @@ import java.util.UUID
 
 private const val CREATE_FOLDER_TAG = "CREATE_FOLDER"
 
+/**
+ * Fragment responsible for creating a new folder.
+ * Allows entering a folder name, choosing a color, validating inputs,
+ * and interacting with the ViewModels to save the folder.
+ */
 class AddFolder : Fragment() {
 
     private lateinit var  binding: FragmentAddFolderBinding
@@ -95,7 +100,12 @@ class AddFolder : Fragment() {
         }
         return binding.root
     }
-
+    /**
+     * Updates the text in the folder name input field without triggering the TextWatcher.
+     *
+     * @param etName The EditText view containing the folder name input.
+     * @param newName The new folder name to display.
+     */
     private fun modifyFolderName(etName: EditText, newName:String){
         etName.apply {
             removeTextChangedListener(folderNameWatcher)
@@ -105,6 +115,14 @@ class AddFolder : Fragment() {
             addTextChangedListener(folderNameWatcher)
         }
     }
+    /**
+     * Configures the "Create Folder" button with click logic:
+     * - Validates the folder name.
+     * - Checks for length limits and non-empty value.
+     * - If valid, triggers the ViewModel to check for duplicates.
+     *
+     * @param binding The FragmentAddFolderBinding instance for accessing the UI.
+     */
     private fun configureButtonAddFolder(binding: FragmentAddFolderBinding) {
         binding.btnCreateFolder.setOnClickListener{
             //call to addFolder
@@ -123,7 +141,12 @@ class AddFolder : Fragment() {
             }
         }
     }
-
+    /**
+     * Configures the spinner for selecting the folder color.
+     * Updates the ViewModel with the selected color.
+     *
+     * @param spFolderColors The Spinner view used for selecting folder colors.
+     */
     private fun configureSpinner(spFolderColors: Spinner){
         spFolderColors.adapter = SpinnerFoldersColorsAdapter(requireContext(),colors)
         spFolderColors.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {

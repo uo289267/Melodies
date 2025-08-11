@@ -30,6 +30,11 @@ private const val IMPORT_TAG = "IMPORT"
 private const val EXTENSION_APP_XML = "application/xml"
 private const val EXTENSION_TXT_XML = "text/xml"
 
+/**
+ * Fragment responsible for importing one or more MusicXML files into a selected folder.
+ * Allows the user to pick files from storage, parse and validate them,
+ * choose a destination folder, and save the files through the ViewModel.
+ */
 class Import : Fragment() {
     private lateinit var binding : FragmentImportBinding
     private val openMultipleMusicXmlLauncher =
@@ -89,7 +94,10 @@ class Import : Fragment() {
         configureSpinner()
         return binding.root
     }
-
+    /**
+     * Observes the selected folder changes in the ViewModel
+     * and updates the Spinner selection accordingly.
+     */
     private fun viewModelFolderChosenSetUp() {
         importViewModel.folderChosen.observe(viewLifecycleOwner) { newFolderChosen ->
             folderChosen = newFolderChosen
@@ -102,7 +110,12 @@ class Import : Fragment() {
             }
         }
     }
-
+    /**
+     * Sets up the import button click listener.
+     * Validates if a folder is selected and files are loaded,
+     * and triggers the saving process of the MusicXML files.
+     *
+     */
     private fun btnImportSetUp() {
         binding.btnImport.setOnClickListener {
             val result = importViewModel.storeNewMusicXML()
@@ -138,6 +151,11 @@ class Import : Fragment() {
         }
     }
 
+    /**
+     * Initializes the ViewModel and observes changes in the list of folders and imported files.
+     * Updates the Spinner adapter and the displayed file names.
+     *
+     */
     private fun viewModelSetUp() {
         importViewModel = ViewModelProvider(
             this, ImportViewModelProviderFactory(
@@ -165,7 +183,11 @@ class Import : Fragment() {
 
 
     }
-
+    /**
+     * Sets up the upload file button click listener.
+     * Launches a file picker to select MusicXML files.
+     *
+     */
     private fun imageButtonSetUp() {
         binding.imgBtnUploadFile.setOnClickListener {
             openMultipleMusicXmlLauncher.launch(
@@ -173,6 +195,11 @@ class Import : Fragment() {
             )
         }
     }
+    /**
+     * Configures the Spinner that displays available folders.
+     * Updates the ViewModel with the newly selected folder.
+     *
+     */
     private fun configureSpinner(){
         binding.spFolder.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(

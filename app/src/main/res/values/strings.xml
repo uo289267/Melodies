@@ -45,4 +45,5 @@
     <string name="add_folder">Add Folder</string>
     <string name="folder_s_name">Folder\'s Name</string>
     <string name="create">Create</string>
+    <string name="log_out_quest">Log</string>
 </resources>

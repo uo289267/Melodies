@@ -1,16 +1,23 @@
 package tfg.uniovi.melodies.entities.notes
 
-import androidx.collection.emptyLongSet
 import tfg.uniovi.melodies.entities.notes.abstractClasses.ScoreElementAbstract
 import tfg.uniovi.melodies.entities.notes.interfaces.NoteComparable
-
+/**
+ * Represents a musical note in a score.
+ * Stores its duration, name (pitch class), octave, and whether it is sharp.
+ * Implements comparison operations with dominant notes.
+ *
+ * @param duration The duration of the note in milliseconds.
+ * @param _name The pitch class of the note (A–G).
+ * @param _octave The octave number of the note.
+ * @param _sharp True if the note is sharp (#), false otherwise.
+ */
 class Note(
-    id: Int,
     duration: Long,
     private val _name: Char,
     private val _octave: Int,
     private val _sharp: Boolean
-) : ScoreElementAbstract(id, duration), NoteComparable {
+) : ScoreElementAbstract(duration), NoteComparable {
 
     override val name: Char
         get() = _name
@@ -20,15 +27,33 @@ class Note(
 
     override val sharp: Boolean
         get() = _sharp
-
-    override fun check(noteToCheck: NoteDominant): Boolean {
+    /**
+     * Checks if the given dominant note matches this note in name and octave.
+     *
+     * @param noteToCheck The dominant note to compare against, or null.
+     * @return True if the names and octaves match, false otherwise.
+     */
+    override fun check(noteToCheck: NoteDominant?): Boolean {
+        if(noteToCheck==null)
+            return false
         return (noteToCheck.name == this.name) && (noteToCheck.octave == this._octave)
     }
 
+    /**
+     * Peeks at the given dominant note to see if it matches this note.
+     * This is equivalent to calling [check] with the given note.
+     *
+     * @param noteToCheck The dominant note to compare against.
+     * @return True if the names and octaves match, false otherwise.
+     */
     override fun peek(noteToCheck: NoteDominant): Boolean {
         return check(noteToCheck)
     }
-
+    /**
+     * Returns the string representation of the note, including sharp sign if applicable.
+     *
+     * @return A string in the format "Name[#]Octave", e.g., "C#4" or "A3".
+     */
     override fun toString(): String {
         var string = ""
         if(_sharp)

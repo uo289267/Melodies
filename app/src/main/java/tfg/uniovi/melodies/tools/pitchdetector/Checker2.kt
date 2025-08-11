@@ -17,46 +17,7 @@ class SheetChecker2() {
     private val minimumNoteStabilityMs = 100L // Tiempo mínimo para considerar una nota estable
     private val minimumSilenceMs = 50L // Tiempo mínimo de silencio para detectar nueva nota repetida
 
-    /**
-     * Detecta si una nueva nota ha comenzado a sonar (incluyendo notas repetidas)
-     * @return la nota detectada si es un onset, null si no hay cambio
-     */
-    private fun detectNoteOnset(): String? {
-        val currentNote = PitchDetector.getLastDetectedNote()
-        val currentTime = System.currentTimeMillis()
 
-        // Si no hay nota detectada (silencio)
-        if (currentNote.isEmpty() || currentNote == "Desconocido") {
-            if (!wasInSilence) {
-                wasInSilence = true
-                lastSilenceTime = currentTime
-                Log.d("ONSET_DETECTOR", "Silencio detectado")
-            }
-            return null
-        }
-
-        // Si había silencio y ahora hay una nota
-        if (wasInSilence) {
-            if (currentTime - lastSilenceTime > minimumSilenceMs) {
-                wasInSilence = false
-                lastDetectedNote = currentNote
-                lastNoteChangeTime = currentTime
-                Log.d("ONSET_DETECTOR", "Nueva nota después de silencio: $currentNote")
-                return currentNote
-            }
-        }
-        // Si cambió la nota (diferente a la anterior)
-        else if (lastDetectedNote != currentNote) {
-            if (currentTime - lastNoteChangeTime > minimumNoteStabilityMs) {
-                lastDetectedNote = currentNote
-                lastNoteChangeTime = currentTime
-                Log.d("ONSET_DETECTOR", "Cambio de nota detectado: $currentNote")
-                return currentNote
-            }
-        }
-
-        return null
-    }
 
     /**
      * Resetea el detector de onset para prepararlo para la siguiente nota
@@ -106,7 +67,6 @@ class SheetChecker2() {
                                          allowSameNote: Boolean = false): Boolean? {
         val startTime = System.currentTimeMillis()
 
-
         Log.d("SHEET_CHECKER", "Esperando inicio de nota: $noteToCheck (permitir repetida: $allowSameNote)")
 
         // Si permitimos la misma nota y ya está sonando la correcta, continuar inmediatamente
@@ -122,7 +82,7 @@ class SheetChecker2() {
         }
 
         while (System.currentTimeMillis() - startTime < timeoutMs) {
-            val detectedOnset = detectNoteOnset()
+            val detectedOnset = PitchDetector.getLastDetectedNote()
 
             // Si no se detecta onset normal, intentar por amplitud/tiempo
             val finalOnset = detectedOnset ?: detectOnsetByAmplitude()
@@ -153,7 +113,7 @@ class SheetChecker2() {
      * @return true si nota correcta, false si incorrecta, null si no se detectó onset
      */
     fun isNotePlayedCorrectlyWithOnset(noteToCheck: ScoreElement,
-                                       dominancePercentage: Double = 0.95,
+                                       dominancePercentage: Double = 0.8,
                                        onsetTimeoutMs: Long = 10000L,
                                        isRepeatedNote: Boolean = false): Boolean? {
 
@@ -170,21 +130,6 @@ class SheetChecker2() {
 
         // PASO 1: Esperar a que comience la nota esperada
         val onsetDetected = waitForExpectedNoteOnset(noteToCheck, onsetTimeoutMs, isRepeatedNote)
-
-
-        /*when (onsetDetected) {
-            null -> {
-                Log.d("SHEET_CHECKER", "TIMEOUT: No se detectó inicio de nota $expectedNoteName")
-                return null
-            }
-            false -> {
-                Log.d("SHEET_CHECKER", "NOTA INCORRECTA detectada al inicio para $expectedNoteName")
-                return false
-            }
-            true -> {
-                Log.d("SHEET_CHECKER", "✓ ONSET CORRECTO detectado para $expectedNoteName. Iniciando verificación de duración...")
-            }
-        }*/
 
         // PASO 2: Una vez detectado el onset correcto, verificar durante la duración
         if(onsetDetected!= null){
@@ -215,11 +160,13 @@ class SheetChecker2() {
                 Log.d("SHEET_CHECKER", "Conteos de notas: $noteCounts")
                 Log.d("SHEET_CHECKER", "Nota dominante: $dominantNote, Esperada: $noteToCheck")
 
-                val result = dominantNote?.let {
-                    noteToCheck.check(NoteDominant(baseNote(it), octave(it)))
-                }
+                val result : Boolean?
+                if(dominantNote!=null)
+                    result = noteToCheck.check(NoteDominant(baseNote(dominantNote), octave(dominantNote)))
+                else
+                    result = noteToCheck.check(null)
 
-                Log.d("SHEET_CHECKER", "=== RESULTADO FINAL: ${result ?: "null"} ===")
+                Log.d("SHEET_CHECKER", "=== RESULTADO FINAL: $result ===")
 
                 return result
             }
@@ -227,40 +174,6 @@ class SheetChecker2() {
         return false
     }
 
-    /**
-     * Método original mantenido para compatibilidad
-     *//*
-    fun isNotePlayedCorrectly(noteToCheck: ScoreElement,
-                              dominancePercentage: Double = 0.95): Boolean? {
-
-        val listOfNotes = mutableListOf<String>()
-        val start = System.currentTimeMillis()
-        val durationMs = noteToCheck.getDuration()
-
-        // Listening for the amount of time said in samplingInterval
-        while (System.currentTimeMillis() - start < durationMs) {
-            val note = PitchDetector.getLastDetectedNote()
-            listOfNotes.add(note)
-            Thread.sleep(50) // Reducido el sleep para mejor responsividad
-        }
-
-        // Get the frequency of each note
-        val noteCounts = listOfNotes.groupingBy { it }.eachCount()
-        val totalSamples = listOfNotes.size
-        val threshold = (totalSamples * dominancePercentage).toInt()
-
-        // find the note that appears at least 95%
-        val dominantNote = noteCounts.entries.find { it.value >= threshold }?.key
-        var name = "Z"
-        if (noteToCheck is Note) {
-            name = noteToCheck.name.toString() + noteToCheck.octave.toString()
-        }
-
-        Log.d("SHEET_CHECKER", "Esperado: $name, Detectado: $dominantNote")
-
-        return dominantNote?.let { noteToCheck.check(NoteDominant(notaBase(it), octave(it))) }
-    }
-*/
     private fun baseNote(nota: String): Char {
         return nota[0]
     }
