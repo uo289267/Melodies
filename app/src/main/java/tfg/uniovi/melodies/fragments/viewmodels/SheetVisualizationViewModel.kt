@@ -11,6 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.entities.notes.Note
+import tfg.uniovi.melodies.entities.notes.Rest
 import tfg.uniovi.melodies.entities.notes.interfaces.ScoreElement
 import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
 import tfg.uniovi.melodies.tools.pitchdetector.SheetChecker2
@@ -139,7 +140,7 @@ class SheetVisualizationViewModel(
         //_shouldNavigateToNextPage.value = false
         val currentPage = _currentPage.value!!
         val pageToBeUpdated = currentPage - 1
-        if(pageToBeUpdated > 1){
+        if(pageToBeUpdated >= 1){
             _currentPage.value= pageToBeUpdated
             isCurrentPageAllSetUp=false
            // currentNoteIndex= notesPerPage[pageToBeUpdated]!!.first
@@ -167,6 +168,7 @@ class SheetVisualizationViewModel(
             while (currentNoteIndex < _noteList.size) {
                 if(_shouldNavigateToNextPage.value == false || isCurrentPageAllSetUp){
                     val currentNote = _noteList[currentNoteIndex]
+                    val currentPageWhenCurrentNote = _currentPage.value
                     val isRepeatedNote = if (currentNoteIndex > 0) {
                         val previousNote = _noteList[currentNoteIndex - 1]
                         areNotesEqual(currentNote, previousNote)
@@ -184,11 +186,16 @@ class SheetVisualizationViewModel(
                     )
                     val relativeIndex = currentNoteIndex - (notesPerPage[_currentPage.value]?.first ?: 0)
                     Log.d("PAGING", "Absolute Index: $currentNoteIndex and relative Index: $relativeIndex")
+                    if(_currentPage.value!=currentPageWhenCurrentNote){
+                        continue
+                    }
                     when (isCorrect) {
                         true -> {
                             highlightNoteByIndex(relativeIndex, "#00FF00")
 
-                            Log.d("CHECK", "Note $currentNoteIndex correct, relative index: $relativeIndex")
+                            Log.d("CHECK", "Note $currentNoteIndex correct, relative index: $relativeIndex " +
+                                    "isRest: ${currentNote is Rest } we are on page: ${_currentPage.value} " +
+                                    "currentPage when current note was fetched $currentPageWhenCurrentNote")
 
                             // Verificar si necesitamos cambiar de página
                             if (needsPageChange()) {

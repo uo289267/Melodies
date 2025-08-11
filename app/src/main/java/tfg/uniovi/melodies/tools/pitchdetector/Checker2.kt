@@ -73,7 +73,8 @@ class SheetChecker2() {
         if (allowSameNote) {
             val currentNote = PitchDetector.getLastDetectedNote()
             if (currentNote.isNotEmpty() && currentNote != "Desconocido") {
-                val isCurrentCorrect = noteToCheck.peek(NoteDominant(baseNote(currentNote), octave(currentNote)))
+                // TODO val isCurrentCorrect = noteToCheck.peek(NoteDominant(baseNote(currentNote), octave(currentNote)))
+                val isCurrentCorrect = noteToCheck.check(NoteDominant(baseNote(currentNote), octave(currentNote)))
                 if (isCurrentCorrect) {
                     Log.d("SHEET_CHECKER", "Nota esperada ya está sonando: $currentNote")
                     return true
@@ -91,7 +92,8 @@ class SheetChecker2() {
                 Log.d("SHEET_CHECKER", "Onset detectado: $detectedNote, Esperado: $noteToCheck")
 
                 // Verificar si la nota detectada coincide con la esperada
-                val isCorrect = noteToCheck.peek(NoteDominant(baseNote(detectedNote), octave(detectedNote)))
+                //TODO val isCorrect = noteToCheck.peek(NoteDominant(baseNote(detectedNote), octave(detectedNote)))
+                val isCorrect = noteToCheck.check(NoteDominant(baseNote(detectedNote), octave(detectedNote)))
                 return isCorrect
             }
 

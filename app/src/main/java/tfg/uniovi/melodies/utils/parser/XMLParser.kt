@@ -42,7 +42,7 @@ class XMLParser() {
 
                 val isRest = restList.length > 0
                 if (isRest) {
-                    val rest = Rest(noteCount++, durationMs.toLong())
+                    val rest = Rest(durationMs.toLong())
                     pendingRests.add(rest)
                     this.notes.add(rest)
                     continue
@@ -70,7 +70,7 @@ class XMLParser() {
                             sharp = true
                     }
 
-                    val note = Note(noteCount++, durationMs.toLong(), name, octave,sharp)
+                    val note = Note(durationMs.toLong(), name, octave,sharp)
 
                     for (rest in pendingRests) {
                         rest.setFollowingNote(note)
