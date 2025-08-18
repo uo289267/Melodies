@@ -54,6 +54,9 @@ class SheetVisualizationViewModel(
     val currentPage: LiveData<Int>
         get() = _currentPage
 
+    private val _canCheckNote =  MutableLiveData(true)
+    val canCheckNote: LiveData<Boolean> get() = _canCheckNote
+
     private val _shouldNavigateToNextPage = MutableLiveData(false)
     val shouldNavigateToNextPage: LiveData<Boolean> get() = _shouldNavigateToNextPage
 
@@ -93,9 +96,13 @@ class SheetVisualizationViewModel(
             calculateNotesInCurrentPage()
             currentNoteIndex= notesPerPage[currentPage.value]?.first ?: currentNoteIndex
             _shouldNavigateToNextPage.postValue(false)
-            if(noteCheckingState.value!= NoteCheckingState.CHECKING)
+            if(noteCheckingState.value!= NoteCheckingState.CHECKING && _canCheckNote.value == true)
                 checkNextNote()
         }
+    }
+
+    fun updateCanCheckNote(canCheckNote: Boolean){
+        _canCheckNote.value=canCheckNote
     }
 
     /**
@@ -181,8 +188,7 @@ class SheetVisualizationViewModel(
                     val isCorrect = sheetChecker.isNotePlayedCorrectlyWithOnset(
                         noteToCheck = currentNote,
                         dominancePercentage = 0.95,
-                        onsetTimeoutMs = 15000L,
-                        isRepeatedNote = isRepeatedNote
+                        onsetTimeoutMs = 15000L
                     )
                     val relativeIndex = currentNoteIndex - (notesPerPage[_currentPage.value]?.first ?: 0)
                     Log.d("PAGING", "Absolute Index: $currentNoteIndex and relative Index: $relativeIndex")
@@ -193,25 +199,21 @@ class SheetVisualizationViewModel(
                         true -> {
                             highlightNoteByIndex(relativeIndex, "#00FF00")
 
-                            Log.d("CHECK", "Note $currentNoteIndex correct, relative index: $relativeIndex " +
-                                    "isRest: ${currentNote is Rest } we are on page: ${_currentPage.value} " +
-                                    "currentPage when current note was fetched $currentPageWhenCurrentNote")
+                            Log.d("CHECK", "Note $currentNoteIndex correct, " +
+                                    "relative index: $relativeIndex")
 
-                            // Verificar si necesitamos cambiar de página
+                            // Verify if we need to change page
                             if (needsPageChange()) {
                                 handlePageCompletion()
                                 currentNoteIndex++
                             } else {
-                                delay(200)
+                                delay(50)
                                 currentNoteIndex++
                             }
                         }
                         false -> {
                             highlightNoteByIndex(relativeIndex, "#FF0000")
-                            delay(200)
-                        }
-                        null -> {
-                            highlightNoteByIndex(relativeIndex, "#FF0000")
+                            delay(50)
                         }
                     }
                     }

@@ -11,10 +11,17 @@ import tfg.uniovi.melodies.entities.notes.interfaces.ScoreElement
 import tfg.uniovi.melodies.entities.notes.Rest
 
 class XMLParser() {
+    //ALL SHEETS PROVIDED NEED TO HAVE THEIR BASE OCTAVE TO BE 4
+    companion object {
+        const val BASE_OCTAVE_FLUTE: Int = 5
+    }
+    private val NEUTRAL_OCTAVE: Int = 4
+
     private lateinit var musicxml: Document
     private val notes = mutableListOf<ScoreElement>()
     private var quarterNoteDuration : Long? = null
     private var divisionsPerQuarter: Int? = null
+
 
     constructor(musicxml: Document) : this() {
         this.musicxml = musicxml
@@ -29,7 +36,6 @@ class XMLParser() {
             this.divisionsPerQuarter = getDivisionsPerQuarter()
 
             val notes: NodeList = musicxml.getElementsByTagName("note")
-            var noteCount = 0
             val pendingRests = mutableListOf<Rest>()
 
             for (i in 0 until notes.length) {
@@ -58,11 +64,12 @@ class XMLParser() {
 
                     val name = stepElement.textContent[0]
                     var octave = octaveElement.textContent.toInt()
-                    //From standard 4 to 5 as flute plays in 4 or 6 TODO
-                    if(octave == 4)
-                        octave = 5
-                    else if(octave == 5)
-                        octave = 6
+                    //From standard 4 to 5 as flute plays in 4 or 6
+                    if(octave == NEUTRAL_OCTAVE)
+                        octave = BASE_OCTAVE_FLUTE
+                    else{
+                        octave = octave-NEUTRAL_OCTAVE+BASE_OCTAVE_FLUTE
+                    }
                     var sharp = false
                     if (alter != null) {
                         val alterElement = alter as Element

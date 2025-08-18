@@ -24,10 +24,14 @@ object PitchDetector {
     private const val KNOWN_NOTE_NAME = "A"
     private const val KNOWN_NOTE_OCTAVE = 4
     private const val KNOWN_NOTE_FREQUENCY = 440.0
+    const val SILENCE ="Unknown"
+    const val MIC_REQ_CODE = 11223344
+
     private var dispatcher: AudioDispatcher? = null
     @Volatile private var isRunning = false
-    private var lastDetectedNote: String = "None"
-     const val MIC_REQ_CODE = 11223344
+    private var lastDetectedNote: String = SILENCE
+
+
 
 
 
@@ -44,6 +48,9 @@ object PitchDetector {
                 val pitchInHz = result.pitch
                 lastDetectedNote = convertFrequencyToNote(pitchInHz)
                 //Log.d("PITCH","Frecuencia: $pitchInHz Hz, Nota: $lastDetectedNote")
+            }else{
+                lastDetectedNote = SILENCE
+                //Log.d("PITCH","SILENCE...")
             }
         }
 
@@ -63,24 +70,6 @@ object PitchDetector {
     }
 
     fun getLastDetectedNote(): String = lastDetectedNote
-/*
-    private fun convertFrequencyToNote(frequency: Float): String {
-        val notes = arrayOf("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
-        // Reference A4 = 440 Hz
-        val A4 = 440
-        //val noteIndex = Math.round(12 * ln((frequency / A4).toDouble()) / ln(2.0)).toInt()
-        //val noteIndex = (12 * kotlin.math.log(frequency / A4) / kotlin.math.log(2.0)).roundToInt()
-        val noteIndex = (12 * log((frequency / A4).toDouble(), 2.0)).roundToInt()
-
-        val noteNumber = (noteIndex + 69) % 12
-        val octave = (noteIndex + 69) / 12
-
-        return if (noteNumber >= 0 && noteNumber < notes.size) {
-            notes[noteNumber] + octave
-        } else {
-            "Desconocido"
-        }
-    }*/
 
     private fun convertFrequencyToNote(frequency: Float): String {
 

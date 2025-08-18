@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
         }
         setupBottomNavigation()
         controlBottomNavigationVisibility()
+
     }
     private fun checkUserAndNavigate() {
         val userId = PreferenceManager.getUserId(this)

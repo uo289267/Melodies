@@ -104,6 +104,7 @@ class SheetVisualization : Fragment() {
                                 "no feedback will be given tap each end of the screen to navigate",
                         "PARSING_XML",
                         "alert dialog showed because xml missing attributes and/or elements")
+                    sheetVisualizationViewModel.updateCanCheckNote(false)
                 }
                 val encondedXML =
                     Base64.encodeToString(it.stringSheet.toByteArray(), Base64.NO_WRAP)
