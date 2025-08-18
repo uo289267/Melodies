@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.Colors
 import tfg.uniovi.melodies.entities.Folder
-import tfg.uniovi.melodies.utils.ShowAlertDialog
 
 class FolderViewHolder(
     private val view: View,
