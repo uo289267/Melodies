@@ -25,9 +25,6 @@ class Rest(duration: Long)
                     || this.followingNote!!.octave!=noteToCheck.octave
     }
 
-    override fun peek(noteToCheck: NoteDominant): Boolean {
-        return true
-    }
 
     /**
      * Sets the following note field with the given note

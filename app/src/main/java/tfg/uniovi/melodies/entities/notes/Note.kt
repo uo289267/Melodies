@@ -42,16 +42,6 @@ class Note(
     }
 
     /**
-     * Peeks at the given dominant note to see if it matches this note.
-     * This is equivalent to calling [check] with the given note.
-     *
-     * @param noteToCheck The dominant note to compare against.
-     * @return True if the names and octaves match, false otherwise.
-     */
-    override fun peek(noteToCheck: NoteDominant): Boolean {
-        return check(noteToCheck)
-    }
-    /**
      * Returns the string representation of the note, including sharp sign if applicable.
      *
      * @return A string in the format "Name[#]Octave", e.g., "C#4" or "A3".

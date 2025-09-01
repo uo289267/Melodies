@@ -8,10 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.view.WindowManager
-import android.webkit.ConsoleMessage
-import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
@@ -35,7 +32,7 @@ import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.MIC_REQ_CODE
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.startListening
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.stopListening
 import tfg.uniovi.melodies.utils.ShowAlertDialog
-import tfg.uniovi.melodies.utils.parser.SVGParserException
+import tfg.uniovi.melodies.utils.parser.XMLParserException
 
 private const val VEROVIO_HTML = "file:///android_asset/verovio.html"
 
@@ -97,7 +94,7 @@ class SheetVisualization : Fragment() {
                 binding.toolbar.title = it.name
                 try{
                     sheetVisualizationViewModel.parseMusicXML()
-                }catch (e : SVGParserException){
+                }catch (e : XMLParserException){
                     ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(requireContext(),
                         "Invalid MusicXML",
                         "MusicXML is missing attributes and/or elements, " +

@@ -5,5 +5,4 @@ import tfg.uniovi.melodies.entities.notes.NoteDominant
 interface ScoreElement {
     fun check(noteToCheck: NoteDominant?): Boolean
     fun getDuration(): Long
-    fun peek(noteToCheck: NoteDominant) : Boolean
 }

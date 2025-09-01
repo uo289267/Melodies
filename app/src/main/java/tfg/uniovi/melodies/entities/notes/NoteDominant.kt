@@ -21,6 +21,6 @@ class NoteDominant(
      * @return A string in the format "Name[#]Octave", e.g., "C#4" or "A3".
      */
     override fun toString(): String {
-        return "$name{if (sharp) \"#\" else \"\"}$octave$"
+        return "$name${if (sharp) "#" else ""}$octave$"
     }
 }
