@@ -61,47 +61,5 @@ class UsersFirestore {
         }
     }
 
-    /*
-        suspend fun setupUserDataIfNeeded(context: Context) {
-
-            /*val storedUserId = PreferenceManager.getUserId(context)
-            if (storedUserId != null) {
-                Log.d("UserRepository", "Usuario ya existente con ID $storedUserId")
-                return  // Ya hay usuario creado, no repetir
-            }
-
-            val userRef = db.collection("users").document() // ID automático
-            val userId = userRef.id
-
-            // Crear documento de usuario
-           // userRef.set(mapOf("createdAt" to FieldValue.serverTimestamp()))
-            //    .addOnSuccessListener {
-                    // Crear carpeta "Basic Sheets"
-                    val folderRef = userRef.collection("folders").document()
-                    val folderData = mapOf(
-                        "name" to "Basic Sheets",
-                        "color" to "YELLOW",
-                        "creationTime" to FieldValue.serverTimestamp()
-                    )
-                    folderRef.set(folderData).addOnSuccessListener {
-                        // Cargar partituras desde Firestore
-                        db.collection("defaultSheets").get()
-                            .addOnSuccessListener { result ->
-                                for (sheetDoc in result) {
-                                    val sheetData = sheetDoc.data
-                                    folderRef.collection("sheets").add(sheetData)
-                                }
-                                Log.d("UserRepository", "Partituras copiadas para usuario $userId")
-                                PreferenceManager.saveUserId(context, userId)
-                            }
-                            .addOnFailureListener { e ->
-                                Log.e("UserRepository", "Error cargando partituras por defecto", e)
-                            }
-                    }
-                /*}
-                .addOnFailureListener { e ->
-                    Log.e("UserRepository", "Error creando usuario", e)
-                }*/*/
-        }*/
 
 }
