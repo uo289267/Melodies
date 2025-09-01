@@ -69,7 +69,7 @@ class SheetChecker2 {
 
             if(detectedOnset != PitchDetector.SILENCE){
                 Log.d("SHEET_CHECKER", "Onset detectado: $detectedOnset, Esperado: $noteToCheck")
-                return noteToCheck.check(NoteDominant(baseNote(detectedOnset), octave(detectedOnset)))
+                return noteToCheck.check(NoteDominant(baseNote(detectedOnset), octave(detectedOnset),isSharp(detectedOnset)))
             }
         }
 
@@ -116,7 +116,7 @@ class SheetChecker2 {
         Log.d("SHEET_CHECKER", "Nota dominante: $dominantNote, Esperada: $noteToCheck")
 
         val result: Boolean = if (dominantNote != null)
-            noteToCheck.check(NoteDominant(baseNote(dominantNote), octave(dominantNote)))
+            noteToCheck.check(NoteDominant(baseNote(dominantNote), octave(dominantNote),isSharp(dominantNote)))
         else
             noteToCheck.check(null)
 
@@ -142,5 +142,14 @@ class SheetChecker2 {
      */
     private fun octave(note: String): Int {
         return Regex("\\d+").find(note)?.value?.toInt() ?: XMLParser.BASE_OCTAVE_FLUTE
+    }
+    /**
+     * Returns true if the note string contains the # symbol
+     *
+     * @param note The note string.
+     * @return True when the note string has a sharp #
+     */
+    private fun isSharp(note: String):Boolean{
+        return note.contains("#")
     }
 }

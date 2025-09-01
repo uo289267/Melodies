@@ -40,7 +40,7 @@ class FolderInFullLibraryViewHolder(
         }
         val itemTouchHelper = ItemTouchHelper(
             MyItemTouchHelper { position, direction ->
-                if (direction == ItemTouchHelper.START) {
+                if (direction == ItemTouchHelper.START || direction == ItemTouchHelper.END) {
                     adapter.removeItemAt(position)
                     // notifying vm to remove from db
                     libraryViewModel.deleteSheetAt(position)

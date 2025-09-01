@@ -13,7 +13,7 @@ import tfg.uniovi.melodies.entities.notes.interfaces.NoteComparable
 class NoteDominant(
     override val name: Char,
     override val octave: Int,
-    override val sharp: Boolean = false
+    override val sharp: Boolean
 ) : NoteComparable {
     /**
      * Returns the string representation of the note, including sharp sign if applicable.

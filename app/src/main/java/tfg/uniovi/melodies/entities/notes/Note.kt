@@ -36,7 +36,9 @@ class Note(
     override fun check(noteToCheck: NoteDominant?): Boolean {
         if(noteToCheck==null)
             return false
-        return (noteToCheck.name == this.name) && (noteToCheck.octave == this._octave)
+        return (noteToCheck.name == this._name) &&
+                (noteToCheck.octave == this._octave) &&
+                (noteToCheck.sharp == this._sharp)
     }
 
     /**

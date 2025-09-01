@@ -32,6 +32,7 @@ class FoldersAndSheetsFirestore (val userId: String){
         } catch (e: Exception) {
             println("Error getting song: $e")
             null
+            // TODO lanzar custom exception?
         }
     }
 
@@ -50,6 +51,7 @@ class FoldersAndSheetsFirestore (val userId: String){
         } catch (e: Exception) {
             println("Error getting song: $e")
             null
+            // TODO lanzar custom exception?
         }
     }
 
@@ -65,6 +67,7 @@ class FoldersAndSheetsFirestore (val userId: String){
         } catch (e: Exception) {
             Log.e("FIRESTORE", "Error getting folders", e)
             emptyList()
+            // TODO lanzar custom exception?
         }
     }
 
@@ -82,6 +85,7 @@ class FoldersAndSheetsFirestore (val userId: String){
             // Handle error
             println("Error adding song: $e")
             null
+            // TODO lanzar custom exception?
         }
     }
 
@@ -103,6 +107,7 @@ class FoldersAndSheetsFirestore (val userId: String){
             // Handle error
             println("Error adding song: $e")
             null
+            // TODO lanzar custom exception?
         }
     }
     suspend fun setNewSheetName(sheetId: String, folderId: String, newName: String) {
@@ -118,10 +123,10 @@ class FoldersAndSheetsFirestore (val userId: String){
         } catch (e: Exception) {
             // Handle error
             println("Error renaming song $sheetId: $e")
+           // TODO lanzar custom exception?
         }
     }
 
-    // Coroutine-based function to delete a song
     suspend fun deleteFolder(folderId: String) {
         try {
             usersCollection.document(userId)
@@ -129,6 +134,7 @@ class FoldersAndSheetsFirestore (val userId: String){
         } catch (e: Exception) {
             // Handle error
             println("Error deleting song: $e")
+            // TODO lanzar custom exception?
         }
     }
     suspend fun deleteSheet(sheetId: String, folderId: String) {
@@ -143,6 +149,7 @@ class FoldersAndSheetsFirestore (val userId: String){
         } catch (e: Exception) {
             // Handle error
             println("Error deleting song: $e")
+            // TODO lanzar custom exception?
         }
     }
 
@@ -165,6 +172,7 @@ class FoldersAndSheetsFirestore (val userId: String){
             // Handle error
             println("Error getting all songs: $e")
             emptyList()
+            // TODO lanzar custom exception?
         }
     }
 
