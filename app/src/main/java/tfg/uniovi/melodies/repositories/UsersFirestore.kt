@@ -7,9 +7,6 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 import tfg.uniovi.melodies.preferences.PreferenceManager
-import tfg.uniovi.melodies.utils.parser.String2MusicXML
-import tfg.uniovi.melodies.utils.parser.XMLParser
-import java.io.IOException
 
 class UsersFirestore {
     private val db = Firebase.firestore
