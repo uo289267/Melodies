@@ -9,6 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.webkit.ConsoleMessage
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +22,9 @@ import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.caverock.androidsvg.SVG
+import android.graphics.Bitmap // Necesario para el FileResolver
+import android.graphics.Typeface
+import com.caverock.androidsvg.SVGExternalFileResolver
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentSheetVisualizationBinding
@@ -28,6 +33,7 @@ import tfg.uniovi.melodies.fragments.viewmodels.NoteCheckingState
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModelFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
+import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.MIC_REQ_CODE
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.startListening
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.stopListening
@@ -42,7 +48,6 @@ class SheetVisualization : Fragment() {
     private lateinit var binding: FragmentSheetVisualizationBinding
     private lateinit var sheetVisualizationViewModel: SheetVisualizationViewModel
     private lateinit var musicXMLSheet: MusicXMLSheet
-    //private var currentPage = 1
     private var totalPages = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,7 +73,7 @@ class SheetVisualization : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSheetVisualizationBinding.inflate(inflater, container, false)
-
+        SVG.registerExternalFileResolver(AssetFileResolver())
         sheetVisualizationViewModel = ViewModelProvider(this, SheetVisualizationViewModelFactory(
             PreferenceManager.getUserId(requireContext())!!
         ))[SheetVisualizationViewModel::class.java]
@@ -121,7 +126,7 @@ class SheetVisualization : Fragment() {
         sheetVisualizationViewModel.svg.observe(viewLifecycleOwner) { svg ->
             try {
                 Log.d("PAGING", "SVG CHANGED")
-                binding.sheetImageView.setSVG(SVG.getFromString(svg))
+                                    binding.sheetImageView.setSVG(SVG.getFromString(svg))
                 binding.sheetImageView.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.GONE
                 sheetVisualizationViewModel.updateCurrentPage()
@@ -129,19 +134,6 @@ class SheetVisualization : Fragment() {
                 Log.e("SVG_OBSERVER", "Failed to load SVG", e)
             }
         }
-/*
-        sheetVisualizationViewModel.parsingFinished.observe(viewLifecycleOwner) { finished ->
-            if (finished) {
-                binding.sheetImageView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver
-                .OnGlobalLayoutListener {
-                    override fun onGlobalLayout() {
-                        // Remove listener to avoid multiple calls
-                        binding.sheetImageView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                        sheetVisualizationViewModel.startNoteChecking()
-                    }
-                })
-            }
-        }*/
 
 
         sheetVisualizationViewModel.currentPage.observe(viewLifecycleOwner) { newCurrentPage ->
@@ -158,7 +150,11 @@ class SheetVisualization : Fragment() {
             }
         }
 
-        val returnToHome = { findNavController().navigate(R.id.home_fragment) }
+        val returnToHome: () -> Unit = {
+            stopListening()
+            findNavController().navigate(R.id.home_fragment)
+        }
+
 
         sheetVisualizationViewModel.noteCheckingState.observe(viewLifecycleOwner) { state ->
             Log.d("CHECKER", "Changed to state $state")
@@ -204,11 +200,44 @@ class SheetVisualization : Fragment() {
      */
     private fun setupWebView() {
         binding.webView.settings.javaScriptEnabled = true
+        binding.webView.settings.allowFileAccess = true
+        binding.webView.webChromeClient = object : WebChromeClient() {
+            override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+                consoleMessage?.let {
+                    Log.d(
+                        "WebViewConsole",
+                        "${it.message()} -- From line ${it.lineNumber()} of ${it.sourceId()}"
+                    )
+                }
+                return true
+            }
+        }
 
         binding.webView.webViewClient = object : WebViewClient() {
+            /*override fun onPageFinished(view: WebView?, url: String?) {
+                //sheetVisualizationViewModel.loadMusicSheet(args.sheetIdNFolderId)
+                if (sheetVisualizationViewModel.musicXMLSheet.value == null) {
+                    sheetVisualizationViewModel.loadMusicSheet(args.sheetIdNFolderId)
+                } else {
+                    renderCurrentPage()
+                }
+            }*/
             override fun onPageFinished(view: WebView?, url: String?) {
-                sheetVisualizationViewModel.loadMusicSheet(args.sheetIdNFolderId)
+                val sheet = sheetVisualizationViewModel.musicXMLSheet.value
+                if (sheet == null) {
+                    // Primera vez: carga desde Firestore
+                    sheetVisualizationViewModel.loadMusicSheet(args.sheetIdNFolderId)
+                } else {
+                    // Reinyectar XML en Verovio y luego renderizar
+                    val encodedXML = Base64.encodeToString(sheet.stringSheet.toByteArray(), Base64.NO_WRAP)
+                    binding.webView.evaluateJavascript(
+                        "loadMusicXmlFromBase64('$encodedXML');"
+                    ) { _ ->
+                        renderCurrentPage()
+                    }
+                }
             }
+
         }
 
         binding.webView.loadUrl(VEROVIO_HTML)
@@ -224,18 +253,43 @@ class SheetVisualization : Fragment() {
                 try {
                     val svgClean = cleanSvg(rawSvg)
                     Log.d("PAINTING", "SVG NEEDS TO PAINTED")
-                    // Solo actualizar el SVG en el ViewModel si realmente cambió
-                    if (sheetVisualizationViewModel.svg.value != svgClean) {
+                    //if (sheetVisualizationViewModel.svg.value != svgClean) {
                         sheetVisualizationViewModel.updateSVGValue(svgClean)
-                    }
+                    //}
                 } catch (e: Exception) {
                     Log.e("SVG_RENDER", "Failed to render SVG", e)
                 }
             }
     }
 
+    /**
+     * Returns a cleaned version of the svg of the music sheet with the correct `@font-face'
+     * declaration and the correct symbols
+     *
+     * @param svgRaw [String] that represents the svg as Verovio created it
+     */
     private fun cleanSvg(svgRaw: String): String {
-        return svgRaw
+
+        // Eliminating @font-face
+        val fontFaceRegex = Regex("<style[\\s\\S]*?@font-face[\\s\\S]*?</style>")
+
+        // Adding out own @font-face with Bravura and having a src with a url of the desired assets
+        val correctFontFaceStyle = """
+        <style type="text/css">
+            @font-face {
+                font-family: 'Bravura';
+                src: url('file:///android_asset/fonts/Bravura.otf');
+            }
+        </style>
+    """
+
+        // We clean the svg to add out correct declaration of @font-face
+        val processedSvg = svgRaw
+            .replace(fontFaceRegex, "")
+            .replace("<defs>", "<defs>$correctFontFaceStyle")
+
+        // We clean the rest of the svg
+        return processedSvg
             .removeSurrounding("\"")
             .replace("\\n", "")
             .replace("\\\"", "\"")
@@ -244,6 +298,9 @@ class SheetVisualization : Fragment() {
             .replace("\\u003E", ">")
             .replace("\\u0026", "&")
     }
+
+
+
 
     /**
      * Configures buttons to next and previous pages
@@ -273,4 +330,34 @@ class SheetVisualization : Fragment() {
             )
         }
     }
+    inner class AssetFileResolver : SVGExternalFileResolver() {
+        /**
+         * Resolves fonts requested by **android-svg** when encountering a `@font-face` with `url()`.
+         *
+         * This implementation forces the use of the **Bravura** font by loading it from the app's assets.
+         * For any other font, it returns `null`, allowing **android-svg** to fall back to its default logic
+         * (e.g., looking for system fonts).
+         *
+         * @param fontFamily the requested font family name, or `null` if none is specified.
+         * @param fontWeight the requested font weight (e.g., `400` for normal, `700` for bold).
+         * @param fontStyle the requested font style (e.g., `"normal"`, `"italic"`), or `null` if none is specified.
+         *
+         * @return a [Typeface] instance for Bravura if matched, or `null` to delegate resolution to android-svg.
+         */
+        override fun resolveFont(fontFamily: String?, fontWeight: Int, fontStyle: String?): Typeface? {
+
+            // As we are trying to only use Bravura, it loads it from the assets
+            if (fontFamily != null && fontFamily.equals("Bravura", ignoreCase = true)) {
+                return Typeface.createFromAsset(requireContext().assets, "fonts/Bravura.otf")
+            }
+
+            // Any other fonts, we return null.
+            // This allows android-svg to go with its default logic, maybe looking for system fonts
+            return null
+        }
+        override fun resolveImage(href: String?): Bitmap? {
+            return null
+        }
+    }
 }
+

@@ -39,16 +39,14 @@ class SheetVisualizationViewModel(
     val svg : LiveData<String>
         get() = _svg
 
-    private val _parsingFinished = MutableLiveData(false)
-    val parsingFinished: LiveData<Boolean> get() = _parsingFinished
 
     private val sheetChecker: SheetChecker2 = SheetChecker2()
-    private var currentNoteIndex = 0  // Índice global absoluto
+    private var currentNoteIndex = 0  // Absolute index
     private var isCheckingNotes = false
     private var _noteList : MutableList<ScoreElement> = mutableListOf()
 
     private var totalPages = 1
-    private var notesPerPage = mutableMapOf<Int, Pair<Int, Int>>() // Página -> (startIndex, endIndex)
+    private var notesPerPage = mutableMapOf<Int, Pair<Int, Int>>()
 
     private val _currentPage = MutableLiveData(0)
     val currentPage: LiveData<Int>
@@ -79,8 +77,7 @@ class SheetVisualizationViewModel(
             val parser = XMLParser(it.musicxml)
             parser.parseAllNotes()
             _noteList = parser.getAllNotes().toMutableList()
-            currentNoteIndex = 0 // Reset al parsear
-            //_parsingFinished.postValue(true)
+            currentNoteIndex = 0
         }
     }
 
@@ -92,7 +89,6 @@ class SheetVisualizationViewModel(
     fun updateCurrentPage(){
         if(!isCurrentPageAllSetUp){
             isCurrentPageAllSetUp = true
-            // Calcular notas en la página actual después de que se haya renderizado
             calculateNotesInCurrentPage()
             currentNoteIndex= notesPerPage[currentPage.value]?.first ?: currentNoteIndex
             _shouldNavigateToNextPage.postValue(false)
@@ -106,7 +102,7 @@ class SheetVisualizationViewModel(
     }
 
     /**
-     * Calcula y mapea las notas de la página actual
+     * Calculates and maps into the notesPerPage map the notes in current page
      */
     private fun calculateNotesInCurrentPage() {
         val page = currentPage.value?:1
@@ -114,7 +110,7 @@ class SheetVisualizationViewModel(
             val regex = Regex("""<g\b[^>]*\bclass="(note|rest)"[^>]*>""")
             val notesInPage = regex.findAll(_svg.value!!).count()
 
-            // Si es la primera vez que visitamos esta página, mapearla
+            // Map the num of notes if we are visiting the page for the first time
             if (!notesPerPage.containsKey(page)) {
                 val startIndex = (notesPerPage[page-1]?.second ?: -1) +1
                 val endIndex = startIndex + notesInPage - 1
@@ -126,17 +122,11 @@ class SheetVisualizationViewModel(
     }
 
     fun moveForward(){
-        Log.d("PAGING", "MOVE FORWARD")
-        //_shouldNavigateToNextPage.value = false
         val currentPage = _currentPage.value!!
-        val pageToBeUpdated = currentPage + 1 //pasamos a la sgte página
-        if(pageToBeUpdated <= totalPages){// la pág a la que pasamos está dentro de las págs existentes
-            //calculateNotesInCurrentPage(pageToBeUpdated)
+        val pageToBeUpdated = currentPage + 1
+        if(pageToBeUpdated <= totalPages){
             isCurrentPageAllSetUp=false
             _currentPage.value= pageToBeUpdated
-
-            //currentNoteIndex = notesPerPage[pageToBeUpdated]!!.first
-            //checkNextNote()
         }
         else
             Log.d("PAGING", "Se intentó ir de ${_currentPage.value} a " +
@@ -144,13 +134,11 @@ class SheetVisualizationViewModel(
     }
 
     fun moveBack(){
-        //_shouldNavigateToNextPage.value = false
         val currentPage = _currentPage.value!!
         val pageToBeUpdated = currentPage - 1
         if(pageToBeUpdated >= 1){
-            _currentPage.value= pageToBeUpdated
             isCurrentPageAllSetUp=false
-           // currentNoteIndex= notesPerPage[pageToBeUpdated]!!.first
+            _currentPage.value= pageToBeUpdated
         }
 
         else
@@ -159,29 +147,13 @@ class SheetVisualizationViewModel(
     }
 
 
-    fun startNoteChecking() {
-        if (!isCheckingNotes) {
-            Log.d("CHECK", "STARTED NOTE CHECKING")
-            isCheckingNotes = true
-            currentNoteIndex = 0 // Empezar desde la primera nota
-            checkNextNote()
-        }
-    }
-
     private fun checkNextNote() {
-
         viewModelScope.launch(Dispatchers.Default) {
             _noteCheckingState.postValue(NoteCheckingState.CHECKING)
             while (currentNoteIndex < _noteList.size) {
                 if(_shouldNavigateToNextPage.value == false || isCurrentPageAllSetUp){
                     val currentNote = _noteList[currentNoteIndex]
                     val currentPageWhenCurrentNote = _currentPage.value
-                    val isRepeatedNote = if (currentNoteIndex > 0) {
-                        val previousNote = _noteList[currentNoteIndex - 1]
-                        areNotesEqual(currentNote, previousNote)
-                    } else {
-                        false
-                    }
 
                     Log.d("CHECK", "Checking note index: $currentNoteIndex")
 
@@ -210,6 +182,7 @@ class SheetVisualizationViewModel(
                                 delay(50)
                                 currentNoteIndex++
                             }
+                            delay(200)
                         }
                         false -> {
                             highlightNoteByIndex(relativeIndex, "#FF0000")
@@ -224,14 +197,14 @@ class SheetVisualizationViewModel(
     }
 
     /**
-     * Verifica si necesitamos cambiar de página basado en el índice actual
+     * Verifies if there is a need to change the page
      */
     private fun needsPageChange(): Boolean {
         return currentNoteIndex == notesPerPage[_currentPage.value]?.second
     }
 
     /**
-     * Maneja la completación de una página
+     * Manages page completion meaning all notes have been played correctly
      */
     private fun handlePageCompletion() {
         val currentPageValue = _currentPage.value ?: 1
@@ -239,10 +212,8 @@ class SheetVisualizationViewModel(
         if (currentPageValue < totalPages) {
             Log.d("PAGE_COMPLETION", "Página $currentPageValue completada, navegando a ${currentPageValue + 1}")
             _shouldNavigateToNextPage.postValue(true)
-
-            //checkNextNote()
         } else {
-            // Hemos terminado todas las páginas
+            // Finished all pages
             isCheckingNotes = false
             _noteCheckingState.postValue(NoteCheckingState.FINISHED)
             Log.d("PAGE_COMPLETION", "Todas las páginas completadas!")
@@ -250,16 +221,8 @@ class SheetVisualizationViewModel(
 
     }
 
-
-
-    private fun areNotesEqual(note1: ScoreElement, note2: ScoreElement): Boolean {
-        if (note1 is Note && note2 is Note) {
-            return note1.name == note2.name
-        }
-        return false
-    }
-
     private fun highlightNoteByIndex(index: Int, color: String) {
+
         val regex = Regex("""<g\s+[^>]*class="(note|rest)"[^>]*>""")
         val matches = regex.findAll(_svg.value!!).toList()
 
@@ -281,10 +244,10 @@ class SheetVisualizationViewModel(
         _svg.postValue(_svg.value!!.replace(targetGroup, modifiedGroup))
     }
 
+
     fun updateSVGValue(svgClean: String) {
         _svg.postValue(svgClean)
     }
-
 
 }
 

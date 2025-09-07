@@ -1,6 +1,7 @@
 var tk = new verovio.toolkit();
 
 tk.setOptions({
+    font: 'Bravura',
     scaleToPageSize: true,
     landscape: true,
     adjustPageWidth: true,
@@ -22,9 +23,6 @@ function renderPageToDom(page) {
 
     try {
         const svg = tk.renderToSVG(page, {});
-        console.log(typeof svg)
-        console.log("Verovio svg rendering good", svg);
-        console.log(typeof svg)
         return svg;
     } catch (e) {
         console.log("Verovio svg rendering error", e);
