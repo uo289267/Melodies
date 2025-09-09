@@ -1,11 +1,13 @@
 package tfg.uniovi.melodies.fragments.viewmodels
 
 import android.util.Log
+import androidx.annotation.InspectableProperty
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.caverock.androidsvg.SVG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -35,7 +37,9 @@ class SheetVisualizationViewModel(
     val musicXMLSheet: LiveData<MusicXMLSheet>
         get()= _musicXML
 
-    private val _svg = MutableLiveData<String>()
+    var hasMusicXMLSheetChanged = false
+
+    private val _svg = MutableLiveData("")
     val svg : LiveData<String>
         get() = _svg
 
@@ -58,17 +62,23 @@ class SheetVisualizationViewModel(
     private val _shouldNavigateToNextPage = MutableLiveData(false)
     val shouldNavigateToNextPage: LiveData<Boolean> get() = _shouldNavigateToNextPage
 
-    private val _noteCheckingState = MutableLiveData<NoteCheckingState>()
+    private val _noteCheckingState = MutableLiveData(NoteCheckingState.NONE)
     val noteCheckingState: LiveData<NoteCheckingState> get() = _noteCheckingState
 
 
     private var isCurrentPageAllSetUp = false
+
     /**
      * Loads the musicxml given the sheedId and the folderId where the sheet resides
      */
     fun loadMusicSheet(dto: SheetVisualizationDto){
         viewModelScope.launch {
-            _musicXML.postValue(sheetBD.getSheetById(dto.sheetId, dto.folderId))
+            val givenMusicXMLSheetViaFirebase = sheetBD.getSheetById(dto.sheetId, dto.folderId)
+            givenMusicXMLSheetViaFirebase?.let{
+                hasMusicXMLSheetChanged = it != _musicXML.value
+                if (hasMusicXMLSheetChanged)
+                     _musicXML.postValue(it)
+            }
         }
     }
 
@@ -77,7 +87,8 @@ class SheetVisualizationViewModel(
             val parser = XMLParser(it.musicxml)
             parser.parseAllNotes()
             _noteList = parser.getAllNotes().toMutableList()
-            currentNoteIndex = 0
+            if(_svg.value!!.isEmpty())
+                currentNoteIndex=0
         }
     }
 
@@ -90,7 +101,11 @@ class SheetVisualizationViewModel(
         if(!isCurrentPageAllSetUp){
             isCurrentPageAllSetUp = true
             calculateNotesInCurrentPage()
-            currentNoteIndex= notesPerPage[currentPage.value]?.first ?: currentNoteIndex
+            notesPerPage[currentPage.value]?.let{
+                //has page changed? (going forward or backward)
+                if(currentNoteIndex < it.first || currentNoteIndex > it.second )
+                    currentNoteIndex = it.first
+            }
             _shouldNavigateToNextPage.postValue(false)
             if(noteCheckingState.value!= NoteCheckingState.CHECKING && _canCheckNote.value == true)
                 checkNextNote()
@@ -215,7 +230,6 @@ class SheetVisualizationViewModel(
         } else {
             // Finished all pages
             isCheckingNotes = false
-            _noteCheckingState.postValue(NoteCheckingState.FINISHED)
             Log.d("PAGE_COMPLETION", "Todas las páginas completadas!")
         }
 
@@ -246,13 +260,18 @@ class SheetVisualizationViewModel(
 
 
     fun updateSVGValue(svgClean: String) {
-        _svg.postValue(svgClean)
+        if(svgClean != "null")
+            _svg.postValue(svgClean)
+    }
+
+    fun updateNoteCheckingState(state : NoteCheckingState){
+        _noteCheckingState.postValue(state)
     }
 
 }
 
 enum class NoteCheckingState {
-    CHECKING, FINISHED
+    CHECKING, FINISHED, NONE
 }
 
 class SheetVisualizationDto (

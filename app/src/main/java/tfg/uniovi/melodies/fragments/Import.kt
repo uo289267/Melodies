@@ -3,6 +3,7 @@ package tfg.uniovi.melodies.fragments
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -172,6 +173,9 @@ class Import : Fragment() {
             if(sheets.isEmpty())
                 binding.tvNameOfFiles.text = getString(R.string.import_name_files)
             else{
+                binding.tvNameOfFiles.movementMethod = ScrollingMovementMethod()
+                binding.tvNameOfFiles.isVerticalScrollBarEnabled = true
+                binding.tvNameOfFiles.scrollBarStyle=View.SCROLLBARS_OUTSIDE_INSET
                 binding.tvNameOfFiles.text = ""
                 var fileNames = ""
                 for (sheet in sheets) {
