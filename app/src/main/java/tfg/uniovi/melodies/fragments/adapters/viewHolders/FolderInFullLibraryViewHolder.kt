@@ -17,6 +17,8 @@ import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 import tfg.uniovi.melodies.utils.RecyclerViewItemDecoration
 
+const val DELETE = "DELETE"
+
 class FolderInFullLibraryViewHolder(
     private val view: View,
     private val navigateFunction: (SheetVisualizationDto) -> Unit,
@@ -44,7 +46,7 @@ class FolderInFullLibraryViewHolder(
                     adapter.removeItemAt(position)
                     // notifying vm to remove from db
                     libraryViewModel.deleteSheetAt(position)
-                    Log.d("DELETE", "One sheet at position $position was deleted")
+                    Log.d(DELETE, "One sheet at position $position was deleted")
                     Toast.makeText(view.context, getString(view.context, R.string.delete_successful), Toast.LENGTH_SHORT)
                         .show()
                 }

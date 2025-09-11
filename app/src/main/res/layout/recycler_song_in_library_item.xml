@@ -34,7 +34,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="TITLE OF THE SONG"
+            android:text="@string/title_of_the_song"
             android:textSize="20sp"
             android:maxLines="1"
             android:ellipsize="end" />
@@ -43,7 +43,7 @@
             android:id="@+id/tv_author"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="AUTHOR"
+            android:text="@string/author_placeholder"
             android:textSize="20sp"
             android:layout_marginStart="8dp"
             android:maxLines="1"

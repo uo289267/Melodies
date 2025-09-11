@@ -44,8 +44,7 @@ class LogIn : Fragment() {
     ): View {
         binding = FragmentLogInBinding.inflate(inflater, container, false)
         binding.inputUserId.addTextChangedListener(userIdInputWatcher)
-        logInViewModel = ViewModelProvider(this, LogInViewModelProviderFactory()).get(
-            LogInViewModel::class.java)
+        logInViewModel = ViewModelProvider(this, LogInViewModelProviderFactory())[LogInViewModel::class.java]
         logInViewModel.userId.observe(viewLifecycleOwner){ userId ->
             modifyUserIdEditText(binding.inputUserId, userId)
         }

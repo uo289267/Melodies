@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.Folder
 import tfg.uniovi.melodies.fragments.adapters.viewHolders.FolderInFullLibraryViewHolder
-import tfg.uniovi.melodies.fragments.viewmodels.FullLibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 

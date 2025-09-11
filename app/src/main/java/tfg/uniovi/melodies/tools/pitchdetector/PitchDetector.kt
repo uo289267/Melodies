@@ -36,7 +36,7 @@ object PitchDetector {
     private const val KNOWN_NOTE_OCTAVE = 4
     private const val KNOWN_NOTE_FREQUENCY = 440.0
 
-    const val SILENCE ="Unknown"
+    private const val SILENCE ="Unknown"
     /** Request code for microphone permission. */
     const val MIC_REQ_CODE = 11223344
     /** Dispatcher that processes audio input. */

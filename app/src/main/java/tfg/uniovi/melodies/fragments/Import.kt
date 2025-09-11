@@ -11,14 +11,12 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentImportBinding
 import tfg.uniovi.melodies.entities.Folder
-import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.adapters.SpinnerFoldersAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.ImportViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.ImportViewModelProviderFactory

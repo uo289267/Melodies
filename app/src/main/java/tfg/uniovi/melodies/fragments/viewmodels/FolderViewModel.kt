@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.entities.Folder
 import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
-import java.util.UUID
 
 class FolderViewModelProviderFactory(
     private val currentUserId : String

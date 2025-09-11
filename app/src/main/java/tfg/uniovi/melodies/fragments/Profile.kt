@@ -12,13 +12,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import coil3.load
 import tfg.uniovi.melodies.MainActivity
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentProfileBinding
 import tfg.uniovi.melodies.preferences.PreferenceManager
-import tfg.uniovi.melodies.utils.ShowAlertDialog
 
 private const val LOGOUT_TAG = "LOGOUT"
 private const val PROFILE_TAG = "PROFILE"

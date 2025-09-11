@@ -1,19 +1,15 @@
 package tfg.uniovi.melodies.fragments.viewmodels
 
 import android.util.Log
-import androidx.annotation.InspectableProperty
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.caverock.androidsvg.SVG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.entities.MusicXMLSheet
-import tfg.uniovi.melodies.entities.notes.Note
-import tfg.uniovi.melodies.entities.notes.Rest
 import tfg.uniovi.melodies.entities.notes.interfaces.ScoreElement
 import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
 import tfg.uniovi.melodies.tools.pitchdetector.SheetChecker2
@@ -29,6 +25,17 @@ class SheetVisualizationViewModelFactory(
         return SheetVisualizationViewModel(sheetBD) as T
     }
 }
+
+private const val PAGE_MAPPING = "PAGE_MAPPING"
+private const val PAGES = "PAGES"
+const val PAGING = "PAGING"
+const val CHECK = "CHECK"
+
+private const val COLOR_FOR_WRONG = "#FF0000" //red
+private const val COLOR_FOR_RIGHT = "#00FF00" //green
+
+private const val PAGE_COMPLETION = "PAGE_COMPLETION"
+private const val SHEET_VISUALIZER = "SheetVisualizer"
 
 class SheetVisualizationViewModel(
     private val sheetBD: FoldersAndSheetsFirestore
@@ -94,7 +101,7 @@ class SheetVisualizationViewModel(
 
     fun setTotalPages(pages: Int) {
         totalPages = pages
-        Log.d("PAGES", "Total pages set to: $totalPages")
+        Log.d(PAGES, "Total pages set to: $totalPages")
     }
 
     fun updateCurrentPage(){
@@ -131,7 +138,7 @@ class SheetVisualizationViewModel(
                 val endIndex = startIndex + notesInPage - 1
                 notesPerPage[page] = Pair(startIndex, endIndex)
 
-                Log.d("PAGE_MAPPING", "Página $page mapeada: notas $startIndex-$endIndex (total: $notesInPage)")
+                Log.d(PAGE_MAPPING, "Página $page mapeada: notas $startIndex-$endIndex (total: $notesInPage)")
             }
         }
     }
@@ -144,7 +151,7 @@ class SheetVisualizationViewModel(
             _currentPage.value= pageToBeUpdated
         }
         else
-            Log.d("PAGING", "Se intentó ir de ${_currentPage.value} a " +
+            Log.d(PAGING, "Se intentó ir de ${_currentPage.value} a " +
                     "$pageToBeUpdated when there are $totalPages num of pages")
     }
 
@@ -157,7 +164,7 @@ class SheetVisualizationViewModel(
         }
 
         else
-            Log.d("PAGING", "Se intentó ir de ${_currentPage.value} a " +
+            Log.d(PAGING, "Se intentó ir de ${_currentPage.value} a " +
                     "$pageToBeUpdated when there are $totalPages num of pages")
     }
 
@@ -170,7 +177,7 @@ class SheetVisualizationViewModel(
                     val currentNote = _noteList[currentNoteIndex]
                     val currentPageWhenCurrentNote = _currentPage.value
 
-                    Log.d("CHECK", "Checking note index: $currentNoteIndex")
+                    Log.d(CHECK, "Checking note index: $currentNoteIndex")
 
                     val isCorrect = sheetChecker.isNotePlayedCorrectlyWithOnset(
                         noteToCheck = currentNote,
@@ -178,15 +185,15 @@ class SheetVisualizationViewModel(
                         onsetTimeoutMs = 15000L
                     )
                     val relativeIndex = currentNoteIndex - (notesPerPage[_currentPage.value]?.first ?: 0)
-                    Log.d("PAGING", "Absolute Index: $currentNoteIndex and relative Index: $relativeIndex")
+                    Log.d(PAGING, "Absolute Index: $currentNoteIndex and relative Index: $relativeIndex")
                     if(_currentPage.value!=currentPageWhenCurrentNote){
                         continue
                     }
                     when (isCorrect) {
                         true -> {
-                            highlightNoteByIndex(relativeIndex, "#00FF00")
+                            highlightNoteByIndex(relativeIndex, COLOR_FOR_RIGHT)
 
-                            Log.d("CHECK", "Note $currentNoteIndex correct, " +
+                            Log.d(CHECK, "Note $currentNoteIndex correct, " +
                                     "relative index: $relativeIndex")
 
                             // Verify if we need to change page
@@ -200,14 +207,14 @@ class SheetVisualizationViewModel(
                             delay(200)
                         }
                         false -> {
-                            highlightNoteByIndex(relativeIndex, "#FF0000")
+                            highlightNoteByIndex(relativeIndex, COLOR_FOR_WRONG)
                             delay(50)
                         }
                     }
                     }
                 }
             _noteCheckingState.postValue(NoteCheckingState.FINISHED)
-            Log.d("CHECK", "All notes finished!")
+            Log.d(CHECK, "All notes finished!")
         }
     }
 
@@ -225,12 +232,12 @@ class SheetVisualizationViewModel(
         val currentPageValue = _currentPage.value ?: 1
 
         if (currentPageValue < totalPages) {
-            Log.d("PAGE_COMPLETION", "Página $currentPageValue completada, navegando a ${currentPageValue + 1}")
+            Log.d(PAGE_COMPLETION, "Página $currentPageValue completada, navegando a ${currentPageValue + 1}")
             _shouldNavigateToNextPage.postValue(true)
         } else {
             // Finished all pages
             isCheckingNotes = false
-            Log.d("PAGE_COMPLETION", "Todas las páginas completadas!")
+            Log.d(PAGE_COMPLETION, "Todas las páginas completadas!")
         }
 
     }
@@ -241,7 +248,7 @@ class SheetVisualizationViewModel(
         val matches = regex.findAll(_svg.value!!).toList()
 
         if (index >= matches.size || index < 0) {
-            Log.w("SheetVisualizer", "Índice fuera de rango: $index, notas disponibles: ${matches.size}")
+            Log.w(SHEET_VISUALIZER, "Índice fuera de rango: $index, notas disponibles: ${matches.size}")
             return
         }
 

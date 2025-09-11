@@ -25,6 +25,7 @@ import tfg.uniovi.melodies.databinding.FragmentLibraryBinding
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.adapters.SheetInFolderAdapter
 import tfg.uniovi.melodies.fragments.adapters.touchHelpers.MyItemTouchHelper
+import tfg.uniovi.melodies.fragments.adapters.viewHolders.DELETE
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModelProviderFactory
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
@@ -72,7 +73,7 @@ class Library : Fragment() {
                     adapter.removeItemAt(position)
                     // notifying vm to remove from db
                     libraryViewModel.deleteSheetAt(position)
-                    Log.d("DELETE", "One sheet at position $position was deleted")
+                    Log.d(DELETE, "One sheet at position $position was deleted")
                     Toast.makeText(context, getString(R.string.delete_successful), Toast.LENGTH_SHORT)
                         .show()
                 }

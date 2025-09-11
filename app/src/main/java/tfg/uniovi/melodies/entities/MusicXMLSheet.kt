@@ -2,8 +2,6 @@ package tfg.uniovi.melodies.entities
 
 import org.w3c.dom.Document
 import tfg.uniovi.melodies.utils.parser.String2MusicXML
-import java.io.ByteArrayInputStream
-import javax.xml.parsers.DocumentBuilderFactory
 
 /**
  * Represents a MusicXML sheet stored in the application.

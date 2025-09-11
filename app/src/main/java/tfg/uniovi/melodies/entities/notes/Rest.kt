@@ -18,10 +18,10 @@ class Rest(duration: Long)
      * @param noteToCheck note to check if corresponds with following note with pitch after this rest
      */
     override fun check(noteToCheck: NoteDominant?): Boolean {
-        if(this.followingNote == null || noteToCheck == null)
-            return true
+        return if(this.followingNote == null || noteToCheck == null)
+            true
         else
-            return this.followingNote!!.name!=noteToCheck.name
+            this.followingNote!!.name!=noteToCheck.name
                     || this.followingNote!!.octave!=noteToCheck.octave
     }
 

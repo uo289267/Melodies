@@ -29,7 +29,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentSheetVisualizationBinding
 import tfg.uniovi.melodies.entities.MusicXMLSheet
+import tfg.uniovi.melodies.fragments.viewmodels.CHECK
 import tfg.uniovi.melodies.fragments.viewmodels.NoteCheckingState
+import tfg.uniovi.melodies.fragments.viewmodels.PAGING
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModelFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
@@ -39,7 +41,23 @@ import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.stopListening
 import tfg.uniovi.melodies.utils.ShowAlertDialog
 import tfg.uniovi.melodies.utils.parser.XMLParserException
 
+
+//LOG TAGS
+private const val SET_UP = "VIEW_MODEL_SET_UP"
+private const val PARSING = "PARSING_XML"
+private const val SVG_OBSERVER = "SVG_OBSERVER"
+private const val CONSOLE = "WebViewConsole"
+private const val NAVIGATION = "NAVIGATION"
+private const val RENDER = "RENDER"
+private const val SVG_RENDER = "SVG_RENDER"
+private const val PAINTING = "PAINTING"
+
+//JAVASCRIPT FUNCTIONS FOR VEROVIO TOOLKIT
 private const val VEROVIO_HTML = "file:///android_asset/verovio.html"
+private const val LOAD_FROM_BASE_64 = "loadMusicXmlFromBase64"
+private const val GET_PAGE_COUNT = "getPageCount"
+private const val RENDER_PAGE_TO_DOM = "renderPageToDom"
+
 
 class SheetVisualization : Fragment() {
 
@@ -101,25 +119,24 @@ class SheetVisualization : Fragment() {
             if(sheetVisualizationViewModel.hasMusicXMLSheetChanged){
                 sheetVisualizationViewModel.hasMusicXMLSheetChanged =false
                 musicxml?.let {
-                    Log.d("VIEW_MODEL_SET_UP", "Setting up musicxml and its observes")
+                    Log.d(SET_UP, "Setting up musicxml and its observes")
                     binding.toolbar.title = it.name
                     try{
                         sheetVisualizationViewModel.parseMusicXML()
                     }catch (e : XMLParserException){
                         ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(requireContext(),
-                            "Invalid MusicXML",
-                            "MusicXML is missing attributes and/or elements, " +
-                                    "no feedback will be given tap each end of the screen to navigate",
-                            "PARSING_XML",
+                            getString(R.string.sheet_visualization_invalid_xml),
+                            getString(R.string.sheet_visualization_invalid_xml_msg),
+                            PARSING,
                             "alert dialog showed because xml missing attributes and/or elements")
                         sheetVisualizationViewModel.updateCanCheckNote(false)
                     }
                     val encondedXML =
                         Base64.encodeToString(it.stringSheet.toByteArray(), Base64.NO_WRAP)
                     binding.webView.evaluateJavascript(
-                        "loadMusicXmlFromBase64('$encondedXML');"
+                        "$LOAD_FROM_BASE_64('$encondedXML');"
                     ) { _ ->
-                        binding.webView.evaluateJavascript("getPageCount();") { pageCount ->
+                        binding.webView.evaluateJavascript("$GET_PAGE_COUNT();") { pageCount ->
                             totalPages = pageCount.toIntOrNull() ?: 1
                             sheetVisualizationViewModel.setTotalPages(totalPages)
                             sheetVisualizationViewModel.moveForward()
@@ -135,13 +152,13 @@ class SheetVisualization : Fragment() {
 
         sheetVisualizationViewModel.svg.observe(viewLifecycleOwner) { svg ->
             try {
-                Log.d("PAGING", "SVG CHANGED")
+                Log.d(PAGING, "SVG CHANGED")
                 binding.sheetImageView.setSVG(SVG.getFromString(svg))
                 binding.sheetImageView.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.GONE
                 sheetVisualizationViewModel.updateCurrentPage()
             } catch (e: Exception) {
-                Log.e("SVG_OBSERVER", "Failed to load SVG", e)
+                Log.e(SVG_OBSERVER, "Failed to load SVG", e)
             }
         }
 
@@ -154,7 +171,7 @@ class SheetVisualization : Fragment() {
         sheetVisualizationViewModel.shouldNavigateToNextPage.observe(viewLifecycleOwner) { should ->
             if (should) {
                 val currentPage = sheetVisualizationViewModel.currentPage.value?:1
-                Log.d("NAVIGATION", "Auto-navigating from page $currentPage to ${currentPage + 1}")
+                Log.d(NAVIGATION, "Auto-navigating from page $currentPage to ${currentPage + 1}")
                 sheetVisualizationViewModel.moveForward()
             }
         }
@@ -166,14 +183,14 @@ class SheetVisualization : Fragment() {
 
 
         sheetVisualizationViewModel.noteCheckingState.observe(viewLifecycleOwner) { state ->
-            Log.d("CHECKER", "Changed to state $state")
+            Log.d(CHECK, "Changed to state $state")
             if (state == NoteCheckingState.FINISHED) {
                 sheetVisualizationViewModel.updateNoteCheckingState(NoteCheckingState.NONE)
                 ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(
                     requireContext(),
-                    "Finished!",
-                    "Congratulations you finished practicing ${musicXMLSheet.name}",
-                    "CHECKER",
+                    getString(R.string.sheet_visualization_finish),
+                    getString(R.string.sheet_visualization_finish_msg)+ musicXMLSheet.name,
+                    CHECK,
                     "${musicXMLSheet.name} was finished",
                     returnToHome
                 )
@@ -215,7 +232,7 @@ class SheetVisualization : Fragment() {
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
                 consoleMessage?.let {
                     Log.d(
-                        "WebViewConsole",
+                        CONSOLE,
                         "${it.message()} -- From line ${it.lineNumber()} of ${it.sourceId()}"
                     )
                 }
@@ -238,16 +255,15 @@ class SheetVisualization : Fragment() {
      */
     private fun renderCurrentPage() {
         val currentPage = sheetVisualizationViewModel.currentPage.value
-        Log.d("RENDER", "Rendering page: $currentPage")
-        binding.webView.evaluateJavascript("renderPageToDom($currentPage);") { rawSvg ->
+        Log.d(RENDER, "Rendering page: $currentPage")
+        binding.webView.evaluateJavascript("$RENDER_PAGE_TO_DOM($currentPage);") { rawSvg ->
                 try {
                     val svgClean = cleanSvg(rawSvg)
-                    Log.d("PAINTING", "SVG NEEDS TO PAINTED")
-                    //if (sheetVisualizationViewModel.svg.value != svgClean) {
-                        sheetVisualizationViewModel.updateSVGValue(svgClean)
-                    //}
+                    Log.d(PAINTING, "SVG NEEDS TO PAINTED")
+                    sheetVisualizationViewModel.updateSVGValue(svgClean)
+
                 } catch (e: Exception) {
-                    Log.e("SVG_RENDER", "Failed to render SVG", e)
+                    Log.e(SVG_RENDER, "Failed to render SVG", e)
                 }
             }
     }

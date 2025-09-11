@@ -66,11 +66,9 @@ class SheetChecker2 {
 
         while (System.currentTimeMillis() - startTime < timeoutMs) {
             val detectedOnset = PitchDetector.getLastDetectedNote()
+            Log.d("SHEET_CHECKER", "Onset detectado: $detectedOnset, Esperado: $noteToCheck")
+            return noteToCheck.check(NoteDominant(baseNote(detectedOnset), octave(detectedOnset),isSharp(detectedOnset)))
 
-           // if(detectedOnset != PitchDetector.SILENCE){
-                Log.d("SHEET_CHECKER", "Onset detectado: $detectedOnset, Esperado: $noteToCheck")
-                return noteToCheck.check(NoteDominant(baseNote(detectedOnset), octave(detectedOnset),isSharp(detectedOnset)))
-           // }
         }
 
         Log.d("SHEET_CHECKER", "Timeout esperando nota: $noteToCheck")

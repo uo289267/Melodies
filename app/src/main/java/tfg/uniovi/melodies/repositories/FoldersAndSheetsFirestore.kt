@@ -18,7 +18,7 @@ import tfg.uniovi.melodies.fragments.viewmodels.MusicXMLDTO
  *
  * @property userId The ID of the authenticated Firebase user.
  */
-class FoldersAndSheetsFirestore (val userId: String){
+class FoldersAndSheetsFirestore (private val userId: String){
     private val db = Firebase.firestore
     private val usersCollection = db.collection("users")
 

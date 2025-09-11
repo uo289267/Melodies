@@ -1,13 +1,12 @@
 package tfg.uniovi.melodies
 
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.w3c.dom.Document
+import tfg.uniovi.melodies.entities.notes.Note
 import tfg.uniovi.melodies.utils.parser.XMLParser
-import java.io.ByteArrayInputStream
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
-import org.junit.Assert.assertEquals
-import tfg.uniovi.melodies.entities.notes.Note
 
 class XMLParserTests {
 

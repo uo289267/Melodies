@@ -3,11 +3,14 @@ package tfg.uniovi.melodies.fragments.adapters.viewHolders
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.core.content.ContextCompat.getString
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 import tfg.uniovi.melodies.utils.ShowAlertDialog
+
+private const val SHEET_RENAME = "SHEET_RENAME"
 
 class SheetInFolderViewHolder(
     private val view: View,
@@ -29,9 +32,9 @@ class SheetInFolderViewHolder(
         itemView.setOnLongClickListener {
             ShowAlertDialog.showInputDialog(
                 context = view.context,
-                title = "Rename Sheet",
-                message = "Enter new name:",
-                tagForLog = "SHEET_RENAME",
+                title = getString(view.context, R.string.rename),
+                message = getString(view.context, R.string.rename_quest),
+                tagForLog = SHEET_RENAME,
                 msgForLog = "Folder renamed"
             ){
                 result ->

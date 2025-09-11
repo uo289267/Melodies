@@ -24,7 +24,7 @@
             android:id="@+id/ivProfileAvatar"
             android:layout_height="80dp"
             android:layout_width="match_parent"
-            android:contentDescription="avatar"
+            android:contentDescription="@string/avatar"
             android:src="@drawable/account">
         </ImageView>
     </androidx.cardview.widget.CardView>
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="135dp"
             android:layout_marginTop="45dp"
-            android:text="01234567890123456789"
+            android:text="@string/_01234567890123456789"
             android:textSize="16sp" />
 
         <ImageButton
@@ -66,6 +66,7 @@
             android:layout_marginTop="45dp"
             android:adjustViewBounds="true"
             android:background="@drawable/round_border"
+            android:contentDescription="@string/copy_to_clipboard"
             android:scaleType="fitCenter"
             android:src="@drawable/copy_icon" />
 

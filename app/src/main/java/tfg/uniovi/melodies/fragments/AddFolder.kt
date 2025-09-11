@@ -10,7 +10,6 @@ import android.widget.EditText
 import android.widget.Spinner
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import tfg.uniovi.melodies.R
@@ -23,7 +22,6 @@ import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModelProviderFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.utils.TextWatcherAdapter
-import java.util.UUID
 
 private const val CREATE_FOLDER_TAG = "CREATE_FOLDER"
 
@@ -79,7 +77,7 @@ class AddFolder : Fragment() {
 
         addFolderViewModel = ViewModelProvider(this, AddFolderViewModelProviderFactory(
             PreferenceManager.getUserId(requireContext())!!
-        )).get(AddFolderViewModel::class.java)
+        ))[AddFolderViewModel::class.java]
 
         addFolderViewModel.folderDTO.observe(viewLifecycleOwner){dto ->
             modifyFolderName(binding.folderNameInput, dto.name)

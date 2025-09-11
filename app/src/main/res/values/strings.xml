@@ -46,4 +46,27 @@
     <string name="folder_s_name">Folder\'s Name</string>
     <string name="create">Create</string>
     <string name="log_out_quest">Log</string>
+    <string name="sheet_visualization_invalid_xml">Invalid MusicXML</string>
+    <string name="sheet_visualization_invalid_xml_msg">MusicXML is missing attributes and/or elements, no feedback will be given tap each side of the screen to navigate</string>
+    <string name="sheet_visualization_finish">Finished!</string>
+    <string name="sheet_visualization_finish_msg">Congratulations you finished practicing </string>
+    <string name="rename">Rename sheet</string>
+    <string name="rename_quest">Enter new name: </string>
+    <string name="delete">Delete folder?</string>
+    <string name="delete_ques">Are you sure you want to delete </string>
+    <string name="delete_confirm"> folder was deleted</string>
+    <string name="enter">Enter</string>
+    <string name="upload">Upload</string>
+    <string name="copy_to_clipboard">copy to clipboard</string>
+    <string name="folder">folder</string>
+    <string name="folder_color">folder color</string>
+    <string name="melodies">MELODIES</string>
+    <string name="avatar">avatar</string>
+    <string name="_01234567890123456789">01234567890123456789</string>
+    <string name="search">Search</string>
+    <string name="folder_title">Folder Title</string>
+    <string name="basic_sheets">Basic Sheets</string>
+    <string name="title_of_the_song">TITLE OF THE SONG</string>
+    <string name="author_placeholder">AUTHOR</string>
+    <string name="aaaa">aaaa</string>
 </resources>

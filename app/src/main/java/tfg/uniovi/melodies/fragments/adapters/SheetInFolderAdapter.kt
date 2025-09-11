@@ -1,15 +1,11 @@
 package tfg.uniovi.melodies.fragments.adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.adapters.viewHolders.SheetInFolderViewHolder
-import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 
 class SheetInFolderAdapter : RecyclerView.Adapter<SheetInFolderViewHolder> {

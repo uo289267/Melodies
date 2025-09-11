@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
-import java.util.UUID
 
 class LibraryViewModelProviderFactory(
     private val currentUserUUID: String,
