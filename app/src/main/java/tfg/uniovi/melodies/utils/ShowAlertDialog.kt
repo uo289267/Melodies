@@ -1,10 +1,7 @@
 package tfg.uniovi.melodies.utils
 
 import android.content.Context
-import android.text.InputType
 import android.util.Log
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import tfg.uniovi.melodies.R
 
