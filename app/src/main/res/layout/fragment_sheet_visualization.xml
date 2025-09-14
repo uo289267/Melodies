@@ -17,13 +17,21 @@
         app:title="Name of the sheet"
         app:layout_constraintBottom_toTopOf="@+id/sheetImageView"
         />
-
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
     <!-- Imagen de la partitura -->
     <com.caverock.androidsvg.SVGImageView
         android:id="@+id/sheetImageView"
         android:layout_width="match_parent"
-        android:layout_height="670dp"
+        android:layout_height="0dp"
         android:background="@android:color/white"
+        android:visibility="invisible"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -52,7 +60,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <ImageButton
+            <Button
                 android:id="@+id/prevButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -62,7 +70,7 @@
 
                 />
 
-            <ImageButton
+            <Button
                 android:id="@+id/nextButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"

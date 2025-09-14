@@ -3,6 +3,10 @@ package tfg.uniovi.melodies.utils
 import android.text.Editable
 import android.text.TextWatcher
 
+/**
+ * Class that provides a basic empty implementation so it is possible to override only the desired
+ * functionalities
+ */
 open class TextWatcherAdapter : TextWatcher {
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
     }

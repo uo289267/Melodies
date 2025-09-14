@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.entities.Folder
 import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
-import java.util.UUID
 
 class ImportViewModelProviderFactory(
     private val currentUserUUID: String
@@ -21,6 +20,8 @@ class ImportViewModelProviderFactory(
         return ImportViewModel(folderBD) as T
     }
 }
+
+private const val MUSICXML = "MUSICXML"
 
 class ImportViewModel(
     private val folderBD: FoldersAndSheetsFirestore) : ViewModel(){
@@ -53,6 +54,9 @@ class ImportViewModel(
             _musicXMLSheetDtos.value = currentList
         }
     }
+    fun cleanMusicXMLSheets(){
+        _musicXMLSheetDtos.value = listOf<MusicXMLDTO>().toMutableList()
+    }
 
 
     fun updateFolderChosen(folderChosen: Folder) {
@@ -70,7 +74,7 @@ class ImportViewModel(
             for(dto in musicXMLSheets.value!!){
                 dto.folderId=folderChosen.value!!.folderId
                 ids.add(folderBD.addMusicXMLSheet(dto))
-                Log.d("MUSICXML", "View model sending ${dto.name} sheet to bd")
+                Log.d(MUSICXML, "View model sending ${dto.name} sheet to bd")
             }
         }
         for(id in ids)
@@ -89,7 +93,13 @@ data class MusicXMLDTO(
     lateinit var folderId: String
 
     override fun equals(other: Any?): Boolean {
-        val other = other as MusicXMLDTO
-        return other.name.equals(this.name) && other.stringSheet.equals(this.stringSheet)
+        val otherDto = other as MusicXMLDTO
+        return otherDto.name == this.name && otherDto.stringSheet == this.stringSheet
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + stringSheet.hashCode()
+        return result
     }
 }

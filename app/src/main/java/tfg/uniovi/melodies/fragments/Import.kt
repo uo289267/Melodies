@@ -3,6 +3,7 @@ package tfg.uniovi.melodies.fragments
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +25,15 @@ import tfg.uniovi.melodies.utils.ShowAlertDialog
 import tfg.uniovi.melodies.utils.parser.String2MusicXML
 import tfg.uniovi.melodies.utils.parser.XMLParser
 
+private const val IMPORT_TAG = "IMPORT"
+private const val EXTENSION_APP_XML = "application/xml"
+private const val EXTENSION_TXT_XML = "text/xml"
+
+/**
+ * Fragment responsible for importing one or more MusicXML files into a selected folder.
+ * Allows the user to pick files from storage, parse and validate them,
+ * choose a destination folder, and save the files through the ViewModel.
+ */
 class Import : Fragment() {
     private lateinit var binding : FragmentImportBinding
     private val openMultipleMusicXmlLauncher =
@@ -49,7 +59,7 @@ class Import : Fragment() {
                             requireContext(),
                             getString(R.string.alert_dialog_title_error_parsing),
                             e.message!!,
-                            "IMPORT",
+                            IMPORT_TAG,
                             "Error parsing XML to import (archivo $index): ${e.message}"
                         )
                     }
@@ -58,20 +68,16 @@ class Import : Fragment() {
                         requireContext(),
                         getString(R.string.alert_dialog_title_error_parsing),
                         getString(R.string.alert_dialog_msg_error_parsing),
-                        "IMPORT",
+                        IMPORT_TAG,
                         "Error parsing XML to import (archivo $index): xml was null/empty"
                     )
                 }
-
-                // Aquí puedes cargar el archivo con Verovio o almacenarlo en una lista
-                Log.d("MusicXML", "Archivo $index leído: ${uri.lastPathSegment}")
-                Log.d("MusicXML", xmlContent ?: "Archivo $index vacío")
             }
         }
 
 
     private lateinit var importViewModel: ImportViewModel
-    private lateinit var folderChosen: Folder
+    private var folderChosen: Folder? = null
     private lateinit var folders:List<Folder>
 
     override fun onCreateView(
@@ -79,45 +85,19 @@ class Import : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentImportBinding.inflate(inflater, container, false)
-        binding.imgBtnUploadFile.setOnClickListener{
-            openMultipleMusicXmlLauncher.launch(
-                arrayOf("application/xml", "application/vnd.recordare.musicxml+xml", "text/xml")
-            )
-        }
+        imageButtonSetUp()
         binding.spFolder.adapter =  SpinnerFoldersAdapter(requireContext(), mutableListOf())
-        importViewModel = ViewModelProvider(this, ImportViewModelProviderFactory(
-            PreferenceManager.getUserId(requireContext())!!
-        ))[ImportViewModel::class.java]
-        importViewModel.folders.observe(viewLifecycleOwner){
-            folders ->
-            this.folders = folders
-            val adapter = binding.spFolder.adapter as SpinnerFoldersAdapter
-            adapter.updateFolders(folders)
-        }
-        importViewModel.loadFolders()
-        importViewModel.musicXMLSheets.observe(viewLifecycleOwner){ sheets ->
-            binding.tvNameOfFiles.text=""
-            var fileNames = ""
-            for (sheet in sheets){
-                fileNames+= sheet.name + " "
-            }
-            binding.tvNameOfFiles.text=fileNames
-        }
-
-        binding.btnImport.setOnClickListener {
-            val result = importViewModel.storeNewMusicXML()
-            if(result){
-
-                Log.d("IMPORT", "New musicxml has been added to ${folderChosen.name}")
-                Toast.makeText(context, getString(R.string.import_successful), Toast.LENGTH_SHORT)
-                    .show()
-                findNavController().navigate(R.id.action_importing_to_home_fragment)
-            }else{
-                Log.d("IMPORT", "New musicxml has NOT been added to ${folderChosen.name}")
-                Toast.makeText(context, getString(R.string.import_unsuccessful), Toast.LENGTH_SHORT)
-                    .show()
-            }
-        }
+        viewModelSetUp()
+        btnImportSetUp()
+        viewModelFolderChosenSetUp()
+        configureSpinner()
+        return binding.root
+    }
+    /**
+     * Observes the selected folder changes in the ViewModel
+     * and updates the Spinner selection accordingly.
+     */
+    private fun viewModelFolderChosenSetUp() {
         importViewModel.folderChosen.observe(viewLifecycleOwner) { newFolderChosen ->
             folderChosen = newFolderChosen
 
@@ -128,12 +108,100 @@ class Import : Fragment() {
                 binding.spFolder.setSelection(index)
             }
         }
-
-        configureSpinner()
-        return binding.root
+    }
+    /**
+     * Sets up the import button click listener.
+     * Validates if a folder is selected and files are loaded,
+     * and triggers the saving process of the MusicXML files.
+     *
+     */
+    private fun btnImportSetUp() {
+        binding.btnImport.setOnClickListener {
+            val result = importViewModel.storeNewMusicXML()
+            if (folderChosen != null && importViewModel.musicXMLSheets.value?.isEmpty() == false) {
+                if (result) {
+                    Log.d(IMPORT_TAG, "New musicxml has been added to ${folderChosen!!.name}")
+                    Toast.makeText(
+                        context,
+                        getString(R.string.import_successful),
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                    findNavController().navigate(R.id.action_importing_to_home_fragment)
+                    //importViewModel.cleanMusicXMLSheets()
+                } else {
+                    Log.d(IMPORT_TAG, "New musicxml has NOT been added to ${folderChosen!!.name}")
+                    Toast.makeText(
+                        context,
+                        getString(R.string.import_unsuccessful),
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                }
+            } else {
+                ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(
+                    requireContext(),
+                    getString(R.string.no_import),
+                    getString(R.string.no_folders_no_import),
+                    IMPORT_TAG, getString(R.string.import_unsuccessful)
+                )
+            }
+            importViewModel.cleanMusicXMLSheets()
+        }
     }
 
+    /**
+     * Initializes the ViewModel and observes changes in the list of folders and imported files.
+     * Updates the Spinner adapter and the displayed file names.
+     *
+     */
+    private fun viewModelSetUp() {
+        importViewModel = ViewModelProvider(
+            this, ImportViewModelProviderFactory(
+                PreferenceManager.getUserId(requireContext())!!
+            )
+        )[ImportViewModel::class.java]
+        importViewModel.folders.observe(viewLifecycleOwner) { folders ->
+            this.folders = folders
+            val adapter = binding.spFolder.adapter as SpinnerFoldersAdapter
+            adapter.updateFolders(folders)
+        }
+        importViewModel.loadFolders()
+        importViewModel.musicXMLSheets.observe(viewLifecycleOwner) { sheets ->
+            if(sheets.isEmpty())
+                binding.tvNameOfFiles.text = getString(R.string.import_name_files)
+            else{
+                binding.tvNameOfFiles.movementMethod = ScrollingMovementMethod()
+                binding.tvNameOfFiles.isVerticalScrollBarEnabled = true
+                binding.tvNameOfFiles.scrollBarStyle=View.SCROLLBARS_OUTSIDE_INSET
+                binding.tvNameOfFiles.text = ""
+                var fileNames = ""
+                for (sheet in sheets) {
+                    fileNames += sheet.name + "\n"
+                }
+                binding.tvNameOfFiles.text = fileNames
+            }
+        }
 
+
+    }
+    /**
+     * Sets up the upload file button click listener.
+     * Launches a file picker to select MusicXML files.
+     *
+     */
+    private fun imageButtonSetUp() {
+        binding.imgBtnUploadFile.setOnClickListener {
+            openMultipleMusicXmlLauncher.launch(
+                arrayOf(EXTENSION_APP_XML, EXTENSION_TXT_XML)
+            )
+        }
+    }
+    /**
+     * Configures the Spinner that displays available folders.
+     * Updates the ViewModel with the newly selected folder.
+     *
+     */
     private fun configureSpinner(){
         binding.spFolder.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -143,7 +211,7 @@ class Import : Fragment() {
                 id: Long
             ) {
                 folderChosen = folders[position]
-                importViewModel.updateFolderChosen(folderChosen)
+                importViewModel.updateFolderChosen(folderChosen!!)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {

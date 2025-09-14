@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
-import java.util.UUID
 
 class LibraryViewModelProviderFactory(
     private val currentUserUUID: String,
@@ -53,7 +52,18 @@ class LibraryViewModel(
 
     fun deleteSheetAt(position: Int) {
         viewModelScope.launch {
-            folderBD.deleteSheet(sheets.value!![position].id,folderId )
+            val currentList = _sheets.value?.toMutableList() ?: return@launch
+            val sheet = currentList.getOrNull(position) ?: return@launch
+            folderBD.deleteSheet(sheet.id, folderId)
+            currentList.removeAt(position)
+            _sheets.postValue(currentList)
         }
     }
+
+    fun renameSheet(sheetId: String, folderId: String, newName: String){
+        viewModelScope.launch {
+            folderBD.setNewSheetName(sheetId,folderId, newName)
+        }
+    }
+
 }

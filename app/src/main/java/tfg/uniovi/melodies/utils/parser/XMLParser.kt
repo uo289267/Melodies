@@ -7,21 +7,43 @@ import org.w3c.dom.Element
 import org.w3c.dom.NodeList
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.notes.Note
-import tfg.uniovi.melodies.entities.notes.ScoreElement
+import tfg.uniovi.melodies.entities.notes.interfaces.ScoreElement
 import tfg.uniovi.melodies.entities.notes.Rest
-
+/**
+ * Parser for MusicXML documents that extracts notes and metadata.
+ *
+ * Converts a MusicXML [Document] into a list of [ScoreElement] objects,
+ * handling standard notes and rests. Also provides utility functions to
+ * retrieve the author and title of a composition.
+ *
+ * **Notes about octaves:**
+ * - All input sheets are expected to have a base octave of 4.
+ */
 class XMLParser() {
+    //ALL SHEETS PROVIDED NEED TO HAVE THEIR BASE OCTAVE TO BE 4
+    companion object {
+        const val BASE_OCTAVE_FLUTE: Int = 5
+    }
+    private val NEUTRAL_OCTAVE: Int = 4
+
     private lateinit var musicxml: Document
     private val notes = mutableListOf<ScoreElement>()
     private var quarterNoteDuration : Long? = null
     private var divisionsPerQuarter: Int? = null
+
 
     constructor(musicxml: Document) : this() {
         this.musicxml = musicxml
     }
 
     /**
-     * Parses the musicXML given by constructor to create Note objects
+     * Parses all notes and rests from the MusicXML document.
+     *
+     * - Converts durations to milliseconds.
+     * - Handles rests and sets references to the following note.
+     * - Transposes octaves for instruments (e.g., flute) if necessary.
+     *
+     * @throws XMLParserException If required MusicXML elements or attributes are missing.
      */
     fun parseAllNotes() {
         try {
@@ -29,7 +51,6 @@ class XMLParser() {
             this.divisionsPerQuarter = getDivisionsPerQuarter()
 
             val notes: NodeList = musicxml.getElementsByTagName("note")
-            var noteCount = 0
             val pendingRests = mutableListOf<Rest>()
 
             for (i in 0 until notes.length) {
@@ -42,7 +63,7 @@ class XMLParser() {
 
                 val isRest = restList.length > 0
                 if (isRest) {
-                    val rest = Rest(noteCount++, durationMs.toLong())
+                    val rest = Rest(durationMs.toLong())
                     pendingRests.add(rest)
                     this.notes.add(rest)
                     continue
@@ -57,7 +78,13 @@ class XMLParser() {
                     val alter = pitchElement.getElementsByTagName("alter").item(0)
 
                     val name = stepElement.textContent[0]
-                    val octave = octaveElement.textContent.toInt()
+                    var octave = octaveElement.textContent.toInt()
+                    //From standard 4 to 5 as flute plays in 4 or 6
+                    if(octave == NEUTRAL_OCTAVE)
+                        octave = BASE_OCTAVE_FLUTE
+                    else{
+                        octave = octave-NEUTRAL_OCTAVE+BASE_OCTAVE_FLUTE
+                    }
                     var sharp = false
                     if (alter != null) {
                         val alterElement = alter as Element
@@ -65,7 +92,7 @@ class XMLParser() {
                             sharp = true
                     }
 
-                    val note = Note(noteCount++, durationMs.toLong(), name, sharp, octave)
+                    val note = Note(durationMs.toLong(), name, octave,sharp)
 
                     for (rest in pendingRests) {
                         rest.setFollowingNote(note)
@@ -76,11 +103,15 @@ class XMLParser() {
                 }
             }
         }catch (e: NullPointerException){
-            throw SVGParserException("MusicXML badly written and missing elements or attributes")
+            throw XMLParserException("MusicXML badly written and missing elements or attributes")
         }
     }
 
-
+    /**
+     * Calculates the duration of a quarter note in milliseconds from metronome markings.
+     *
+     * @return Duration of a quarter note in milliseconds, or `null` if not found.
+     */
     private fun getQuarterNoteDurationMsFromMetronome(): Long? {
         val beatUnitMap = mapOf(
             "whole" to 4.0,
@@ -121,7 +152,11 @@ class XMLParser() {
         }
         return null
     }
-
+    /**
+     * Retrieves the number of divisions per quarter note from the MusicXML document.
+     *
+     * @return Number of divisions per quarter note, or `null` if not found.
+     */
     private fun getDivisionsPerQuarter(): Int? {
         val measures = musicxml.getElementsByTagName("measure")
         for (i in 0 until measures.length) {
@@ -137,20 +172,40 @@ class XMLParser() {
         }
         return null
     }
-
+    /**
+     * Calculates the duration of a note in milliseconds based on divisions and quarter note duration.
+     *
+     * @param noteDuration Duration of the note in MusicXML divisions.
+     * @return Duration in milliseconds.
+     */
     private fun calculateNoteDurationMs(
         noteDuration: Int
     ): Int {
         return ((noteDuration.toDouble() / this.divisionsPerQuarter!!) * this.quarterNoteDuration!!).toInt()
     }
-
+    /**
+     * Returns all parsed [ScoreElement]s (notes and rests).
+     *
+     * @return List of [ScoreElement].
+     */
     fun getAllNotes(): List<ScoreElement> {
         return this.notes
     }
-
+    /**
+     * Returns the total number of parsed notes and rests.
+     *
+     * @return Number of [ScoreElement] objects.
+     */
     fun getTotalNumberOfNotes(): Int {
         return this.notes.size
     }
+    /**
+     * Finds the composer/author of the MusicXML document.
+     *
+     * @param context The application context, used to access default string resources.
+     * @param xmlDocument The MusicXML document.
+     * @return Composer name, or "Anonymous" if not specified.
+     */
     fun findAuthor(context: Context, xmlDocument: Document) : String{
         val nodeList = xmlDocument.getElementsByTagName("creator")
         for (i in 0 until nodeList.length) {
@@ -161,8 +216,14 @@ class XMLParser() {
         }
         return getString(context, R.string.anonymous)
     }
-
-    fun findNameTitle(context: Context, xmlDocument: Document):String{
+    /**
+     * Finds the title of the piece in the MusicXML document.
+     *
+     * @param context The application context, used to access default string resources.
+     * @param xmlDocument The MusicXML document.
+     * @return Title of the piece, or "Unknown Name" if not specified.
+     */
+    fun findNameTitle(context: Context, xmlDocument: Document) : String{
         val workNodes = xmlDocument.getElementsByTagName("work-title")
         if (workNodes.length > 0) {
             return workNodes.item(0).textContent

@@ -1,63 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="12dp"
     android:paddingTop="5dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
 
     <ImageButton
         android:id="@+id/btn_start_playing"
         android:layout_width="50dp"
-        android:layout_marginTop="5dp"
         android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="34dp"
         android:contentDescription="@string/play_icon"
         android:src="@drawable/play"
         android:scaleType="fitCenter"
         android:adjustViewBounds="true"
-        android:background="@drawable/round_border"
-        android:layout_marginStart="50dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="wrap_content"
+        android:background="@drawable/round_border" />
+
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/btn_start_playing"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="80dp"
-        android:layout_margin="20dp"
-        android:textSize="20sp"
-        android:text="TITLE OF THE SONG"
-    />
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:layout_marginStart="16dp"
+        android:gravity="center_vertical"
+        android:layout_gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/tv_label_author"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="@string/author"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.68"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:textSize="20sp"
-        />
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/title_of_the_song"
+            android:textSize="20sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
-    <TextView
-        android:id="@+id/tv_author"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="800dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="AUTHOR OF THE SONG"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:textSize="20sp"
-        />
+        <TextView
+            android:id="@+id/tv_author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/author_placeholder"
+            android:textSize="20sp"
+            android:layout_marginStart="8dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_marginEnd="24dp"
+            />
+    </LinearLayout>
 
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

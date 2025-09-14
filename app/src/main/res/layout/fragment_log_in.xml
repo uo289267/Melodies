@@ -10,7 +10,7 @@
         android:id="@+id/tvTitleMelodies"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="MELODIES"
+        android:text="@string/melodies"
         android:fontFamily="serif"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -88,7 +88,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="20dp"
-        android:text="Enter"
+        android:text="@string/enter"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

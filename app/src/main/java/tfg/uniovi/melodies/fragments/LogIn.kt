@@ -17,11 +17,11 @@ import tfg.uniovi.melodies.fragments.viewmodels.LogInViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LogInViewModelProviderFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.utils.TextWatcherAdapter
-
 /**
- * A simple [Fragment] subclass.
- * Use the [LogIn.newInstance] factory method to
- * create an instance of this fragment.
+ * Fragment responsible for handling user login.
+ * Allows users to enter an existing user ID or create a new user.
+ * Observes ViewModel for login status and navigates accordingly.
+ * Also manages visibility of the bottom navigation menu during login.
  */
 class LogIn : Fragment() {
     private lateinit var  binding: FragmentLogInBinding
@@ -44,8 +44,7 @@ class LogIn : Fragment() {
     ): View {
         binding = FragmentLogInBinding.inflate(inflater, container, false)
         binding.inputUserId.addTextChangedListener(userIdInputWatcher)
-        logInViewModel = ViewModelProvider(this, LogInViewModelProviderFactory()).get(
-            LogInViewModel::class.java)
+        logInViewModel = ViewModelProvider(this, LogInViewModelProviderFactory())[LogInViewModel::class.java]
         logInViewModel.userId.observe(viewLifecycleOwner){ userId ->
             modifyUserIdEditText(binding.inputUserId, userId)
         }
@@ -61,7 +60,7 @@ class LogIn : Fragment() {
         logInViewModel.userExists.observe(viewLifecycleOwner){ exists ->
             if(exists){
                 Log.e("LOGIN", "User exists")
-                Toast.makeText(requireContext(), "Log in successful", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.log_in_successfull), Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_logIn_to_home_fragment)
                 PreferenceManager.saveUserId(requireContext(), logInViewModel.userId.value!!)
             }
@@ -94,7 +93,12 @@ class LogIn : Fragment() {
             navView.visibility = visibility
         }
     }
-
+    /**
+     * Updates the user ID EditText field with a new value without triggering the text watcher.
+     *
+     * @param etName The EditText view for the user ID input.
+     * @param newName The new user ID string to set in the EditText.
+     */
     private fun modifyUserIdEditText(etName: EditText, newName:String){
         etName.apply {
             removeTextChangedListener(userIdInputWatcher)

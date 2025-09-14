@@ -11,28 +11,53 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.coroutineScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.caverock.androidsvg.SVG
+import android.graphics.Bitmap // Necesario para el FileResolver
+import android.graphics.Typeface
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import com.caverock.androidsvg.SVGExternalFileResolver
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentSheetVisualizationBinding
 import tfg.uniovi.melodies.entities.MusicXMLSheet
+import tfg.uniovi.melodies.fragments.viewmodels.CHECK
+import tfg.uniovi.melodies.fragments.viewmodels.NoteCheckingState
+import tfg.uniovi.melodies.fragments.viewmodels.PAGING
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModelFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.MIC_REQ_CODE
+import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.startListening
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.stopListening
 import tfg.uniovi.melodies.utils.ShowAlertDialog
-import tfg.uniovi.melodies.utils.parser.SVGParserException
+import tfg.uniovi.melodies.utils.parser.XMLParserException
 
+
+//LOG TAGS
+private const val SET_UP = "VIEW_MODEL_SET_UP"
+private const val PARSING = "PARSING_XML"
+private const val SVG_OBSERVER = "SVG_OBSERVER"
+private const val CONSOLE = "WebViewConsole"
+private const val NAVIGATION = "NAVIGATION"
+private const val RENDER = "RENDER"
+private const val SVG_RENDER = "SVG_RENDER"
+private const val PAINTING = "PAINTING"
+
+//JAVASCRIPT FUNCTIONS FOR VEROVIO TOOLKIT
 private const val VEROVIO_HTML = "file:///android_asset/verovio.html"
+private const val LOAD_FROM_BASE_64 = "loadMusicXmlFromBase64"
+private const val GET_PAGE_COUNT = "getPageCount"
+private const val RENDER_PAGE_TO_DOM = "renderPageToDom"
+
 
 class SheetVisualization : Fragment() {
 
@@ -40,8 +65,8 @@ class SheetVisualization : Fragment() {
     private lateinit var binding: FragmentSheetVisualizationBinding
     private lateinit var sheetVisualizationViewModel: SheetVisualizationViewModel
     private lateinit var musicXMLSheet: MusicXMLSheet
-    private var currentPage = 1
     private var totalPages = 1
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,14 +91,11 @@ class SheetVisualization : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSheetVisualizationBinding.inflate(inflater, container, false)
-
+        SVG.registerExternalFileResolver(AssetFileResolver())
         sheetVisualizationViewModel = ViewModelProvider(this, SheetVisualizationViewModelFactory(
             PreferenceManager.getUserId(requireContext())!!
         ))[SheetVisualizationViewModel::class.java]
 
-
-        setupWebView()
-        setupNavigationButtons()
         return binding.root
     }
 
@@ -82,54 +104,99 @@ class SheetVisualization : Fragment() {
         view.post {
             setBottomNavMenuVisibility(View.GONE)
         }
+        setupWebView()
+        setupNavigationButtons()
         viewModelSetUp()
         toolBarSetUp()
 
+        if (sheetVisualizationViewModel.musicXMLSheet.value!=null) {
+            binding.webView.reload()
+        }
     }
-
 
     private fun viewModelSetUp() {
         sheetVisualizationViewModel.musicXMLSheet.observe(viewLifecycleOwner) { musicxml ->
-            this.musicXMLSheet = musicxml
-            musicxml?.let {
-                val encondedXML =
-                    Base64.encodeToString(it.stringSheet.toByteArray(), Base64.NO_WRAP)
-                binding.webView.evaluateJavascript(
-                    "loadMusicXmlFromBase64('$encondedXML');"
-                ) { _ ->
-                    binding.webView.evaluateJavascript("getPageCount();") { pageCount ->
-                        totalPages = pageCount.toIntOrNull() ?: 1
-                        renderCurrentPage()
+            if(sheetVisualizationViewModel.hasMusicXMLSheetChanged){
+                sheetVisualizationViewModel.hasMusicXMLSheetChanged =false
+                musicxml?.let {
+                    Log.d(SET_UP, "Setting up musicxml and its observes")
+                    binding.toolbar.title = it.name
+                    try{
+                        sheetVisualizationViewModel.parseMusicXML()
+                    }catch (e : XMLParserException){
+                        ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(requireContext(),
+                            getString(R.string.sheet_visualization_invalid_xml),
+                            getString(R.string.sheet_visualization_invalid_xml_msg),
+                            PARSING,
+                            "alert dialog showed because xml missing attributes and/or elements")
+                        sheetVisualizationViewModel.updateCanCheckNote(false)
                     }
-                }
-                binding.toolbar.title = it.name
-                try{
-                    sheetVisualizationViewModel.parseMusicXML()
-                }catch (e : SVGParserException){
-                    ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(requireContext(),
-                        "Invalid MusicXML",
-                        "MusicXML is missing attributes and/or elements, " +
-                                "no feedback will be given tap each end of the screen to navigate",
-                        "PARSING_XML",
-                        "alert dialog showed becuase xml missing attributes and/or elements")
+                    val encondedXML =
+                        Base64.encodeToString(it.stringSheet.toByteArray(), Base64.NO_WRAP)
+                    binding.webView.evaluateJavascript(
+                        "$LOAD_FROM_BASE_64('$encondedXML');"
+                    ) { _ ->
+                        binding.webView.evaluateJavascript("$GET_PAGE_COUNT();") { pageCount ->
+                            totalPages = pageCount.toIntOrNull() ?: 1
+                            sheetVisualizationViewModel.setTotalPages(totalPages)
+                            sheetVisualizationViewModel.moveForward()
+                        }
+                    }
 
                 }
+            }
 
+            this.musicXMLSheet = musicxml
+
+        }
+
+        sheetVisualizationViewModel.svg.observe(viewLifecycleOwner) { svg ->
+            try {
+                Log.d(PAGING, "SVG CHANGED")
+                binding.sheetImageView.setSVG(SVG.getFromString(svg))
+                binding.sheetImageView.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
+                sheetVisualizationViewModel.updateCurrentPage()
+            } catch (e: Exception) {
+                Log.e(SVG_OBSERVER, "Failed to load SVG", e)
             }
         }
-        sheetVisualizationViewModel.svg.observe(viewLifecycleOwner){ svg ->
-            renderCurrentPage() //TODO is this oke
 
+
+        sheetVisualizationViewModel.currentPage.observe(viewLifecycleOwner) { newCurrentPage ->
+            if(newCurrentPage!=0)
+                renderCurrentPage()
         }
 
-        sheetVisualizationViewModel.correctlyPlayedNotesCounter.observe(viewLifecycleOwner){ newCorrect ->
-            //highlightNoteByIndex(,newCorrect,"green") svg as attribute?
+        sheetVisualizationViewModel.shouldNavigateToNextPage.observe(viewLifecycleOwner) { should ->
+            if (should) {
+                val currentPage = sheetVisualizationViewModel.currentPage.value?:1
+                Log.d(NAVIGATION, "Auto-navigating from page $currentPage to ${currentPage + 1}")
+                sheetVisualizationViewModel.moveForward()
+            }
+        }
 
+        val returnToHome: () -> Unit = {
+            stopListening()
+            findNavController().navigate(R.id.home_fragment)
+        }
+
+
+        sheetVisualizationViewModel.noteCheckingState.observe(viewLifecycleOwner) { state ->
+            Log.d(CHECK, "Changed to state $state")
+            if (state == NoteCheckingState.FINISHED) {
+                sheetVisualizationViewModel.updateNoteCheckingState(NoteCheckingState.NONE)
+                ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(
+                    requireContext(),
+                    getString(R.string.sheet_visualization_finish),
+                    getString(R.string.sheet_visualization_finish_msg)+ musicXMLSheet.name,
+                    CHECK,
+                    "${musicXMLSheet.name} was finished",
+                    returnToHome
+                )
+            }
         }
     }
-
-
-
 
     /**
      * Changes the visibility of the Bottom Navigation
@@ -160,10 +227,15 @@ class SheetVisualization : Fragment() {
      */
     private fun setupWebView() {
         binding.webView.settings.javaScriptEnabled = true
-        //TODO REMOVE
+        binding.webView.settings.allowFileAccess = true
         binding.webView.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
-                Log.d("JS_CONSOLE", "${consoleMessage?.message()} -- From line ${consoleMessage?.lineNumber()} of ${consoleMessage?.sourceId()}")
+                consoleMessage?.let {
+                    Log.d(
+                        CONSOLE,
+                        "${it.message()} -- From line ${it.lineNumber()} of ${it.sourceId()}"
+                    )
+                }
                 return true
             }
         }
@@ -172,54 +244,58 @@ class SheetVisualization : Fragment() {
                 sheetVisualizationViewModel.loadMusicSheet(args.sheetIdNFolderId)
             }
         }
-        binding.webView.loadUrl(VEROVIO_HTML)
-
-    }
-
-    /**
-     * Loads MUSICXML and gives it to VEROVIO
-     */
-
-    private fun highlightNoteByIndex(svg: String, index: Int, color: String): String {
-        // Find the notes
-        val regex = Regex("""<g[^>]*class="[^"]*note[^"]*"[^>]*>.*?</g>""", RegexOption.DOT_MATCHES_ALL)
-        val matches = regex.findAll(svg).toList()
-
-        if (index >= matches.size) {
-            Log.d("SheetVisualizer","Índice fuera de rango: ${matches.size} notas encontradas")
-            return svg
-        }
-
-        val targetGroup = matches[index].value
-
-        // Añade o reemplaza fill="color" en los elementos internos
-        val modifiedGroup = targetGroup.replace(
-            Regex("""(fill="[^"]*")"""),
-            """fill="$color""""
-        ).ifEmpty {
-            // Si no tiene atributo fill, lo añadimos a cada elemento gráfico
-            targetGroup.replace("<path", """<path fill="$color"""")
-        }
-
-        return svg.replace(targetGroup, modifiedGroup)
+        val headers = mapOf(
+            "Cache-Control" to "no-cache, no-store, must-revalidate"
+        )
+        binding.webView.loadUrl(VEROVIO_HTML,headers)
     }
 
     /**
      * Renders current page and shows its SVG in the ImageView
      */
     private fun renderCurrentPage() {
-        binding.webView.evaluateJavascript("renderPageToDom($currentPage);") { rawSvg ->
-            val svgClean = cleanSvg(rawSvg)
-            binding.sheetImageView.setSVG(SVG.getFromString(svgClean)) // TODO DA NULL AL GIRAR
-        }
-    }
-    private fun countNotesInSvg(svg: String): Int {
-        val regex = Regex("""<g[^>]*class="[^"]*note[^"]*"[^>]*>.*?</g>""")
-        return regex.findAll(svg).count()
+        val currentPage = sheetVisualizationViewModel.currentPage.value
+        Log.d(RENDER, "Rendering page: $currentPage")
+        binding.webView.evaluateJavascript("$RENDER_PAGE_TO_DOM($currentPage);") { rawSvg ->
+                try {
+                    val svgClean = cleanSvg(rawSvg)
+                    Log.d(PAINTING, "SVG NEEDS TO PAINTED")
+                    sheetVisualizationViewModel.updateSVGValue(svgClean)
+
+                } catch (e: Exception) {
+                    Log.e(SVG_RENDER, "Failed to render SVG", e)
+                }
+            }
     }
 
+    /**
+     * Returns a cleaned version of the svg of the music sheet with the correct `@font-face'
+     * declaration and the correct symbols
+     *
+     * @param svgRaw [String] that represents the svg as Verovio created it
+     */
     private fun cleanSvg(svgRaw: String): String {
-        return svgRaw
+
+        // Eliminating @font-face
+        val fontFaceRegex = Regex("<style[\\s\\S]*?@font-face[\\s\\S]*?</style>")
+
+        // Adding out own @font-face with Bravura and having a src with a url of the desired assets
+        val correctFontFaceStyle = """
+        <style type="text/css">
+            @font-face {
+                font-family: 'Bravura';
+                src: url('file:///android_asset/fonts/Bravura.otf');
+            }
+        </style>
+    """
+
+        // We clean the svg to add out correct declaration of @font-face
+        val processedSvg = svgRaw
+            .replace(fontFaceRegex, "")
+            .replace("<defs>", "<defs>$correctFontFaceStyle")
+
+        // We clean the rest of the svg
+        return processedSvg
             .removeSurrounding("\"")
             .replace("\\n", "")
             .replace("\\\"", "\"")
@@ -229,33 +305,30 @@ class SheetVisualization : Fragment() {
             .replace("\\u0026", "&")
     }
 
+
+
+
     /**
      * Configures buttons to next and previous pages
      */
     private fun setupNavigationButtons() {
+
         binding.prevButton.setOnClickListener {
-            if (currentPage > 1) {
-                currentPage--
-                renderCurrentPage()
-            }
+            sheetVisualizationViewModel.moveBack()
         }
+
         binding.nextButton.setOnClickListener {
-            if (currentPage < totalPages) {
-                currentPage++
-                renderCurrentPage()
-            }
+            sheetVisualizationViewModel.moveForward()
         }
     }
 
     /**
-        Requests mic permissions to start the pitch detection
+     * Requests mic permissions to start the pitch detection
      */
     private fun requestMicPermission() {
         if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-            //Pitch detector start listening and processing audio
-            //TODO startListening(lifecycle.coroutineScope)
-        }
-        else {
+            startListening(lifecycle.coroutineScope)
+        } else {
             ActivityCompat.requestPermissions(
                 requireActivity(),
                 arrayOf(Manifest.permission.RECORD_AUDIO),
@@ -263,4 +336,34 @@ class SheetVisualization : Fragment() {
             )
         }
     }
+    inner class AssetFileResolver : SVGExternalFileResolver() {
+        /**
+         * Resolves fonts requested by **android-svg** when encountering a `@font-face` with `url()`.
+         *
+         * This implementation forces the use of the **Bravura** font by loading it from the app's assets.
+         * For any other font, it returns `null`, allowing **android-svg** to fall back to its default logic
+         * (e.g., looking for system fonts).
+         *
+         * @param fontFamily the requested font family name, or `null` if none is specified.
+         * @param fontWeight the requested font weight (e.g., `400` for normal, `700` for bold).
+         * @param fontStyle the requested font style (e.g., `"normal"`, `"italic"`), or `null` if none is specified.
+         *
+         * @return a [Typeface] instance for Bravura if matched, or `null` to delegate resolution to android-svg.
+         */
+        override fun resolveFont(fontFamily: String?, fontWeight: Int, fontStyle: String?): Typeface? {
+
+            // As we are trying to only use Bravura, it loads it from the assets
+            if (fontFamily != null && fontFamily.equals("Bravura", ignoreCase = true)) {
+                return Typeface.createFromAsset(requireContext().assets, "fonts/Bravura.otf")
+            }
+
+            // Any other fonts, we return null.
+            // This allows android-svg to go with its default logic, maybe looking for system fonts
+            return null
+        }
+        override fun resolveImage(href: String?): Bitmap? {
+            return null
+        }
+    }
 }
+

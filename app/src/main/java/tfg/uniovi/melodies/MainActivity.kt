@@ -1,30 +1,18 @@
 package tfg.uniovi.melodies
 
-import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import tfg.uniovi.melodies.databinding.ActivityMainBinding
 import tfg.uniovi.melodies.preferences.PreferenceManager
-import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.MIC_REQ_CODE
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.startListening
 
@@ -48,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         }
         setupBottomNavigation()
         controlBottomNavigationVisibility()
+
     }
     private fun checkUserAndNavigate() {
         val userId = PreferenceManager.getUserId(this)
@@ -61,6 +50,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNavigation() {
+        //bottomNavView.setupWithNavController(navController)
         bottomNavView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.home_fragment -> {

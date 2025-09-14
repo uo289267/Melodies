@@ -10,7 +10,6 @@ import android.widget.EditText
 import android.widget.Spinner
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import tfg.uniovi.melodies.R
@@ -23,14 +22,19 @@ import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModelProviderFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.utils.TextWatcherAdapter
-import java.util.UUID
 
+private const val CREATE_FOLDER_TAG = "CREATE_FOLDER"
+
+/**
+ * Fragment responsible for creating a new folder.
+ * Allows entering a folder name, choosing a color, validating inputs,
+ * and interacting with the ViewModels to save the folder.
+ */
 class AddFolder : Fragment() {
 
     private lateinit var  binding: FragmentAddFolderBinding
     private lateinit var foldersViewModel: FolderViewModel
     private lateinit var addFolderViewModel: AddFolderViewModel
-    private val folderViewModel: FolderViewModel by viewModels()
 
     private val folderNameWatcher = object : TextWatcherAdapter() {
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -73,7 +77,7 @@ class AddFolder : Fragment() {
 
         addFolderViewModel = ViewModelProvider(this, AddFolderViewModelProviderFactory(
             PreferenceManager.getUserId(requireContext())!!
-        )).get(AddFolderViewModel::class.java)
+        ))[AddFolderViewModel::class.java]
 
         addFolderViewModel.folderDTO.observe(viewLifecycleOwner){dto ->
             modifyFolderName(binding.folderNameInput, dto.name)
@@ -82,11 +86,11 @@ class AddFolder : Fragment() {
         addFolderViewModel.folderNameExists.observe(viewLifecycleOwner){
             exists ->
             if(!exists){
-                Log.e("CREATE_FOLDER", "Folder was created")
+                Log.e(CREATE_FOLDER_TAG, "Folder was created")
                 addFolderViewModel.createFolder()
                 findNavController().popBackStack()
             }else{
-                binding.folderNameInput.setError(getString(R.string.error_folder_name_exists_already))
+                binding.folderName.setError(getString(R.string.error_folder_name_exists_already))
             }
         }
         binding.toolbar.setNavigationOnClickListener{
@@ -94,7 +98,12 @@ class AddFolder : Fragment() {
         }
         return binding.root
     }
-
+    /**
+     * Updates the text in the folder name input field without triggering the TextWatcher.
+     *
+     * @param etName The EditText view containing the folder name input.
+     * @param newName The new folder name to display.
+     */
     private fun modifyFolderName(etName: EditText, newName:String){
         etName.apply {
             removeTextChangedListener(folderNameWatcher)
@@ -104,12 +113,20 @@ class AddFolder : Fragment() {
             addTextChangedListener(folderNameWatcher)
         }
     }
+    /**
+     * Configures the "Create Folder" button with click logic:
+     * - Validates the folder name.
+     * - Checks for length limits and non-empty value.
+     * - If valid, triggers the ViewModel to check for duplicates.
+     *
+     * @param binding The FragmentAddFolderBinding instance for accessing the UI.
+     */
     private fun configureButtonAddFolder(binding: FragmentAddFolderBinding) {
         binding.btnCreateFolder.setOnClickListener{
             //call to addFolder
             val name = binding.folderNameInput.text
             val color = getString(colorSelected.second)
-            Log.d("FOLDER_CREATION", "Folder: with name $name and color $color was created")
+            Log.d(CREATE_FOLDER_TAG, "Folder: with name $name and color $color was created")
 
             val currentFolderName = binding.folderNameInput.text.toString().trim()
             if(currentFolderName.isNotEmpty()){
@@ -120,22 +137,14 @@ class AddFolder : Fragment() {
             }else{
                 binding.folderName.setError(getString(R.string.error_blank_folder_name))
             }
-            /*
-            //communicating to viewmodel
-            if(binding.folderNameInput.text.isNullOrEmpty())
-                binding.folderName.setError(getString(R.string.error_blank_folder_name))
-            else{
-                addFolderViewModel.checkIfFolderNameExists()
-                if(binding.folderNameInput.text!!.length > 30)
-                    binding.folderName.setError(getString(R.string.too_long_folder_name))
-                else{
-                    addFolderViewModel.createFolder()
-                    findNavController().popBackStack()
-                }
-            }*/
         }
     }
-
+    /**
+     * Configures the spinner for selecting the folder color.
+     * Updates the ViewModel with the selected color.
+     *
+     * @param spFolderColors The Spinner view used for selecting folder colors.
+     */
     private fun configureSpinner(spFolderColors: Spinner){
         spFolderColors.adapter = SpinnerFoldersColorsAdapter(requireContext(),colors)
         spFolderColors.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {

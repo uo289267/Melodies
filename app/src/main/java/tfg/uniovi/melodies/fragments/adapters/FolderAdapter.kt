@@ -2,7 +2,6 @@ package tfg.uniovi.melodies.fragments.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.Folder
@@ -16,21 +15,16 @@ class FolderAdapter : RecyclerView.Adapter<FolderViewHolder> {
     private val onLongClickDelete: (Folder) -> Unit
     constructor(folderList: List<Folder>,
                 navigateFunction: (String) -> Unit
-                , viewModel: FolderViewModel
-                ,lifecycleOwner: LifecycleOwner){
+                , viewModel: FolderViewModel){
         this.folderList = folderList.toMutableList()
         this.navigateFunction = navigateFunction
         this.viewModel = viewModel
-        this.viewModel.folders.observe(lifecycleOwner){
-            list -> updateFolders(list)
-        }
-        this.viewModel.loadFolders()
         this.onLongClickDelete = {folder ->
             viewModel.deleteFolder(folder.folderId)
         }
     }
 
-    private fun updateFolders(newFolders: List<Folder>) {
+    fun updateFolders(newFolders: List<Folder>) {
         val oldSize = folderList.size
         folderList.clear()
         folderList.addAll(newFolders)

@@ -1,17 +1,25 @@
 package tfg.uniovi.melodies.entities
 
-import com.google.firebase.Timestamp
-
+/**
+ * Represents a folder entity used to organize scores or other musical sheets.
+ *
+ * @param name The folder name (maximum 30 characters).
+ * @param color The visual color assigned to the folder.
+ * @param folderId The unique identifier of the folder.
+ */
 class Folder(
     val name: String, //max 30 chars
     val color: Colors,
-    val creationTime: Timestamp, //TODO necesario?
     val folderId: String
 ){
     override fun toString(): String {
         return this.name
     }
 }
+
+/**
+ * Enum representing the available folder colors.
+ */
 enum class Colors{
     YELLOW, PINK, BLUE
 }

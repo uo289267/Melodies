@@ -6,11 +6,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat.getString
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.Colors
 import tfg.uniovi.melodies.entities.Folder
-import tfg.uniovi.melodies.utils.ShowAlertDialog
 
 class FolderViewHolder(
     private val view: View,
@@ -26,18 +26,18 @@ class FolderViewHolder(
             navigateFunction(currentFolder!!.folderId)
         }
         itemView.setOnLongClickListener {
-            AlertDialog.Builder(view.context).setTitle("Delete folder?")
+            AlertDialog.Builder(view.context).setTitle(getString(view.context, R.string.delete))
                 .setMessage(
-                    "Are you sure you want to delete ${currentFolder?.name}"
+                    getString(view.context, R.string.delete_ques) + currentFolder?.name +"?"
                 )
                 .setIcon(R.drawable.icon_alert)
                 .setPositiveButton(android.R.string.ok) { dialogInterface, i ->
-                    Log.d("DELETE", "Long click was activated for ${currentFolder?.name}")
-                    Toast.makeText(view.context, "${currentFolder?.name} folder was deleted"
+                    Log.d(DELETE, "Long click was activated for ${currentFolder?.name}")
+                    Toast.makeText(view.context, currentFolder?.name + getString(view.context, R.string.delete_confirm)
                         , Toast.LENGTH_SHORT).show()
                     onLongClickDelete(currentFolder!!)
                 }.setNegativeButton(android.R.string.cancel){ dialogInterface, i ->
-                    Log.d("DELETE", "Long click was canceled for ${currentFolder?.name}")
+                    Log.d(DELETE, "Long click was canceled for ${currentFolder?.name}")
                 }.show()
             true
         }

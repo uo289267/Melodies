@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.entities.Colors
 import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
-import java.util.UUID
 
 class AddFolderViewModelProviderFactory(
     private val currentUserUUID: String
@@ -20,6 +19,8 @@ class AddFolderViewModelProviderFactory(
         return AddFolderViewModel(folderBD) as T
     }
 }
+
+private const val FOLDER = "FOLDER"
 
 class AddFolderViewModel (private val folderBD: FoldersAndSheetsFirestore)
     : ViewModel() {
@@ -41,7 +42,7 @@ class AddFolderViewModel (private val folderBD: FoldersAndSheetsFirestore)
     fun createFolder(){
         viewModelScope.launch {
             folderBD.addFolder(_folderDTO.value!!)
-            Log.d("FOLDER", "View model sending folderdto to bd")
+            Log.d(FOLDER, "View model sending folderdto to bd")
         }
     }
 

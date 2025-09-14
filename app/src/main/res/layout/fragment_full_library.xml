@@ -12,19 +12,31 @@
         android:layout_height="?attr/actionBarSize"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintBottom_toTopOf="@+id/recycler_view_full_library"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/arrow_back"
+
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:title="Library"
-        app:layout_constraintBottom_toTopOf="@+id/recycler_view_full_library"
-        />
+        app:title="Library" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_full_library"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+    <TextView
+        android:id="@+id/tv_no_songs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        android:text="@string/no_folders_have_been_created_yet"
+        android:textAlignment="center"
+        android:textStyle="italic"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

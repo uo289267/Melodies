@@ -30,6 +30,7 @@
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:layout_centerInParent="true"
+                android:contentDescription="@string/folder"
                 android:src="@drawable/folder_yellow"
                 android:layout_centerHorizontal="true"
                 android:id="@+id/iv_folder"/>
@@ -40,8 +41,9 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:paddingEnd="10dp"
+                android:paddingStart="0dp"
                 android:lines="3"
-                android:text="Basic Sheets"
+                android:text="@string/basic_sheets"
                 android:textAlignment="center"
                 android:textSize="15sp" />
         </RelativeLayout>

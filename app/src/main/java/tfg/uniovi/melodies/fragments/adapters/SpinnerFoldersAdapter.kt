@@ -11,6 +11,8 @@ import tfg.uniovi.melodies.entities.Folder
 
 private const val MAX_CHARS_SHOWN = 13
 
+private const val ELLIPSIS = "..."
+
 class SpinnerFoldersAdapter(context: Context, var folders: MutableList<Folder>)
     : ArrayAdapter<Folder>(context, R.layout.spinner_folder_item, folders) {
 
@@ -42,7 +44,7 @@ class SpinnerFoldersAdapter(context: Context, var folders: MutableList<Folder>)
         return if (name.length <= MAX_CHARS_SHOWN) {
             name
         } else {
-            name.substring(0, MAX_CHARS_SHOWN) + "..."
+            name.substring(0, MAX_CHARS_SHOWN) + ELLIPSIS
         }
     }
 

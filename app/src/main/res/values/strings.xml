@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Melodies</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="yellow">Yellow</string>
     <string name="pink">Pink</string>
     <string name="blue">Blue</string>
@@ -27,6 +25,9 @@
     <string name="user_id">User Id</string>
     <string name="first_time_using_melodies_msg">If this is your first time using Melodies, please click the following button and enjoy the app.</string>
     <string name="log_in">Log In</string>
+    <string name="log_out_question">Are you sure you want to log out?</string>
+    <string name="log_in_successfull">Log in successful</string>
+    <string name="text_copied_in_clipboard">User Id copied in clipboard</string>
     <string name="error_user_doesnt_exist">User does not exist</string>
     <string name="error_folder_name_exists_already">Folder name already exists, pick a different folder name</string>
     <string name="home">Home</string>
@@ -35,4 +36,37 @@
     <string name="profile">Profile</string>
     <string name="user_id_label">User Id:</string>
     <string name="log_out">Log out</string>
+    <string name="search_hint">Search…</string>
+    <string name="no_import">No import</string>
+    <string name="no_sheets_have_been_imported_yet">No sheets have been imported yet</string>
+    <string name="no_folders_have_been_created_yet">No folders have been created yet</string>
+    <string name="no_folders_no_import">Cannot Import, no folders exist or no sheets have been selected yet</string>
+    <string name="new_folder">New folder</string>
+    <string name="add_folder">Add Folder</string>
+    <string name="folder_s_name">Folder\'s Name</string>
+    <string name="create">Create</string>
+    <string name="log_out_quest">Log</string>
+    <string name="sheet_visualization_invalid_xml">Invalid MusicXML</string>
+    <string name="sheet_visualization_invalid_xml_msg">MusicXML is missing attributes and/or elements, no feedback will be given tap each side of the screen to navigate</string>
+    <string name="sheet_visualization_finish">Finished!</string>
+    <string name="sheet_visualization_finish_msg">Congratulations you finished practicing </string>
+    <string name="rename">Rename sheet</string>
+    <string name="rename_quest">Enter new name: </string>
+    <string name="delete">Delete folder?</string>
+    <string name="delete_ques">Are you sure you want to delete </string>
+    <string name="delete_confirm"> folder was deleted</string>
+    <string name="enter">Enter</string>
+    <string name="upload">Upload</string>
+    <string name="copy_to_clipboard">copy to clipboard</string>
+    <string name="folder">folder</string>
+    <string name="folder_color">folder color</string>
+    <string name="melodies">MELODIES</string>
+    <string name="avatar">avatar</string>
+    <string name="_01234567890123456789">01234567890123456789</string>
+    <string name="search">Search</string>
+    <string name="folder_title">Folder Title</string>
+    <string name="basic_sheets">Basic Sheets</string>
+    <string name="title_of_the_song">TITLE OF THE SONG</string>
+    <string name="author_placeholder">AUTHOR</string>
+    <string name="aaaa">aaaa</string>
 </resources>
