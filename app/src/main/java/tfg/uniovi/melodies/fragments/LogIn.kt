@@ -50,10 +50,16 @@ class LogIn : Fragment() {
         }
         binding.btnEnterPreviousAccount.setOnClickListener {
             val currentId = binding.inputUserId.text.toString().trim()
-            if (currentId.isNotEmpty()) {
+            if (currentId.isNotEmpty() && currentId.length==20) {
                 logInViewModel.updateUserId(currentId)
                 logInViewModel.checkIfUserExists()
-            } else {
+            }
+            else if(currentId.isEmpty()){
+                binding.layoutUserId.error = getString(R.string.login_wrong_blank_err)
+            }
+            else if(currentId.length!=20) {
+                binding.layoutUserId.error = getString(R.string.login_wrong_length_err)
+            }else{
                 binding.layoutUserId.error = getString(R.string.error_user_doesnt_exist)
             }
         }
