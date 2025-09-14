@@ -28,7 +28,7 @@ class FolderViewHolder(
         itemView.setOnLongClickListener {
             AlertDialog.Builder(view.context).setTitle(getString(view.context, R.string.delete))
                 .setMessage(
-                    getString(view.context, R.string.delete_ques) + currentFolder?.name +"?"
+                    getString(view.context, R.string.delete_ques)+ " " +currentFolder?.name +"?"
                 )
                 .setIcon(R.drawable.icon_alert)
                 .setPositiveButton(android.R.string.ok) { dialogInterface, i ->

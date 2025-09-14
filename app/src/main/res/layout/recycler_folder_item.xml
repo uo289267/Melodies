@@ -43,6 +43,7 @@
                 android:paddingEnd="10dp"
                 android:paddingStart="0dp"
                 android:lines="3"
+                android:ellipsize="end"
                 android:text="@string/basic_sheets"
                 android:textAlignment="center"
                 android:textSize="15sp" />
