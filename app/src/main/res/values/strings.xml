@@ -52,6 +52,8 @@
     <string name="sheet_visualization_finish_msg">Congratulations you finished practicing </string>
     <string name="rename">Rename sheet</string>
     <string name="rename_quest">Enter new name: </string>
+    <string name="rename_empty_err">New name cannot be empty</string>
+    <string name="rename_length_err">New name cannot be more than 20 chars long</string>
     <string name="delete">Delete folder?</string>
     <string name="delete_ques">Are you sure you want to delete </string>
     <string name="delete_confirm"> folder was deleted</string>

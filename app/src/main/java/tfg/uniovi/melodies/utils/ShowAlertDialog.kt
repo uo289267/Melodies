@@ -59,57 +59,5 @@ object ShowAlertDialog {
                 Log.d(tagForLog, msgForNegativeBtnLog)
             }.show()
     }
-    /**
-     * Shows an input dialog with a text field, OK, and Cancel buttons.
-     *
-     * - The input field requests focus automatically and shows the soft keyboard.
-     * - If the user presses OK, the input text is returned via [onResult].
-     * - If the user presses Cancel, the dialog is dismissed and `null` is returned.
-     *
-     * @param context The context used to create the dialog.
-     * @param title The title of the dialog.
-     * @param message The message body of the dialog.
-     * @param tagForLog The tag used in the log statement.
-     * @param msgForLog The log message written when OK is pressed, followed by the entered text.
-     * @param onResult A callback invoked with the entered text, or `null` if canceled.
-     */
-    fun showInputDialog(
-        context: Context,
-        title: String,
-        message: String,
-        tagForLog: String,
-        msgForLog: String,
-        onResult: (String?) -> Unit
-    ) {
-        val input = EditText(context).apply {
-            hint = "Nuevo Nombre de Folder"
-            inputType = InputType.TYPE_CLASS_TEXT
-            setSingleLine()
-        }
-
-        val dialog = AlertDialog.Builder(context)
-            .setTitle(title)
-            .setMessage(message)
-            .setView(input)
-            .setIcon(R.drawable.icon_alert)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                val text = input.text.toString()
-                Log.d(tagForLog, "$msgForLog: $text")
-                onResult(text)
-            }
-            .setNegativeButton(android.R.string.cancel) { dialogInterface, _ ->
-                dialogInterface.dismiss()
-                onResult(null)
-            }
-            .create()
-
-        input.requestFocus()
-        dialog.setOnShowListener {
-            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
-        }
-
-        dialog.show()
-    }
 
 }

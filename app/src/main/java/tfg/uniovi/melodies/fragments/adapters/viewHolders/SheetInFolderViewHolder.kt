@@ -1,8 +1,14 @@
 package tfg.uniovi.melodies.fragments.adapters.viewHolders
 
+import android.content.Context
+import android.text.InputType
+import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat.getString
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
@@ -29,19 +35,10 @@ class SheetInFolderViewHolder(
         btnPlay.setOnClickListener {
             navigateFunction(SheetVisualizationDto(currentSheet!!.id, currentSheet!!.folderId))
         }
+
         itemView.setOnLongClickListener {
-            ShowAlertDialog.showInputDialog(
-                context = view.context,
-                title = getString(view.context, R.string.rename),
-                message = getString(view.context, R.string.rename_quest),
-                tagForLog = SHEET_RENAME,
-                msgForLog = "Folder renamed"
-            ){
-                result ->
-                if(result!= null){
-                    onLongClickRename(SheetVisualizationDto(currentSheet!!.id, currentSheet!!.folderId), result)
-                }
-            }
+            showInputDialog()
+
             true
         }
 
@@ -51,4 +48,48 @@ class SheetInFolderViewHolder(
         tvSheetAuthor.text = sheet.author
         tvSheetTitle.text = sheet.name
     }
+
+    private fun showInputDialog() {
+        val input = EditText(view.context).apply {
+            inputType = InputType.TYPE_CLASS_TEXT
+            setSingleLine()
+        }
+
+        val dialog = AlertDialog.Builder(view.context)
+            .setTitle(getString(view.context, R.string.rename))
+            .setMessage(getString(view.context, R.string.rename_quest))
+            .setView(input)
+            .setIcon(R.drawable.icon_alert)
+            .setPositiveButton(android.R.string.ok, null) // we handle later
+            .setNegativeButton(android.R.string.cancel) { dialogInterface, _ ->
+                dialogInterface.dismiss()
+            }
+            .create()
+
+        input.requestFocus()
+        dialog.setOnShowListener {
+            val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
+
+            val button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            button.setOnClickListener {
+                val text = input.text.toString().trim()
+                if (text.isEmpty()) {
+                    input.error = getString(view.context, R.string.rename_empty_err)
+                }
+                else if(text.length > 20){
+                    input.error = getString(view.context, R.string.rename_length_err)
+                }
+                else {
+                    input.error = null
+                    Log.d(SHEET_RENAME, "Renaming sheet to: $text")
+                    onLongClickRename(SheetVisualizationDto(currentSheet!!.id, currentSheet!!.folderId), text)
+                    dialog.dismiss()
+                }
+            }
+        }
+
+        dialog.show()
+    }
+
 }
