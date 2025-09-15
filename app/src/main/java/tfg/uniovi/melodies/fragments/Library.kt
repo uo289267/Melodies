@@ -60,7 +60,10 @@ class Library : Fragment() {
         libraryViewModel = ViewModelProvider(this, LibraryViewModelProviderFactory(
             PreferenceManager.getUserId(requireContext())!!, args.folderId
         ))[LibraryViewModel::class.java]
-
+        binding.fabImportSheet.setOnClickListener{
+            val destination = LibraryDirections.actionLibraryToImporting(args.folderId)
+            findNavController().navigate(destination)
+        }
 
         val onLongClickRename = {sheetIdNFolderId : SheetVisualizationDto, newName : String ->
             libraryViewModel.renameSheet(sheetIdNFolderId.sheetId, sheetIdNFolderId.folderId, newName)

@@ -72,7 +72,7 @@ class ImportViewModel(
        val ids = mutableListOf<String?>()
         viewModelScope.launch {
             for(dto in musicXMLSheets.value!!){
-                dto.folderId=folderChosen.value!!.folderId
+                dto.folderId=_folderChosen.value!!.folderId
                 ids.add(folderBD.addMusicXMLSheet(dto))
                 Log.d(MUSICXML, "View model sending ${dto.name} sheet to bd")
             }

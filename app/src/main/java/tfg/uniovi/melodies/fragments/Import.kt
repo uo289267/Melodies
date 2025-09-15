@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentImportBinding
 import tfg.uniovi.melodies.entities.Folder
@@ -36,6 +37,7 @@ private const val EXTENSION_TXT_XML = "text/xml"
  */
 class Import : Fragment() {
     private lateinit var binding : FragmentImportBinding
+    private val args : ImportArgs by navArgs()
     private val openMultipleMusicXmlLauncher =
         registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris: List<Uri> ->
             uris.forEachIndexed { index, uri ->
@@ -87,10 +89,13 @@ class Import : Fragment() {
         binding = FragmentImportBinding.inflate(inflater, container, false)
         imageButtonSetUp()
         binding.spFolder.adapter =  SpinnerFoldersAdapter(requireContext(), mutableListOf())
+
         viewModelSetUp()
         btnImportSetUp()
         viewModelFolderChosenSetUp()
         configureSpinner()
+
+        super.onCreate(savedInstanceState)
         return binding.root
     }
     /**
@@ -165,6 +170,19 @@ class Import : Fragment() {
             this.folders = folders
             val adapter = binding.spFolder.adapter as SpinnerFoldersAdapter
             adapter.updateFolders(folders)
+            // Aquí ya sí podemos usar folderId de los args
+            val folderId = args.folderId
+            if(folderId.isNotEmpty()){
+                folderChosen = folders.find { it.folderId == folderId }
+                // Si hay una carpeta encontrada, actualizar Spinner y ViewModel
+                folderChosen?.let {
+                    val index = folders.indexOf(it)
+                    if (index != -1) binding.spFolder.setSelection(index)
+                    importViewModel.updateFolderChosen(it)
+                }
+            }
+
+
         }
         importViewModel.loadFolders()
         importViewModel.musicXMLSheets.observe(viewLifecycleOwner) { sheets ->
