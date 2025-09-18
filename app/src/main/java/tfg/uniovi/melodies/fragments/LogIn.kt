@@ -1,7 +1,7 @@
 package tfg.uniovi.melodies.fragments
 
+import android.graphics.Paint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +16,7 @@ import tfg.uniovi.melodies.databinding.FragmentLogInBinding
 import tfg.uniovi.melodies.fragments.viewmodels.LogInViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LogInViewModelProviderFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
+import tfg.uniovi.melodies.utils.ShowAlertDialog.showAlertDialogOnlyWithPositiveButton
 import tfg.uniovi.melodies.utils.TextWatcherAdapter
 /**
  * Fragment responsible for handling user login.
@@ -29,7 +30,7 @@ class LogIn : Fragment() {
     private val userIdInputWatcher = object : TextWatcherAdapter() {
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             //communicating to viewmodel
-            this@LogIn.logInViewModel.updateUserId(s.toString())
+            this@LogIn.logInViewModel.updateNickname(s.toString())
         }
     }
 
@@ -43,41 +44,51 @@ class LogIn : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentLogInBinding.inflate(inflater, container, false)
-        binding.inputUserId.addTextChangedListener(userIdInputWatcher)
+        binding.inputNickname.addTextChangedListener(userIdInputWatcher)
         logInViewModel = ViewModelProvider(this, LogInViewModelProviderFactory())[LogInViewModel::class.java]
-        logInViewModel.userId.observe(viewLifecycleOwner){ userId ->
-            modifyUserIdEditText(binding.inputUserId, userId)
+        logInViewModel.nickname.observe(viewLifecycleOwner){ userId ->
+            modifyNicknameEditText(binding.inputNickname, userId)
+        }
+        binding.btnRegister.paintFlags =
+            binding.btnRegister.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+
+        binding.btnRegister.setOnClickListener{
+            findNavController().navigate(R.id.action_logIn_to_register)
         }
         binding.btnEnterPreviousAccount.setOnClickListener {
-            val currentId = binding.inputUserId.text.toString().trim()
-            if (currentId.isNotEmpty() && currentId.length==20) {
-                logInViewModel.updateUserId(currentId)
+            val currentNickname = binding.inputNickname.text.toString().trim()
+            if (currentNickname.isNotEmpty() && currentNickname.length<20) {
+                logInViewModel.updateNickname(currentNickname)
                 logInViewModel.checkIfUserExists()
             }
-            else if(currentId.isEmpty()){
+            else if(currentNickname.isEmpty()){
                 binding.layoutUserId.error = getString(R.string.login_wrong_blank_err)
             }
-            else if(currentId.length!=20) {
+            else if(currentNickname.length!=20) {
                 binding.layoutUserId.error = getString(R.string.login_wrong_length_err)
             }else{
                 binding.layoutUserId.error = getString(R.string.error_user_doesnt_exist)
             }
         }
-        logInViewModel.userExists.observe(viewLifecycleOwner){ exists ->
-            if(exists){
-                Log.e("LOGIN", "User exists")
+        logInViewModel.userId.observe(viewLifecycleOwner){ id ->
+            if (id == null && binding.inputNickname.text?.isNotEmpty() == true) {
+                binding.layoutUserId.error = getString(R.string.error_user_doesnt_exist)
+            } else if (!id.isNullOrEmpty()) {
+                binding.layoutUserId.error = null
                 Toast.makeText(requireContext(), getString(R.string.log_in_successfull), Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_logIn_to_home_fragment)
-                PreferenceManager.saveUserId(requireContext(), logInViewModel.userId.value!!)
+                PreferenceManager.saveUserId(requireContext(), id)
+                view?.let {
+                    showAlertDialogOnlyWithPositiveButton(
+                        it.context,
+                        "Hi ${logInViewModel.nickname.value}",
+                        "Welcome back to Melodies",
+                        "LOGIN", " ${logInViewModel.nickname.value} LOGGED IN"
+                    )
+                }
             }
         }
-        binding.btnEnterAsNewUser.setOnClickListener{
-            logInViewModel.createAndLoadNewUser(requireContext())
-        }
-        logInViewModel.newUserId.observe(viewLifecycleOwner){
-            if(!logInViewModel.newUserId.value.isNullOrEmpty())
-                findNavController().navigate(R.id.action_logIn_to_home_fragment)
-        }
+
         return binding.root
     }
 
@@ -105,7 +116,7 @@ class LogIn : Fragment() {
      * @param etName The EditText view for the user ID input.
      * @param newName The new user ID string to set in the EditText.
      */
-    private fun modifyUserIdEditText(etName: EditText, newName:String){
+    private fun modifyNicknameEditText(etName: EditText, newName:String){
         etName.apply {
             removeTextChangedListener(userIdInputWatcher)
             val currentSelection = selectionStart

@@ -4,8 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragments.LogIn">
-
+    tools:context=".fragments.Register">
     <TextView
         android:id="@+id/tvTitleMelodies"
         android:layout_width="wrap_content"
@@ -30,15 +29,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="20dp"
         android:textStyle="bold"
-        android:text="@string/log_in_title"
+        android:text="@string/register_title"
 
-    />
+        />
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layout_user_id"
         android:layout_marginTop="40dp"
         android:layout_width="400dp"
         android:layout_height="wrap_content"
-        android:hint="@string/user_id"
+        android:hint="@string/nickname_input"
         app:layout_constraintTop_toBottomOf="@+id/tvLogInTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -51,57 +50,14 @@
 
     </com.google.android.material.textfield.TextInputLayout>
     <Button
-        android:id="@+id/btnEnterPreviousAccount"
+        android:id="@+id/btnRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/layout_user_id"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="20dp"
-        android:text="@string/log_in"
+        android:text="@string/register_title"
         />
-    <Button
-        android:id="@+id/btnRegister"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/btnEnterPreviousAccount"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        style="?android:attr/borderlessButtonStyle"
-        android:textColor="@color/black"
-        android:text="New User? Create account"
-        />
-    <!--<View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"
-        android:layout_marginTop="34dp"
-        android:layout_marginStart="400dp"
-        android:layout_marginEnd="400dp"
-        app:layout_constraintTop_toBottomOf="@+id/btnEnterPreviousAccount" />
-
-    <TextView
-        android:id="@+id/tvNewUserMsg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:maxWidth="400dp"
-        app:layout_constraintTop_toBottomOf="@+id/divider"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="30dp"
-        android:text="@string/first_time_using_melodies_msg"
-
-        />
-    <Button
-        android:id="@+id/btnEnterAsNewUser"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/tvNewUserMsg"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"
-        android:text="@string/enter"
-        />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

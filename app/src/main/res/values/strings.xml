@@ -71,7 +71,13 @@
     <string name="title_of_the_song">TITLE OF THE SONG</string>
     <string name="author_placeholder">AUTHOR</string>
     <string name="aaaa">aaaa</string>
-    <string name="login_wrong_length_err">User id must be 20 chars in length</string>
+    <string name="login_wrong_length_err">User id must be less than 20 chars in length</string>
     <string name="login_wrong_blank_err">User id cannot be blank</string>
+    <string name="log_in_title">Log In</string>
+    <string name="register_title">Register</string>
+    <string name="nickname_input">Nickname</string>
+    <string name="nickname">nickname</string>
+
+    <string name="nickname_unable">Unable to register with given nickname</string>
 
 </resources>

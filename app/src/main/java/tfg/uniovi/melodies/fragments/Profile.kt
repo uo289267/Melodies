@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import coil3.load
 import tfg.uniovi.melodies.MainActivity
 import tfg.uniovi.melodies.R
@@ -72,6 +73,7 @@ class Profile : Fragment() {
         val intent = Intent(requireContext(), MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
+        findNavController().navigate(R.id.action_profile_to_logIn)
     }
     /**
      * Copies a given string to the clipboard and shows a Toast message.
