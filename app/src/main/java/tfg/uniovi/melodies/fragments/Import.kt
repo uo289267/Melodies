@@ -171,7 +171,7 @@ class Import : Fragment() {
             val adapter = binding.spFolder.adapter as SpinnerFoldersAdapter
             adapter.updateFolders(folders)
             // Aquí ya sí podemos usar folderId de los args
-            val folderId = args.folderId
+            val folderId = args.folderIdImport
             if(folderId.isNotEmpty()){
                 folderChosen = folders.find { it.folderId == folderId }
                 // Si hay una carpeta encontrada, actualizar Spinner y ViewModel

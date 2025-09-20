@@ -38,7 +38,11 @@
             app:destination="@id/sheetVisualization" />
         <action
             android:id="@+id/action_library_to_importing"
-            app:destination="@id/importing" />
+            app:destination="@id/importing">
+            <argument
+                android:name="folderIdImport"
+                app:argType="string" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/addFolder"
@@ -72,8 +76,9 @@
             android:id="@+id/action_importing_to_home_fragment"
             app:destination="@id/home_fragment" />
         <argument
-            android:name="folderId"
+            android:name="folderIdImport"
             app:argType="string"
+            android:defaultValue=""
             />
     </fragment>
     <fragment

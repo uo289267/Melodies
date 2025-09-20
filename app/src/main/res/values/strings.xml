@@ -54,6 +54,8 @@
     <string name="rename_quest">Enter new name: </string>
     <string name="rename_empty_err">New name cannot be empty</string>
     <string name="rename_length_err">New name cannot be more than 20 chars long</string>
+    <string name="rename_nick_empty_err">New nickname cannot be empty</string>
+    <string name="rename_nick_length_err">New nickname cannot be more than 20 chars long</string>
     <string name="delete">Delete folder?</string>
     <string name="delete_ques">Are you sure you want to delete </string>
     <string name="delete_confirm"> folder was deleted</string>
@@ -71,13 +73,14 @@
     <string name="title_of_the_song">TITLE OF THE SONG</string>
     <string name="author_placeholder">AUTHOR</string>
     <string name="aaaa">aaaa</string>
-    <string name="login_wrong_length_err">User id must be less than 20 chars in length</string>
-    <string name="login_wrong_blank_err">User id cannot be blank</string>
+    <string name="login_wrong_length_err">Nickname must be less than 20 chars in length</string>
+    <string name="login_wrong_blank_err">Nickname cannot be blank</string>
     <string name="log_in_title">Log In</string>
     <string name="register_title">Register</string>
     <string name="nickname_input">Nickname</string>
     <string name="nickname">nickname</string>
-
+    <string name="nickname_rename">Change Nickname</string>
+    <string name="nickname_new_name">Enter new nickname</string>
     <string name="nickname_unable">Unable to register with given nickname</string>
 
 </resources>

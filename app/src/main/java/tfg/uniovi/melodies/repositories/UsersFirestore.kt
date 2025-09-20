@@ -51,6 +51,26 @@ class UsersFirestore {
         }
     }
     /**
+     * Updates the nickname of a user in Firestore.
+     *
+     * @param userId The ID of the user document.
+     * @param newNickname The new nickname to set.
+     * @return true if the update was successful, false otherwise.
+     */
+    suspend fun updateUserNickname(userId: String, newNickname: String): Boolean {
+        return try {
+            val userRef = db.collection("users").document(userId)
+
+            userRef.update("nickname", newNickname).await()
+            Log.d("UserRepository", "Nickname updated for user $userId -> $newNickname")
+            true
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error updating nickname", e)
+            false
+        }
+    }
+
+    /**
      * Retrieves the user ID associated with a given nickname in Firestore.
      *
      * @param nickname The nickname to search for.
@@ -74,6 +94,30 @@ class UsersFirestore {
             null
         }
     }
+    /**
+     * Retrieves the nickname associated with a given user ID in Firestore.
+     *
+     * @param userId The user ID to search for.
+     * @return The nickname if found, or `null` if the user doesn't exist or an error occurs.
+     */
+    suspend fun getNicknameFromUserId(userId: String): String? {
+        return try {
+            val documentSnapshot = db.collection("users")
+                .document(userId)
+                .get()
+                .await()
+
+            if (documentSnapshot.exists()) {
+                documentSnapshot.getString("nickname")
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error retrieving nickname from userId", e)
+            null
+        }
+    }
+
 
     /**
      * Sets up user data in Firestore if the user does not already exist.

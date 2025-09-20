@@ -1,9 +1,12 @@
 package tfg.uniovi.melodies.utils
 
 import android.content.Context
+import android.text.InputType
 import android.util.Log
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import tfg.uniovi.melodies.R
+import android.widget.EditText
 
 /**
  * Static class that allows to easily create and show [AlertDialog]
@@ -56,5 +59,53 @@ object ShowAlertDialog {
                 Log.d(tagForLog, msgForNegativeBtnLog)
             }.show()
     }
+
+    fun showInputDialog(
+        context: Context,
+         titleRes: String,
+         messageRes: String,
+        validations: List<Pair<(String) -> Boolean, String>> = emptyList(),
+        onConfirm: (String) -> Unit
+    ) {
+        val input = EditText(context).apply {
+            inputType = InputType.TYPE_CLASS_TEXT
+            setSingleLine()
+        }
+
+        val dialog = AlertDialog.Builder(context)
+            .setTitle(titleRes)
+            .setMessage(messageRes)
+            .setView(input)
+            .setPositiveButton(android.R.string.ok, null) // listener handled later
+            .setNegativeButton(android.R.string.cancel) { d, _ -> d.dismiss() }
+            .setIcon(R.drawable.icon_alert)
+            .create()
+
+        input.requestFocus()
+        dialog.setOnShowListener {
+            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
+
+            val button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            button.setOnClickListener {
+                val text = input.text.toString().trim()
+
+                // Ejecutar comprobaciones en orden
+                val failed = validations.firstOrNull { (check, _) -> !check(text) }
+
+                if (failed != null) {
+                    input.error = failed.second
+                } else {
+                    input.error = null
+                    onConfirm(text)
+                    dialog.dismiss()
+                }
+            }
+        }
+
+        dialog.show()
+    }
+
+
 
 }

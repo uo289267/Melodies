@@ -44,22 +44,22 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="35dp"
             android:layout_marginTop="45dp"
-            android:text="@string/user_id_label"
-            android:maxWidth="80dp"
+            android:text="Nickname"
+            android:maxWidth="100dp"
             android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tvUserId"
+            android:id="@+id/tvNickname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="135dp"
+            android:layout_marginStart="160dp"
             android:layout_marginTop="45dp"
             android:text="@string/_01234567890123456789"
             android:textSize="16sp" />
 
         <ImageButton
-            android:id="@+id/btnCopy"
+            android:id="@+id/btnEdit"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginStart="340dp"
@@ -68,7 +68,7 @@
             android:background="@drawable/round_border"
             android:contentDescription="@string/copy_to_clipboard"
             android:scaleType="fitCenter"
-            android:src="@drawable/copy_icon" />
+            android:src="@drawable/edit" />
 
     </androidx.cardview.widget.CardView>
     <Button

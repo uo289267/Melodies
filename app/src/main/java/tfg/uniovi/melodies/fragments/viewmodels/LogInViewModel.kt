@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.repositories.UsersFirestore
 
 
-class LogInViewModelProviderFactory(): ViewModelProvider.Factory {
+class LogInViewModelProviderFactory: ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         val usersBD = UsersFirestore()
         return LogInViewModel(usersBD) as T
