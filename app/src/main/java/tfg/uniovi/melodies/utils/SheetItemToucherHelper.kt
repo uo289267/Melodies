@@ -20,17 +20,27 @@ object SheetItemToucherHelper {
         return ItemTouchHelper(
             MyItemTouchHelper { position, direction ->
                 if (direction == ItemTouchHelper.START || direction == ItemTouchHelper.END) {
-                    // Quitar del adaptador
-                    adapter.removeItemAt(position)
-                    // Eliminar de la BD a través del ViewModel
-                    viewModel.deleteSheetAt(position)
-                    // Log y Toast
-                    Log.d(DELETE, "One sheet at position $position was deleted")
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.delete_successful),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    ShowAlertDialog.showAlertDialogOnlyWithPositiveNNegativeButton(
+                        context = context,
+                        title = "Delete Sheet",
+                        message = "Are you sure you want to delete this sheet?",
+                        tagForLog = DELETE,
+                        msgForPositiveBtnLog = "Deleting sheet at $position position",
+                        msgForNegativeBtnLog = "Not deleting sheet at $position position",
+                        actionPositive = {
+                            adapter.removeItemAt(position)
+                            viewModel.deleteSheetAt(position)
+                            Log.d(DELETE, "One sheet at position $position was deleted")
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.delete_successful),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        },
+                        actionNegative = {
+                            viewModel.loadSheets()
+                        }
+                    )
                 }
             }
         )

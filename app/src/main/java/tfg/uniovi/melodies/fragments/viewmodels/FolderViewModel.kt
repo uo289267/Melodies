@@ -49,5 +49,12 @@ class FolderViewModel(
         }
     }
 
+    fun renameFolder(folderId: String, newName: String){
+        viewModelScope.launch {
+            folderBD.setNewFolderName(folderId, newName)
+        }
+        loadFolders()
+    }
+
 
 }

@@ -11,17 +11,17 @@ import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
 class FolderAdapter : RecyclerView.Adapter<FolderViewHolder> {
     private val folderList : MutableList<Folder>
     private val navigateFunction: (String) -> Unit
-    private val viewModel : FolderViewModel
-    private val onLongClickDelete: (Folder) -> Unit
+    private val onLongClickDelete: (String) -> Unit
+    private val onLongClickRename: (String, String) -> Unit
     constructor(folderList: List<Folder>,
-                navigateFunction: (String) -> Unit
-                , viewModel: FolderViewModel){
+                navigateFunction: (String) -> Unit,
+                onLongClickDelete: (String) -> Unit,
+                onLongClickRename: (String, String) -> Unit
+        ){
         this.folderList = folderList.toMutableList()
         this.navigateFunction = navigateFunction
-        this.viewModel = viewModel
-        this.onLongClickDelete = {folder ->
-            viewModel.deleteFolder(folder.folderId)
-        }
+        this.onLongClickDelete = onLongClickDelete
+        this.onLongClickRename = onLongClickRename
     }
 
     fun updateFolders(newFolders: List<Folder>) {
@@ -39,7 +39,7 @@ class FolderAdapter : RecyclerView.Adapter<FolderViewHolder> {
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): FolderViewHolder {
         val layout = R.layout.recycler_folder_item
         val view = LayoutInflater.from(viewGroup.context).inflate(layout, viewGroup, false)
-        return FolderViewHolder(view, navigateFunction,onLongClickDelete )
+        return FolderViewHolder(view, navigateFunction,onLongClickDelete, onLongClickRename )
     }
 
     override fun onBindViewHolder(viewHolder: FolderViewHolder, position: Int) {

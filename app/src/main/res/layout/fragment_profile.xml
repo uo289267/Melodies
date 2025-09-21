@@ -31,7 +31,7 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardUserId"
-        android:layout_width="402dp"
+        android:layout_width="400dp"
         android:layout_height="120dp"
         android:layout_marginTop="60dp"
         app:cardCornerRadius="20dp"
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="35dp"
             android:layout_marginTop="45dp"
-            android:text="Nickname"
+            android:text="@string/nickname_title"
             android:maxWidth="100dp"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -54,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="160dp"
-            android:layout_marginTop="45dp"
+            android:layout_marginTop="47dp"
             android:text="@string/_01234567890123456789"
             android:textSize="16sp" />
 
@@ -62,7 +62,7 @@
             android:id="@+id/btnEdit"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginStart="340dp"
+            android:layout_marginStart="350dp"
             android:layout_marginTop="45dp"
             android:adjustViewBounds="true"
             android:background="@drawable/round_border"

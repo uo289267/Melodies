@@ -51,6 +51,7 @@
     <string name="sheet_visualization_finish">Finished!</string>
     <string name="sheet_visualization_finish_msg">Congratulations you finished practicing </string>
     <string name="rename">Rename sheet</string>
+    <string name="rename_folder_title">Rename folder</string>
     <string name="rename_quest">Enter new name: </string>
     <string name="rename_empty_err">New name cannot be empty</string>
     <string name="rename_length_err">New name cannot be more than 20 chars long</string>
@@ -59,7 +60,7 @@
     <string name="delete_folder">Delete folder?</string>
     <string name="delete_btn">Delete sheet</string>
     <string name="delete_ques">Are you sure you want to delete </string>
-    <string name="delete_confirm"> folder was deleted</string>
+    <string name="delete_confirm"> Folder was deleted</string>
     <string name="enter">Enter</string>
     <string name="upload">Upload</string>
     <string name="copy_to_clipboard">copy to clipboard</string>
@@ -83,5 +84,6 @@
     <string name="nickname_rename">Change Nickname</string>
     <string name="nickname_new_name">Enter new nickname</string>
     <string name="nickname_unable">Unable to register with given nickname</string>
+    <string name="nickname_title">Nickname</string>
 
 </resources>

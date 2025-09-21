@@ -5,17 +5,18 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat.getString
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.Colors
 import tfg.uniovi.melodies.entities.Folder
-
+import tfg.uniovi.melodies.utils.ShowAlertDialog
+private const val FOLDER_RENAME = "FOLDER_RENAME"
 class FolderViewHolder(
     private val view: View,
     private val navigateFunction: (String) -> Unit,
-    private val onLongClickDelete: (Folder) -> Unit
+    private val onLongClickDelete: (String) -> Unit,
+    private val onLongClickRename: (String, String) -> Unit
 ): RecyclerView.ViewHolder(view) {
     private val tvFolderTitle: TextView = view.findViewById(R.id.tv_folder_title)
     private val ivFolder: ImageView = view.findViewById(R.id.iv_folder)
@@ -26,19 +27,7 @@ class FolderViewHolder(
             navigateFunction(currentFolder!!.folderId)
         }
         itemView.setOnLongClickListener {
-            AlertDialog.Builder(view.context).setTitle(getString(view.context, R.string.delete_folder))
-                .setMessage(
-                    getString(view.context, R.string.delete_ques)+ " " +currentFolder?.name +"?"
-                )
-                .setIcon(R.drawable.icon_alert)
-                .setPositiveButton(android.R.string.ok) { dialogInterface, i ->
-                    Log.d(DELETE, "Long click was activated for ${currentFolder?.name}")
-                    Toast.makeText(view.context, currentFolder?.name + getString(view.context, R.string.delete_confirm)
-                        , Toast.LENGTH_SHORT).show()
-                    onLongClickDelete(currentFolder!!)
-                }.setNegativeButton(android.R.string.cancel){ dialogInterface, i ->
-                    Log.d(DELETE, "Long click was canceled for ${currentFolder?.name}")
-                }.show()
+            showInputDialog()
             true
         }
     }
@@ -54,6 +43,34 @@ class FolderViewHolder(
             Colors.BLUE -> R.drawable.folder_blue
         }
         ivFolder.setImageResource(resId)
+    }
+
+    private fun showInputDialog(){
+        ShowAlertDialog.showInputDialog(
+            view.context,
+            titleRes = view.context.getString(R.string.rename_folder_title),
+            messageRes = getString(view.context, R.string.rename_quest),
+            optionalButtonText = view.context.getString(R.string.delete_folder),
+            onOptionalButtonClick = {
+                currentFolder?.let {
+                    onLongClickDelete(it.folderId)
+                }
+                Toast.makeText(
+                    view.context,
+                    view.context.getString(R.string.delete_confirm),
+                    Toast.LENGTH_SHORT
+                ).show()
+                Log.d(DELETE, "Folder ${currentFolder?.name} was deleted")
+            }
+        ){ newName ->
+            Log.d(FOLDER_RENAME, "Renaming sheet to: $newName")
+            currentFolder?.let {
+                onLongClickRename(
+                    it.folderId,
+                    newName
+                )
+            }
+        }
     }
 
 }

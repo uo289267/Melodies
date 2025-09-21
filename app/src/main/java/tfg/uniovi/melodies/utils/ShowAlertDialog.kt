@@ -43,19 +43,27 @@ object ShowAlertDialog {
      * @param tagForLog The tag used in log statements.
      * @param msgForPositiveBtnLog The log message written when the positive button is pressed.
      * @param msgForNegativeBtnLog The log message written when the negative button is pressed.
+     * @param actionPositive action for when the positive button is pressed.
      */
 
-    fun showAlertDialogOnlyWithPositiveNNegativeButton(context: Context, title: String, message: String,
-                                              tagForLog: String, msgForPositiveBtnLog:
-                                                       String,msgForNegativeBtnLog: String ){
+    fun showAlertDialogOnlyWithPositiveNNegativeButton(context: Context,
+                                                       title: String,
+                                                       message: String,
+                                                       tagForLog: String,
+                                                       msgForPositiveBtnLog:
+                                                       String,msgForNegativeBtnLog: String,
+                                                       actionPositive: ()-> Unit = {},
+                                                       actionNegative: () -> Unit ={}){
         AlertDialog.Builder(context).setTitle(title)
             .setMessage(
                 message
             )
             .setIcon(R.drawable.icon_alert)
             .setPositiveButton(android.R.string.ok) { dialogInterface, i ->
+                actionPositive()
                 Log.d(tagForLog, msgForPositiveBtnLog)
             }.setNegativeButton(android.R.string.cancel){ dialogInterface, i ->
+                actionNegative()
                 Log.d(tagForLog, msgForNegativeBtnLog)
             }.show()
     }

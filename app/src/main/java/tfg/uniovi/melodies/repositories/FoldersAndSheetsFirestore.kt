@@ -140,6 +140,19 @@ class FoldersAndSheetsFirestore (private val userId: String){
             // TODO lanzar custom exception?
         }
     }
+    suspend fun setNewFolderName(folderId: String, newName: String){
+        try{
+            val documentReference = usersCollection.document(userId)
+                .collection("folders")
+                .document(folderId)
+            documentReference
+                .update("name", newName)
+                .await()
+        } catch (e: Exception) {
+            println("Error renaming song $newName: $e")
+            // TODO lanzar custom exception?
+        }
+    }
     /**
      * Updates the name of an existing MusicXML sheet.
      *

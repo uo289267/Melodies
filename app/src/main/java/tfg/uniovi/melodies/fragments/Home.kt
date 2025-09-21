@@ -38,6 +38,11 @@ class Home : Fragment() {
             findNavController().navigate(destination)
         }
     }
+    private val onLongClickDelete=
+    { folderId : String -> folderViewModel.deleteFolder(folderId)}
+    private val onLongClickRename = {
+        folderId: String, newName: String -> folderViewModel.renameFolder(folderId, newName)
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -68,7 +73,7 @@ class Home : Fragment() {
         }
         folderViewModel.loadFolders()
         // Adapter
-        adapter = FolderAdapter(allFolders, navigationFunction, folderViewModel)
+        adapter = FolderAdapter(allFolders, navigationFunction, onLongClickDelete,onLongClickRename)
         binding.recyclerView.adapter = adapter
         return binding.root
 
