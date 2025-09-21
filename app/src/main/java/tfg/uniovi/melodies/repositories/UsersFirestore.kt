@@ -7,6 +7,9 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 import tfg.uniovi.melodies.preferences.PreferenceManager
+
+private const val USER_REPOSITORY = "UserRepository"
+
 /**
  * Repository for managing user-related data in Firestore.
  *
@@ -26,7 +29,7 @@ class UsersFirestore {
             val snapshot = db.collection("users").document(userId).get().await()
             snapshot.exists()
         } catch (e: Exception) {
-            Log.e("UserRepository", "Error checking user existence", e)
+            Log.e(USER_REPOSITORY, "Error checking user existence", e)
             false
         }
     }
@@ -46,7 +49,7 @@ class UsersFirestore {
 
             !querySnapshot.isEmpty
         } catch (e: Exception) {
-            Log.e("UserRepository", "Error checking nickname existence", e)
+            Log.e(USER_REPOSITORY, "Error checking nickname existence", e)
             false
         }
     }
@@ -56,17 +59,17 @@ class UsersFirestore {
      * @param userId The ID of the user document.
      * @param newNickname The new nickname to set.
      * @return true if the update was successful, false otherwise.
+     * @throws DBException if nickname update fails
      */
-    suspend fun updateUserNickname(userId: String, newNickname: String): Boolean {
-        return try {
+    suspend fun updateUserNickname(userId: String, newNickname: String) {
+        try {
             val userRef = db.collection("users").document(userId)
 
             userRef.update("nickname", newNickname).await()
-            Log.d("UserRepository", "Nickname updated for user $userId -> $newNickname")
-            true
+            Log.d(USER_REPOSITORY, "Nickname updated for user $userId -> $newNickname")
         } catch (e: Exception) {
-            Log.e("UserRepository", "Error updating nickname", e)
-            false
+            Log.e(USER_REPOSITORY, "Error updating nickname", e)
+            throw DBException("Error while updating $userId updating: ${e.message}")
         }
     }
 
@@ -90,7 +93,7 @@ class UsersFirestore {
                 null
             }
         } catch (e: Exception) {
-            Log.e("UserRepository", "Error retrieving userId from nickname", e)
+            Log.e(USER_REPOSITORY, "Error retrieving userId from nickname", e)
             null
         }
     }
@@ -113,7 +116,7 @@ class UsersFirestore {
                 null
             }
         } catch (e: Exception) {
-            Log.e("UserRepository", "Error retrieving nickname from userId", e)
+            Log.e(USER_REPOSITORY, "Error retrieving nickname from userId", e)
             null
         }
     }
@@ -132,13 +135,14 @@ class UsersFirestore {
      * @param nickname The nickname to associate with the newly created user.
      * @param context The application context used to access [PreferenceManager].
      * @return The newly created user ID, or `null` if the user already exists or if an error occurs.
+     * @throws DBException when setup fails
      */
 
     suspend fun setupUserDataIfNeeded(nickname: String, context: Context): String? {
         val storedUserId = PreferenceManager.getUserId(context)
         if (storedUserId != null) {
             if (storedUserId.isNotEmpty()) {
-                Log.d("UserRepository", "User already exists with ID $storedUserId")
+                Log.d(USER_REPOSITORY, "User already exists with ID $storedUserId")
                 return null //the user has already been created
             }
         }
@@ -166,11 +170,11 @@ class UsersFirestore {
             }
 
             PreferenceManager.saveUserId(context, userId)
-            Log.d("UserRepository", "Sheets copied to user $userId")
+            Log.d(USER_REPOSITORY, "Sheets copied to user $userId")
             userId
         } catch (e: Exception) {
-            Log.e("UserRepository", "Error configuring user", e)
-            null
+            Log.e(USER_REPOSITORY, "Error configuring user", e)
+            throw DBException("Unable to create user $nickname")
         }
     }
 

@@ -49,6 +49,12 @@ class FolderViewModel(
         }
     }
 
+    /**
+     * Renames the folder given its id
+     *
+     * @param folderId the id of the folder to rename
+     * @param newName the new name of the folder
+     */
     fun renameFolder(folderId: String, newName: String){
         viewModelScope.launch {
             folderBD.setNewFolderName(folderId, newName)
