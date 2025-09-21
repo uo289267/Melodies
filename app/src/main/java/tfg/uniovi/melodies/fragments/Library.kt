@@ -31,6 +31,7 @@ import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModelProviderFactory
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.utils.RecyclerViewItemDecoration
+import tfg.uniovi.melodies.utils.SheetItemToucherHelper
 
 /**
  * Fragment that displays all MusicXML sheets within a selected folder.
@@ -51,6 +52,7 @@ class Library : Fragment() {
         }
     }
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -69,19 +71,13 @@ class Library : Fragment() {
             libraryViewModel.renameSheet(sheetIdNFolderId.sheetId, sheetIdNFolderId.folderId, newName)
             libraryViewModel.loadSheets()
         }
-        adapter = SheetInFolderAdapter(sheetList,navigationFunction,onLongClickRename)
-        val itemTouchHelper = ItemTouchHelper(
-            MyItemTouchHelper { position, direction ->
-                if (direction == ItemTouchHelper.START|| direction == ItemTouchHelper.END) {
-                    adapter.removeItemAt(position)
-                    // notifying vm to remove from db
-                    libraryViewModel.deleteSheetAt(position)
-                    Log.d(DELETE, "One sheet at position $position was deleted")
-                    Toast.makeText(context, getString(R.string.delete_successful), Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
-        )
+        val onDelete = { dto: SheetVisualizationDto ->
+            libraryViewModel.deleteSheet(dto.sheetId, dto.folderId)
+        }
+
+        adapter = SheetInFolderAdapter(sheetList, navigationFunction, onLongClickRename, onDelete)
+        binding.recyclerViewLibrary.adapter = adapter
+        val itemTouchHelper = SheetItemToucherHelper.create(adapter, libraryViewModel, requireContext())
         itemTouchHelper.attachToRecyclerView(binding.recyclerViewLibrary)
 
 

@@ -18,13 +18,12 @@ class FolderInFullLibraryAdapter : RecyclerView.Adapter<FolderInFullLibraryViewH
     private val lifecycleOwner : LifecycleOwner
     private val onLongClickRename: (SheetVisualizationDto, String) -> Unit
 
-
     constructor(
         folderList: List<Folder>,
         navigateFunction: (SheetVisualizationDto) -> Unit,
         lifecycleOwner: LifecycleOwner,
         libraryViewModelProviderFactory: (String) -> LibraryViewModel,
-        onLongClickRename: (SheetVisualizationDto, String) -> Unit
+        onLongClickRename: (SheetVisualizationDto, String) -> Unit,
     ){
         this.folderList = folderList.toMutableList()
         this.navigateFunction = navigateFunction

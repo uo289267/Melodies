@@ -59,52 +59,62 @@ object ShowAlertDialog {
                 Log.d(tagForLog, msgForNegativeBtnLog)
             }.show()
     }
+   fun showInputDialog(
+       context: Context,
+       titleRes: String,
+       messageRes: String,
+       validations: List<Pair<(String) -> Boolean, String>> = emptyList(),
+       optionalButtonText: String? = null,
+       onOptionalButtonClick: (() -> Unit)? = null,
+       onConfirm: (String) -> Unit
 
-    fun showInputDialog(
-        context: Context,
-         titleRes: String,
-         messageRes: String,
-        validations: List<Pair<(String) -> Boolean, String>> = emptyList(),
-        onConfirm: (String) -> Unit
-    ) {
-        val input = EditText(context).apply {
-            inputType = InputType.TYPE_CLASS_TEXT
-            setSingleLine()
-        }
+   ) {
+       val input = EditText(context).apply {
+           inputType = InputType.TYPE_CLASS_TEXT
+           setSingleLine()
+       }
 
-        val dialog = AlertDialog.Builder(context)
-            .setTitle(titleRes)
-            .setMessage(messageRes)
-            .setView(input)
-            .setPositiveButton(android.R.string.ok, null) // listener handled later
-            .setNegativeButton(android.R.string.cancel) { d, _ -> d.dismiss() }
-            .setIcon(R.drawable.icon_alert)
-            .create()
+       val builder = AlertDialog.Builder(context)
+           .setTitle(titleRes)
+           .setMessage(messageRes)
+           .setView(input)
+           .setPositiveButton(android.R.string.ok, null) // listener handled later
+           .setNegativeButton(android.R.string.cancel) { d, _ -> d.dismiss() }
+           .setIcon(R.drawable.icon_alert)
 
-        input.requestFocus()
-        dialog.setOnShowListener {
-            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
+       // Si se pasa botón opcional, lo añadimos como neutro
+       if (optionalButtonText != null && onOptionalButtonClick != null) {
+           builder.setNeutralButton(optionalButtonText) { _, _ ->
+               onOptionalButtonClick()
+           }
+       }
 
-            val button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            button.setOnClickListener {
-                val text = input.text.toString().trim()
+       val dialog = builder.create()
 
-                // Ejecutar comprobaciones en orden
-                val failed = validations.firstOrNull { (check, _) -> !check(text) }
+       input.requestFocus()
+       dialog.setOnShowListener {
+           val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+           imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
 
-                if (failed != null) {
-                    input.error = failed.second
-                } else {
-                    input.error = null
-                    onConfirm(text)
-                    dialog.dismiss()
-                }
-            }
-        }
+           val button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+           button.setOnClickListener {
+               val text = input.text.toString().trim()
 
-        dialog.show()
-    }
+               // Ejecutar comprobaciones en orden
+               val failed = validations.firstOrNull { (check, _) -> !check(text) }
+
+               if (failed != null) {
+                   input.error = failed.second
+               } else {
+                   input.error = null
+                   onConfirm(text)
+                   dialog.dismiss()
+               }
+           }
+       }
+
+       dialog.show()
+   }
 
 
 

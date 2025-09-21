@@ -12,14 +12,17 @@ class SheetInFolderAdapter : RecyclerView.Adapter<SheetInFolderViewHolder> {
     private val sheetList: MutableList<MusicXMLSheet>
     private val navigateFunction: (SheetVisualizationDto) -> Unit
     private val onLongClickRename: (SheetVisualizationDto, String) -> Unit
+    private val onDelete: (SheetVisualizationDto) -> Unit
     constructor(
         sheetList: List<MusicXMLSheet>,
         navigateFunction: (SheetVisualizationDto) -> Unit,
-        onLongClickRename: (SheetVisualizationDto, String) -> Unit
+        onLongClickRename: (SheetVisualizationDto, String) -> Unit,
+        onDelete : (SheetVisualizationDto) -> Unit
         ){
         this.sheetList = sheetList.toMutableList()
         this.navigateFunction = navigateFunction
         this.onLongClickRename = onLongClickRename
+        this.onDelete = onDelete
     }
 
 
@@ -38,7 +41,7 @@ class SheetInFolderAdapter : RecyclerView.Adapter<SheetInFolderViewHolder> {
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): SheetInFolderViewHolder {
         val layout = R.layout.recycler_song_in_library_item
         val view = LayoutInflater.from(viewGroup.context).inflate(layout, viewGroup, false)
-        return SheetInFolderViewHolder(view, navigateFunction, onLongClickRename)
+        return SheetInFolderViewHolder(view, navigateFunction, onLongClickRename, onDelete)
     }
 
     override fun onBindViewHolder(viewHolder: SheetInFolderViewHolder, position: Int) {

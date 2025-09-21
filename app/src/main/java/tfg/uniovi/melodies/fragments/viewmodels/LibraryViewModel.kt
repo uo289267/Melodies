@@ -49,15 +49,22 @@ class LibraryViewModel(
             _folderName.postValue(name)
         }
     }
-
-    fun deleteSheetAt(position: Int) {
+    fun deleteSheet(sheetId: String, folderId: String) {
         viewModelScope.launch {
             val currentList = _sheets.value?.toMutableList() ?: return@launch
-            val sheet = currentList.getOrNull(position) ?: return@launch
-            folderBD.deleteSheet(sheet.id, folderId)
-            currentList.removeAt(position)
+            val sheet = currentList.firstOrNull { it.id == sheetId && it.folderId == folderId }
+                ?: return@launch
+
+            folderBD.deleteSheet(sheet.id, sheet.folderId)
+            currentList.remove(sheet)
             _sheets.postValue(currentList)
         }
+    }
+
+    fun deleteSheetAt(position: Int) {
+        val currentList = _sheets.value ?: return
+        val sheet = currentList.getOrNull(position) ?: return
+        deleteSheet(sheet.id, sheet.folderId)
     }
 
     fun renameSheet(sheetId: String, folderId: String, newName: String){

@@ -1,15 +1,10 @@
 package tfg.uniovi.melodies.fragments.adapters.viewHolders
 
-import android.content.Context
-import android.text.InputType
 import android.util.Log
 import android.view.View
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContentProviderCompat.requireContext
+import android.widget.Toast
 import androidx.core.content.ContextCompat.getString
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
@@ -22,7 +17,8 @@ private const val SHEET_RENAME = "SHEET_RENAME"
 class SheetInFolderViewHolder(
     private val view: View,
     private val navigateFunction: (SheetVisualizationDto) -> Unit,
-    private val onLongClickRename: (SheetVisualizationDto, String) -> Unit
+    private val onLongClickRename: (SheetVisualizationDto, String) -> Unit,
+    private val onDelete: (SheetVisualizationDto) -> Unit
     ): RecyclerView.ViewHolder(view){
         private var tvSheetTitle : TextView = view.findViewById(R.id.tv_title)
         private var tvSheetAuthor: TextView = view.findViewById(R.id.tv_author)
@@ -52,21 +48,29 @@ class SheetInFolderViewHolder(
 
     private fun showInputDialog() {
         ShowAlertDialog.showInputDialog(
-            context = view.context,
+            view.context,
             titleRes = getString(view.context, R.string.rename),
             messageRes = getString(view.context, R.string.rename_quest),
-            validations = listOf(
-                Pair({ it.isNotEmpty() }, getString(view.context, R.string.rename_empty_err)),
-                Pair({ it.length <= 20 }, getString(view.context, R.string.rename_length_err))
-            )
-
-        ) { newName ->
+            optionalButtonText = getString(view.context, R.string.delete_btn),
+            onOptionalButtonClick = {
+                currentSheet?.let {
+                    onDelete(SheetVisualizationDto(it.id, it.folderId))
+                }
+                Toast.makeText(
+                    view.context,
+                    view.context.getString(R.string.delete_successful),
+                    Toast.LENGTH_SHORT
+                ).show()
+                Log.d(DELETE, "sheet ${currentSheet?.name} was deleted")
+            }
+        ){ newName ->
             Log.d(SHEET_RENAME, "Renaming sheet to: $newName")
             onLongClickRename(
                 SheetVisualizationDto(currentSheet!!.id, currentSheet!!.folderId),
                 newName
             )
         }
+
     }
 
 
