@@ -26,7 +26,7 @@ class FolderViewHolder(
             navigateFunction(currentFolder!!.folderId)
         }
         itemView.setOnLongClickListener {
-            AlertDialog.Builder(view.context).setTitle(getString(view.context, R.string.delete))
+            AlertDialog.Builder(view.context).setTitle(getString(view.context, R.string.delete_folder))
                 .setMessage(
                     getString(view.context, R.string.delete_ques)+ " " +currentFolder?.name +"?"
                 )
