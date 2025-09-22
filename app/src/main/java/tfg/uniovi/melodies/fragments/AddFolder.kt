@@ -25,6 +25,8 @@ import tfg.uniovi.melodies.utils.TextWatcherAdapter
 
 private const val CREATE_FOLDER_TAG = "CREATE_FOLDER"
 
+private const val MAX_FOLDER_NAME_LENGTH = 30
+
 /**
  * Fragment responsible for creating a new folder.
  * Allows entering a folder name, choosing a color, validating inputs,
@@ -130,7 +132,7 @@ class AddFolder : Fragment() {
 
             val currentFolderName = binding.folderNameInput.text.toString().trim()
             if(currentFolderName.isNotEmpty()){
-                if(currentFolderName.length > 30)
+                if(currentFolderName.length > MAX_FOLDER_NAME_LENGTH)
                     binding.folderName.setError(getString(R.string.too_long_folder_name))
                 else
                     addFolderViewModel.checkIfFolderNameExists()

@@ -3,6 +3,7 @@ package tfg.uniovi.melodies.repositories
 import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
@@ -21,9 +22,12 @@ private const val FIRESTORE = "FIRESTORE"
  *
  * @property userId The ID of the authenticated Firebase user.
  */
-class FoldersAndSheetsFirestore (private val userId: String){
-    private val db = Firebase.firestore
-    private val usersCollection = db.collection("users")
+
+    class FoldersAndSheetsFirestore(
+        private val userId: String,
+        internal val usersCollection: CollectionReference = Firebase.firestore.collection("users")
+    ){
+
 
     /**
      * Retrieves a folder given its ID.
