@@ -64,15 +64,15 @@ class LogIn : Fragment() {
             else if(currentNickname.isEmpty()){
                 binding.layoutUserId.error = getString(R.string.login_wrong_blank_err)
             }
-            else if(currentNickname.length!=20) {
+            else if(currentNickname.length>20) {
                 binding.layoutUserId.error = getString(R.string.login_wrong_length_err)
             }else{
-                binding.layoutUserId.error = getString(R.string.error_user_doesnt_exist)
+                binding.layoutUserId.error = getString(R.string.nickname_unable_login)
             }
         }
         logInViewModel.userId.observe(viewLifecycleOwner){ id ->
             if (id == null && binding.inputNickname.text?.isNotEmpty() == true) {
-                binding.layoutUserId.error = getString(R.string.error_user_doesnt_exist)
+                binding.layoutUserId.error = getString(R.string.nickname_unable_login)
             } else if (!id.isNullOrEmpty()) {
                 binding.layoutUserId.error = null
                 Toast.makeText(requireContext(), getString(R.string.log_in_successfull), Toast.LENGTH_SHORT).show()

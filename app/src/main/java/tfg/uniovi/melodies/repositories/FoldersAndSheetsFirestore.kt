@@ -24,10 +24,10 @@ private const val FIRESTORE = "FIRESTORE"
  */
 
     class FoldersAndSheetsFirestore(
-        private val userId: String,
-        internal val usersCollection: CollectionReference = Firebase.firestore.collection("users")
+        private val userId: String
+        //internal val usersCollection: CollectionReference = Firebase.firestore.collection("users")
     ){
-
+    private val db = Firebase.firestore
 
     /**
      * Retrieves a folder given its ID.
@@ -38,7 +38,7 @@ private const val FIRESTORE = "FIRESTORE"
      */
     suspend fun getFolderById(folderId: String): Folder? {
         return try {
-            val document = usersCollection.document(userId)
+            val document = db.collection("users").document(userId)
                             .collection("folders")
                             .document(folderId).get().await()
             if (document.exists()) {
@@ -60,7 +60,7 @@ private const val FIRESTORE = "FIRESTORE"
      */
     suspend fun getSheetById(sheetId: String, folderId: String): MusicXMLSheet?{
         return try{
-            val document = usersCollection.document(userId)
+            val document = db.collection("users").document(userId)
                             .collection("folders")
                             .document(folderId)
                             .collection("sheets")
@@ -81,7 +81,7 @@ private const val FIRESTORE = "FIRESTORE"
      */
     suspend fun getAllFolders(): List<Folder> {
         return try {
-            val result = usersCollection.document(userId)
+            val result = db.collection("users").document(userId)
                 .collection("folders").orderBy("creationTime",
                                                             Query.Direction.ASCENDING)
                                                             .get().await()
@@ -106,7 +106,7 @@ private const val FIRESTORE = "FIRESTORE"
             "creationTime" to Timestamp.now(),
             "color" to dto.color.name)
         return try {
-            val documentReference = usersCollection.document(userId)
+            val documentReference = db.collection("users").document(userId)
                 .collection("folders").add(data).await()
             documentReference.id // Return the new document ID
         } catch (e: Exception) {
@@ -126,7 +126,7 @@ private const val FIRESTORE = "FIRESTORE"
             "musicxml" to dto.stringSheet,
             "name" to dto.name)
         return try {
-            val documentReference = usersCollection.document(userId)
+            val documentReference = db.collection("users").document(userId)
                 .collection("folders")
                 .document(dto.folderId)
                 .collection("sheets")
@@ -148,7 +148,7 @@ private const val FIRESTORE = "FIRESTORE"
      */
     suspend fun setNewFolderName(folderId: String, newName: String){
         try{
-            val documentReference = usersCollection.document(userId)
+            val documentReference = db.collection("users").document(userId)
                 .collection("folders")
                 .document(folderId)
             documentReference
@@ -168,7 +168,7 @@ private const val FIRESTORE = "FIRESTORE"
      */
     suspend fun setNewSheetName(sheetId: String, folderId: String, newName: String) {
        try{
-            val documentReference = usersCollection.document(userId)
+            val documentReference = db.collection("users").document(userId)
                 .collection("folders")
                 .document(folderId)
                 .collection("sheets")
@@ -188,7 +188,7 @@ private const val FIRESTORE = "FIRESTORE"
      */
     suspend fun deleteFolder(folderId: String) {
         try {
-            usersCollection.document(userId)
+            db.collection("users").document(userId)
                 .collection("folders").document(folderId).delete().await()
         } catch (e: Exception) {
             throw DBException("$folderId could not be deleted: $e.message")
@@ -203,7 +203,7 @@ private const val FIRESTORE = "FIRESTORE"
      */
     suspend fun deleteSheet(sheetId: String, folderId: String) {
         try {
-            usersCollection.document(userId)
+            db.collection("users").document(userId)
                 .collection("folders")
                 .document(folderId)
                 .collection("sheets")
@@ -224,7 +224,7 @@ private const val FIRESTORE = "FIRESTORE"
      */
     suspend fun getAllSheetsFromFolder(folderId: String): List<MusicXMLSheet> {
         return try {
-            val result = usersCollection.document(userId)
+            val result = db.collection("users").document(userId)
                 .collection("folders")
                 .document(folderId) // Filter with folderId
                 .collection("sheets")
@@ -254,7 +254,7 @@ private const val FIRESTORE = "FIRESTORE"
      */
     suspend fun isFolderNameInUse(folderName: String): Boolean? {
         return try{
-            val result = usersCollection.document(userId)
+            val result = db.collection("users").document(userId)
                 .collection("folders")
                 .whereEqualTo("name",folderName)
                 .get()
