@@ -82,13 +82,17 @@ class AddFolder : Fragment() {
         addFolderViewModel.folderDTO.observe(viewLifecycleOwner){dto ->
             modifyFolderName(binding.folderNameInput, dto.name)
         }
+        addFolderViewModel.folderCreated.observe(viewLifecycleOwner) { created ->
+            if (created) {
+                findNavController().popBackStack() // navega atrás solo cuando se haya guardado
+            }
+        }
 
         addFolderViewModel.folderNameExists.observe(viewLifecycleOwner){
             exists ->
             if(!exists){
                 Log.e(CREATE_FOLDER_TAG, "Folder was created")
                 addFolderViewModel.createFolder()
-                findNavController().popBackStack()
             }else{
                 binding.folderName.setError(getString(R.string.error_folder_name_exists_already))
             }

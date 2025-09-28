@@ -33,16 +33,19 @@ class AddFolderViewModel (private val folderBD: FoldersAndSheetsFirestore)
     private val _folderNameExists = MutableLiveData<Boolean>()
     val folderNameExists : LiveData<Boolean>
         get() = _folderNameExists
+    private val _folderCreated = MutableLiveData<Boolean>()
+    val folderCreated: LiveData<Boolean> = _folderCreated
     fun updateFolderName(newName: String) {
         _folderDTO.value = _folderDTO.value?.copy(name = newName)
     }
     fun updateFolderColor(newColor:Colors){
         _folderDTO.value = _folderDTO.value?.copy(color = newColor)
     }
-    fun createFolder(){
+    fun createFolder() {
         viewModelScope.launch {
             folderBD.addFolder(_folderDTO.value!!)
-            Log.d(FOLDER, "View model sending folderdto to bd")
+            _folderCreated.postValue(true) // notifica éxito
+
         }
     }
 
