@@ -1,7 +1,9 @@
 package tfg.uniovi.melodies.fragments
 
 import android.Manifest
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -22,6 +24,7 @@ import androidx.navigation.fragment.navArgs
 import com.caverock.androidsvg.SVG
 import android.graphics.Bitmap // Necesario para el FileResolver
 import android.graphics.Typeface
+import android.view.ViewTreeObserver
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.caverock.androidsvg.SVGExternalFileResolver
@@ -66,6 +69,7 @@ class SheetVisualization : Fragment() {
     private lateinit var sheetVisualizationViewModel: SheetVisualizationViewModel
     private lateinit var musicXMLSheet: MusicXMLSheet
     private var totalPages = 1
+    private var webViewLoaded = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +81,7 @@ class SheetVisualization : Fragment() {
     override fun onPause() {
         super.onPause()
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
     override fun onStop() {
@@ -91,6 +96,7 @@ class SheetVisualization : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSheetVisualizationBinding.inflate(inflater, container, false)
+
         SVG.registerExternalFileResolver(AssetFileResolver())
         sheetVisualizationViewModel = ViewModelProvider(this, SheetVisualizationViewModelFactory(
             PreferenceManager.getUserId(requireContext())!!
@@ -98,7 +104,6 @@ class SheetVisualization : Fragment() {
 
         return binding.root
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.post {
@@ -108,10 +113,6 @@ class SheetVisualization : Fragment() {
         setupNavigationButtons()
         viewModelSetUp()
         toolBarSetUp()
-
-        if (sheetVisualizationViewModel.musicXMLSheet.value!=null) {
-            binding.webView.reload()
-        }
     }
 
     private fun viewModelSetUp() {
@@ -181,11 +182,19 @@ class SheetVisualization : Fragment() {
             findNavController().navigate(R.id.home_fragment)
         }
 
-
         sheetVisualizationViewModel.noteCheckingState.observe(viewLifecycleOwner) { state ->
             Log.d(CHECK, "Changed to state $state")
+            if (state == NoteCheckingState.CHECKING) {
+                val currentOrientation = resources.configuration.orientation
+                requireActivity().requestedOrientation = if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                } else {
+                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+            }
             if (state == NoteCheckingState.FINISHED) {
                 sheetVisualizationViewModel.updateNoteCheckingState(NoteCheckingState.NONE)
+
                 ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(
                     requireContext(),
                     getString(R.string.sheet_visualization_finish),
@@ -205,9 +214,8 @@ class SheetVisualization : Fragment() {
      */
     private fun setBottomNavMenuVisibility(visibility: Int){
         if(visibility == View.GONE || visibility == View.VISIBLE){
-            val navView =
-                requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-            navView.visibility = visibility
+            val navView = activity?.findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+            navView?.visibility = visibility
         }
     }
 
