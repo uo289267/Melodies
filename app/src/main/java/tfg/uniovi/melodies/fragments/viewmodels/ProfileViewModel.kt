@@ -1,5 +1,6 @@
 package tfg.uniovi.melodies.fragments.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -29,15 +30,22 @@ class ProfileViewModel(private val usersBD: UsersFirestore):ViewModel(){
             _nickname.value=usersBD.getNicknameFromUserId(userId)
         }
     }
-    fun checkNicknameAvailability(){
+    fun checkNicknameAvailability(newNickname: String) {
         viewModelScope.launch {
-            _isNicknameTaken.value= _nickname.value?.let { usersBD.nicknameExists(it) }
+            _isNicknameTaken.value = usersBD.nicknameExists(newNickname)
         }
     }
 
-    fun renameUserNewNickname(userId: String, newNickname: String){
+
+    fun renameUserNewNickname(userId: String, newNickname: String) {
         viewModelScope.launch {
-            usersBD.updateUserNickname(userId,newNickname )
+            try {
+                usersBD.updateUserNickname(userId, newNickname) // suspend call
+                _nickname.postValue(newNickname) // actualizar LiveData
+            } catch (e: Exception) {
+                // Manejo de errores, log o mostrar mensaje
+                Log.e("ProfileViewModel", "Error renaming nickname", e)
+            }
         }
     }
 }

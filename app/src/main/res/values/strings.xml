@@ -82,8 +82,10 @@
     <string name="nickname_input">Nickname</string>
     <string name="nickname">nickname</string>
     <string name="nickname_rename">Change Nickname</string>
-    <string name="nickname_new_name">Enter new nickname</string>
+    <string name="nickname_new_name">Changing my nickname </string>
+    <string name="nickname_new_name2">to something new: </string>
     <string name="nickname_unable">Unable to register with given nickname</string>
     <string name="nickname_title">Nickname</string>
+    <string name="nickname_hint">Enter new nickname...</string>
 
 </resources>

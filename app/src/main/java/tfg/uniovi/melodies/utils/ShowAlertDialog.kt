@@ -3,10 +3,16 @@ package tfg.uniovi.melodies.utils
 import android.content.Context
 import android.text.InputType
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import tfg.uniovi.melodies.R
 import android.widget.EditText
+import android.widget.ProgressBar
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import tfg.uniovi.melodies.fragments.viewmodels.ProfileViewModel
 
 /**
  * Static class that allows to easily create and show [AlertDialog]
@@ -123,6 +129,81 @@ object ShowAlertDialog {
 
        dialog.show()
    }
+
+
+    fun showInputNewNicknameDialog(
+        context: Context,
+        lifecycleOwner: LifecycleOwner,
+        profileViewModel: ProfileViewModel,
+        titleRes: String,
+        messageRes: String,
+        validations: List<Pair<(String) -> Boolean, String>> = emptyList(),
+        optionalButtonText: String? = null,
+        onOptionalButtonClick: (() -> Unit)? = null,
+        onConfirm: (String) -> Unit
+    ) {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.input_dialog, null)
+        val input = dialogView.findViewById<EditText>(R.id.input)
+        val progressBar = dialogView.findViewById<ProgressBar>(R.id.progress)
+
+        val builder = AlertDialog.Builder(context)
+            .setTitle(titleRes)
+            .setMessage(messageRes)
+            .setView(dialogView)
+            .setPositiveButton(android.R.string.ok, null)
+            .setNegativeButton(android.R.string.cancel) { d, _ -> d.dismiss() }
+            .setIcon(R.drawable.icon_alert)
+
+        if (optionalButtonText != null && onOptionalButtonClick != null) {
+            builder.setNeutralButton(optionalButtonText) { _, _ -> onOptionalButtonClick() }
+        }
+
+        val dialog = builder.create()
+
+        dialog.setOnShowListener {
+            val button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            button.setOnClickListener {
+                val nickname = input.text.toString().trim()
+
+                // validaciones síncronas
+                val failed = validations.firstOrNull { (check, _) -> !check(nickname) }
+                if (failed != null) {
+                    input.error = failed.second
+                    return@setOnClickListener
+                }
+
+                // bloquear botón y mostrar progreso
+                button.isEnabled = false
+                progressBar.visibility = View.VISIBLE
+
+                profileViewModel.checkNicknameAvailability(nickname)
+
+                val observer = object : Observer<Boolean> {
+                    override fun onChanged(taken: Boolean) {
+                        // quitamos el observer después del primer resultado
+                        profileViewModel.isNicknameTaken.removeObserver(this)
+
+                        button.isEnabled = true
+                        progressBar.visibility = View.GONE
+
+                        if (taken) {
+                            input.error = context.getString(R.string.nickname_unable)
+                        } else {
+                            dialog.dismiss()
+                            onConfirm(nickname)
+                        }
+                    }
+                }
+
+                profileViewModel.isNicknameTaken.observe(lifecycleOwner, observer)
+
+            }
+        }
+
+        dialog.show()
+    }
+
+
 
 
 
