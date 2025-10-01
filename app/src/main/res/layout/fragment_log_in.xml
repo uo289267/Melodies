@@ -38,7 +38,7 @@
         android:layout_marginTop="40dp"
         android:layout_width="400dp"
         android:layout_height="wrap_content"
-        android:hint="@string/user_id"
+        android:hint="@string/nickname_title"
         app:layout_constraintTop_toBottomOf="@+id/tvLogInTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -52,7 +52,7 @@
     </com.google.android.material.textfield.TextInputLayout>
     <Button
         android:id="@+id/btnEnterPreviousAccount"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/layout_user_id"
         app:layout_constraintStart_toStartOf="parent"
