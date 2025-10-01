@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import coil3.load
@@ -57,8 +56,8 @@ class Profile : Fragment() {
                         +" "+profileViewModel.nickname.value+" "+
                         ContextCompat.getString(requireContext(), R.string.nickname_new_name2),
                 validations = listOf(
-                    {it:String -> it.isNotEmpty() } to getString(R.string.rename_nick_empty_err),
-                    {it:String -> it.length <= 20 } to getString(R.string.rename_nick_length_err),
+                    {newNick:String -> newNick.isNotEmpty() } to getString(R.string.rename_nick_empty_err),
+                    {newNick:String -> newNick.length <= 20 } to getString(R.string.rename_nick_length_err),
                 ),
                 onConfirm = { nickname ->
                     Log.d(RENAME, "Nuevo nickname: $nickname")

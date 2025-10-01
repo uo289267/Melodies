@@ -179,14 +179,14 @@ object ShowAlertDialog {
                 profileViewModel.checkNicknameAvailability(nickname)
 
                 val observer = object : Observer<Boolean> {
-                    override fun onChanged(taken: Boolean) {
+                    override fun onChanged(value: Boolean) {
                         // quitamos el observer después del primer resultado
                         profileViewModel.isNicknameTaken.removeObserver(this)
 
                         button.isEnabled = true
                         progressBar.visibility = View.GONE
 
-                        if (taken) {
+                        if (value) {
                             input.error = context.getString(R.string.nickname_unable)
                         } else {
                             dialog.dismiss()
