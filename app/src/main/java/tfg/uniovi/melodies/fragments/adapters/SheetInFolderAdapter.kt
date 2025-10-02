@@ -58,4 +58,8 @@ class SheetInFolderAdapter : RecyclerView.Adapter<SheetInFolderViewHolder> {
 
     }
 
+    fun getNameOfSheetAtPosition(position: Int): String {
+        return sheetList[position].name
+    }
+
 }

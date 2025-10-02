@@ -34,8 +34,7 @@ class SheetInFolderViewHolder(
         }
 
         itemView.setOnLongClickListener {
-            showInputDialog()
-
+            currentSheet?.let { it1 -> showInputDialog(it1) }
             true
         }
 
@@ -46,10 +45,10 @@ class SheetInFolderViewHolder(
         tvSheetTitle.text = sheet.name
     }
 
-    private fun showInputDialog() {
+    private fun showInputDialog(sheet: MusicXMLSheet) {
         ShowAlertDialog.showInputDialog(
             view.context,
-            titleRes = getString(view.context, R.string.rename),
+            titleRes = getString(view.context, R.string.rename)+ " " +sheet.name,
             messageRes = getString(view.context, R.string.rename_quest),
             optionalButtonText = getString(view.context, R.string.delete_btn),
             onOptionalButtonClick = {
@@ -58,7 +57,7 @@ class SheetInFolderViewHolder(
                 }
                 Toast.makeText(
                     view.context,
-                    view.context.getString(R.string.delete_successful),
+                    sheet.name +" "+view.context.getString(R.string.delete_successful),
                     Toast.LENGTH_SHORT
                 ).show()
                 Log.d(DELETE, "sheet ${currentSheet?.name} was deleted")

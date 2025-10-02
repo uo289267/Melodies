@@ -18,7 +18,7 @@
         app:navigationIcon="@drawable/arrow_back"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:title="@string/library"
-        app:layout_constraintBottom_toTopOf="@+id/tv_no_songs"
+        app:layout_constraintBottom_toTopOf="@+id/iv_no_songs"
         />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -30,7 +30,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
-
+    <ImageView
+        android:id="@+id/iv_no_songs"
+        android:layout_width="400dp"
+        android:layout_height="350dp"
+        android:src="@drawable/no_data"
+        android:contentDescription="@string/no_sheets_have_been_imported_yet"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/tv_no_songs"
+        />
     <TextView
         android:id="@+id/tv_no_songs"
         android:layout_width="match_parent"
@@ -40,7 +50,7 @@
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@id/iv_no_songs"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_import_sheet"

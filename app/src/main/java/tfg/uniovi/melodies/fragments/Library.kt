@@ -101,9 +101,11 @@ class Library : Fragment() {
             adapter.updateSheets(allSheetsInFolder)
             if(allSheetsInFolder.isNotEmpty()){
                 binding.tvNoSongs.visibility = View.GONE
+                binding.ivNoSongs.visibility = View.GONE
                 binding.recyclerViewLibrary.visibility = View.VISIBLE
             }else{
                 binding.tvNoSongs.visibility = View.VISIBLE
+                binding.ivNoSongs.visibility = View.VISIBLE
                 binding.recyclerViewLibrary.visibility =View.GONE
             }
         }

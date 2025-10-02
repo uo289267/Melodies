@@ -40,7 +40,6 @@ class Profile : Fragment() {
 
         val userId = PreferenceManager.getUserId(requireContext())!!
 
-        // Observa el nickname y actualiza el TextView
         profileViewModel.loadNickname(userId)
         profileViewModel.nickname.observe(viewLifecycleOwner) { nickname ->
             binding.tvNickname.text = nickname
@@ -60,7 +59,7 @@ class Profile : Fragment() {
                     {newNick:String -> newNick.length <= 20 } to getString(R.string.rename_nick_length_err),
                 ),
                 onConfirm = { nickname ->
-                    Log.d(RENAME, "Nuevo nickname: $nickname")
+                    Log.d(RENAME, "New nick: $nickname")
                     profileViewModel.renameUserNewNickname(userId, nickname)
                 }
             )
