@@ -45,7 +45,7 @@ class FolderViewHolder(
         ivFolder.setImageResource(resId)
     }
 
-    private fun showInputDialog(){
+    private fun showInputDialog(){/*
         ShowAlertDialog.showInputDialog(
             view.context,
             titleRes = view.context.getString(R.string.rename_folder_title),
@@ -70,7 +70,7 @@ class FolderViewHolder(
                     newName
                 )
             }
-        }
+        }*/
     }
 
 }

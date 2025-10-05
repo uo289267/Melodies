@@ -46,6 +46,7 @@ class Profile : Fragment() {
         }
 
         binding.btnEdit.setOnClickListener {
+
             showInputNewNicknameDialog(
                 context = requireContext(),
                 lifecycleOwner = viewLifecycleOwner,
@@ -62,10 +63,9 @@ class Profile : Fragment() {
                     Log.d(RENAME, "New nick: $nickname")
                     profileViewModel.renameUserNewNickname(userId, nickname)
                 }
-            )
-        }
+            )}
 
-        val apiUrl = "$AVATAR_HTTPS$userId"
+            val apiUrl = "$AVATAR_HTTPS$userId"
         binding.ivProfileAvatar.load(apiUrl)
 
         binding.btnLogOut.setOnClickListener {

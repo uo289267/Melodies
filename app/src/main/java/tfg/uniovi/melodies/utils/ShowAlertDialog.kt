@@ -73,6 +73,7 @@ object ShowAlertDialog {
                 Log.d(tagForLog, msgForNegativeBtnLog)
             }.show()
     }
+    /*
    fun showInputDialog(
        context: Context,
        titleRes: String,
@@ -129,7 +130,7 @@ object ShowAlertDialog {
 
        dialog.show()
    }
-
+*/
 
     fun showInputNewNicknameDialog(
         context: Context,
@@ -202,9 +203,5 @@ object ShowAlertDialog {
 
         dialog.show()
     }
-
-
-
-
 
 }

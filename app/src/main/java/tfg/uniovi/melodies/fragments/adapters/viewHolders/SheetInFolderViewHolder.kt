@@ -45,7 +45,9 @@ class SheetInFolderViewHolder(
         tvSheetTitle.text = sheet.name
     }
 
+
     private fun showInputDialog(sheet: MusicXMLSheet) {
+        /*
         ShowAlertDialog.showInputDialog(
             view.context,
             titleRes = getString(view.context, R.string.rename)+ " " +sheet.name,
@@ -68,7 +70,7 @@ class SheetInFolderViewHolder(
                 SheetVisualizationDto(currentSheet!!.id, currentSheet!!.folderId),
                 newName
             )
-        }
+        }*/
 
     }
 

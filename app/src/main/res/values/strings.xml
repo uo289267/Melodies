@@ -89,5 +89,6 @@
     <string name="nickname_unable">Unable to register with given nickname</string>
     <string name="nickname_title">Nickname</string>
     <string name="nickname_hint">Enter new nickname…</string>
+    <string name="name_already_exists">This name already exists</string>
 
 </resources>
