@@ -40,8 +40,8 @@
     <string name="log_out">Log out</string>
     <string name="search_hint">Search by title or author…</string>
     <string name="no_import">No import</string>
-    <string name="no_sheets_have_been_imported_yet">No sheets have been imported yet</string>
-    <string name="no_folders_have_been_created_yet">No folders have been created yet</string>
+    <string name="no_sheets_have_been_imported_yet">No sheets have been imported yet, import some with the button at the bottom right corner. </string>
+    <string name="no_folders_have_been_created_yet">No folders have been created yet, create some with the button at the bottom right corner.</string>
     <string name="no_folders_no_import">Cannot Import, no folders exist or no sheets have been selected yet</string>
     <string name="new_folder">New folder</string>
     <string name="add_folder">Add Folder</string>

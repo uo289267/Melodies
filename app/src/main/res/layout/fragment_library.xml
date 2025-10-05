@@ -43,11 +43,12 @@
         />
     <TextView
         android:id="@+id/tv_no_songs"
-        android:layout_width="match_parent"
+        android:layout_width="500dp"
         android:layout_height="wrap_content"
         android:text="@string/no_sheets_have_been_imported_yet"
         android:textAlignment="center"
         android:textStyle="italic"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/iv_no_songs"/>

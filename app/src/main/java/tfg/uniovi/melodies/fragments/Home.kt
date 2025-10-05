@@ -65,9 +65,11 @@ class Home : Fragment() {
             adapter.updateFolders(list)
             if(allFolders.isNotEmpty()){
                 binding.tvNoFolders.visibility = View.GONE
+                binding.ivNoFolders.visibility = View.GONE
                 binding.recyclerView.visibility = View.VISIBLE
             }else{
                 binding.tvNoFolders.visibility = View.VISIBLE
+                binding.ivNoFolders.visibility = View.VISIBLE
                 binding.recyclerView.visibility =View.GONE
             }
         }
