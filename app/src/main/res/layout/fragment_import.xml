@@ -9,7 +9,7 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="500dp"
-        android:layout_height="450dp"
+        android:layout_height="500dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -104,13 +104,14 @@
                 android:id="@+id/btnImport"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/import_files_btn"
                 android:layout_marginTop="36dp"
-                android:textColor="@color/black"
                 android:backgroundTint="#f8c63d"
+                android:text="@string/import_files_btn"
+                android:textColor="@color/black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvNameOfFiles"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/tvNameOfFiles" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

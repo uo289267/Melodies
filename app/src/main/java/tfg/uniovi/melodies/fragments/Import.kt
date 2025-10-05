@@ -130,7 +130,8 @@ class Import : Fragment() {
                     Log.d(IMPORT_TAG, "New musicxml has been added to ${folderChosen!!.name}")
                     Toast.makeText(
                         context,
-                        getString(R.string.import_successful),
+                        importViewModel.musicXMLSheets.value?.size.toString()+" "
+                                +getString(R.string.import_successful),
                         Toast.LENGTH_SHORT
                     )
                         .show()
