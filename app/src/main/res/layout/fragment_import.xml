@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -15,13 +16,11 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.312"
         android:elevation="1dp"
-        app:cardCornerRadius="10dp"
-        >
+        app:cardCornerRadius="10dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/tvImportText"
@@ -33,14 +32,14 @@
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <TextView
                 android:id="@+id/tvImportInto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="44dp"
                 android:text="@string/import_into"
                 android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -48,56 +47,57 @@
 
             <TextView
                 android:id="@+id/tvUploadFrom"
-                android:layout_width="wrap_content"
+                android:layout_width="170dp"
                 android:layout_height="wrap_content"
-                android:maxWidth="250dp"
                 android:layout_marginStart="100dp"
-                android:layout_marginTop="36dp"
+                android:layout_marginTop="48dp"
+                android:maxWidth="250dp"
                 android:text="@string/import_upload_from"
                 android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvImportInto" />
+
             <TextView
                 android:id="@+id/tvNameOfFiles"
                 android:layout_width="wrap_content"
-                android:maxWidth="250dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="100dp"
                 android:layout_marginTop="36dp"
+                android:ellipsize="end"
+                android:fadeScrollbars="false"
+                android:maxWidth="250dp"
+                android:maxLines="3"
+                android:scrollbars="vertical"
                 android:text="@string/import_name_files"
                 android:textSize="18sp"
                 android:textStyle="bold|italic"
-                android:scrollbars="vertical"
-                android:fadeScrollbars="false"
-                android:maxLines="3"
-                android:ellipsize="end"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvUploadFrom" />
 
             <Spinner
                 android:id="@+id/sp_folder"
                 android:layout_width="150dp"
-                android:layout_height="26dp"
+                android:layout_height="48dp"
                 android:layout_marginStart="36dp"
                 android:layout_marginTop="32dp"
+                android:layout_centerInParent="true"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
                 android:background="@drawable/spinner_background"
                 app:layout_constraintStart_toEndOf="@id/tvImportInto"
                 app:layout_constraintTop_toBottomOf="@id/tvImportText" />
 
             <ImageButton
                 android:id="@+id/imgBtnUploadFile"
-                android:layout_width="46dp"
-                android:layout_height="46dp"
-                android:layout_centerInParent="true"
-                android:layout_marginTop="168dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="196dp"
+                android:layout_marginEnd="128dp"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/upload"
                 android:scaleType="fitCenter"
                 android:src="@drawable/upload"
-                app:cardCornerRadius="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.197"
-                app:layout_constraintStart_toEndOf="@+id/tvUploadFrom"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
@@ -105,11 +105,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/import_files_btn"
+                android:layout_marginTop="36dp"
+                android:textColor="@color/black"
+                android:backgroundTint="#f8c63d"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvNameOfFiles"
-                android:layout_marginTop="36dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                />
+                app:layout_constraintEnd_toEndOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>

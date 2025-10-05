@@ -20,6 +20,8 @@ class Folder(
 /**
  * Enum representing the available folder colors.
  */
-enum class Colors{
-    YELLOW, PINK, BLUE
+enum class Colors(val hex: String) {
+    YELLOW("#f8c63d"),
+    BLUE("#34a1e4"),
+    PINK("#f76592")
 }

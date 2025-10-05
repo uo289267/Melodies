@@ -1,6 +1,7 @@
 package tfg.uniovi.melodies.fragments
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
@@ -111,6 +112,7 @@ class Import : Fragment() {
 
             if (index != -1) {
                 binding.spFolder.setSelection(index)
+
             }
         }
     }
@@ -177,7 +179,10 @@ class Import : Fragment() {
                 // Si hay una carpeta encontrada, actualizar Spinner y ViewModel
                 folderChosen?.let {
                     val index = folders.indexOf(it)
-                    if (index != -1) binding.spFolder.setSelection(index)
+                    if (index != -1){
+                        binding.spFolder.setSelection(index)
+                        importViewModel.getColorOfSelectedFolder(folderId)
+                    }
                     importViewModel.updateFolderChosen(it)
                 }
             }
@@ -201,6 +206,11 @@ class Import : Fragment() {
             }
         }
 
+        importViewModel.folderChosenColor.observe(viewLifecycleOwner){
+            val backgroundColor = Color.parseColor(importViewModel.folderChosenColor.value?.hex)
+            binding.btnImport.setBackgroundColor(backgroundColor)
+
+        }
 
     }
     /**
@@ -230,6 +240,7 @@ class Import : Fragment() {
             ) {
                 folderChosen = folders[position]
                 importViewModel.updateFolderChosen(folderChosen!!)
+                importViewModel.getColorOfSelectedFolder(folderChosen!!.folderId)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {

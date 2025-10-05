@@ -330,6 +330,31 @@ class FoldersAndSheetsFirestore (private val userId: String){
         )
     }
 
+    /**
+     * Retrieves the color of a folder given its ID.
+     *
+     * @param folderId The ID of the folder whose color is to be retrieved.
+     * @return The [Colors] value representing the folder's color, or null if not found.
+     * @throws DBException if the folder could not be retrieved or has no color field.
+     */
+    suspend fun getFolderColor(folderId: String): Colors? {
+        return try {
+            val document = usersCollection.document(userId)
+                .collection("folders")
+                .document(folderId)
+                .get()
+                .await()
+
+            if (document.exists()) {
+                val colorName = document.getString("color")
+                colorName?.let { Colors.valueOf(it.uppercase()) }
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            throw DBException("Could not retrieve color for folder $folderId: ${e.message}")
+        }
+    }
 
 
 

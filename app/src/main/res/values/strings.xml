@@ -11,8 +11,8 @@
     <string name="pagina_siguiente">Página siguiente</string>
     <string name="import_xml">Import MusicXML</string>
     <string name="import_into">Into folder:</string>
-    <string name="import_upload_from">Upload from device storage:</string>
-    <string name="import_name_files">No files upladed yet</string>
+    <string name="import_upload_from">Select from devices storage:</string>
+    <string name="import_name_files">No files selected yet</string>
     <string name="import_files_btn">Import</string>
     <string name="anonymous">Anonymous</string>
     <string name="unknown_name">Unknown Name</string>
