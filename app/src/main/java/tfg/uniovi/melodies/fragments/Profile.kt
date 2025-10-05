@@ -11,13 +11,16 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import coil3.load
 import tfg.uniovi.melodies.MainActivity
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentProfileBinding
+import tfg.uniovi.melodies.fragments.adapters.HistoryEntryAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.ProfileViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.ProfileViewModelProviderFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
+import tfg.uniovi.melodies.utils.SheetItemToucherHelper
 import tfg.uniovi.melodies.utils.ShowAlertDialog.showInputNewNicknameDialog
 
 private const val LOGOUT_TAG = "LOGOUT"
@@ -39,12 +42,14 @@ class Profile : Fragment() {
         )[ProfileViewModel::class.java]
 
         val userId = PreferenceManager.getUserId(requireContext())!!
+        setupRecyclerView()
+        observeViewModel()
+        profileViewModel.loadHistoryEntries(userId)
 
         profileViewModel.loadNickname(userId)
         profileViewModel.nickname.observe(viewLifecycleOwner) { nickname ->
             binding.tvNickname.text = nickname
         }
-
         binding.btnEdit.setOnClickListener {
 
             showInputNewNicknameDialog(
@@ -93,4 +98,20 @@ class Profile : Fragment() {
         startActivity(intent)
         findNavController().navigate(R.id.action_profile_to_logIn)
     }
+
+    private fun setupRecyclerView() {
+        binding.recyclerViewHistoryEntries.layoutManager = LinearLayoutManager(requireContext())
+    }
+
+    private fun observeViewModel() {
+        profileViewModel.historyEntries.observe(viewLifecycleOwner) { entries ->
+            if (entries.isNotEmpty()) {
+                binding.recyclerViewHistoryEntries.adapter = HistoryEntryAdapter(entries)
+                binding.cardHistoryEntries.visibility = View.VISIBLE
+            } else {
+                binding.cardHistoryEntries.visibility = View.GONE
+            }
+
+    }
+}
 }

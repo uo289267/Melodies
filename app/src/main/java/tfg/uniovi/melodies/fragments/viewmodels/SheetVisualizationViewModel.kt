@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import tfg.uniovi.melodies.entities.HistoryEntry
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.entities.notes.interfaces.ScoreElement
 import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
@@ -71,6 +72,10 @@ class SheetVisualizationViewModel(
 
     private val _noteCheckingState = MutableLiveData(NoteCheckingState.NONE)
     val noteCheckingState: LiveData<NoteCheckingState> get() = _noteCheckingState
+
+    private var startTime: Long = 0L
+    private val _elapsedTimeMs = MutableLiveData<Long>()
+    val elapsedTimeMs: LiveData<Long> get() = _elapsedTimeMs
 
 
     private var isCurrentPageAllSetUp = false
@@ -172,6 +177,7 @@ class SheetVisualizationViewModel(
     private fun checkNextNote() {
         viewModelScope.launch(Dispatchers.Default) {
             _noteCheckingState.postValue(NoteCheckingState.CHECKING)
+            startTime = System.currentTimeMillis()
             while (currentNoteIndex < _noteList.size) {
                 if(_shouldNavigateToNextPage.value == false || isCurrentPageAllSetUp){
                     val currentNote = _noteList[currentNoteIndex]
@@ -213,8 +219,9 @@ class SheetVisualizationViewModel(
                     }
                     }
                 }
+            _elapsedTimeMs.postValue(System.currentTimeMillis() - startTime)
             _noteCheckingState.postValue(NoteCheckingState.FINISHED)
-            Log.d(CHECK, "All notes finished!")
+            Log.d(CHECK, "All notes finished! Total: ${_elapsedTimeMs.value?.div(1000.0)} segundos")
         }
     }
 
@@ -273,6 +280,12 @@ class SheetVisualizationViewModel(
 
     fun updateNoteCheckingState(state : NoteCheckingState){
         _noteCheckingState.postValue(state)
+    }
+
+    fun saveNewHistoryEntry(historyEntry: HistoryEntry) {
+        viewModelScope.launch {
+            sheetBD.saveNewHistoryEntry(historyEntry)
+        }
     }
 
 }

@@ -6,6 +6,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
+import tfg.uniovi.melodies.entities.HistoryEntry
 import tfg.uniovi.melodies.preferences.PreferenceManager
 
 private const val USER_REPOSITORY = "UserRepository"
@@ -175,6 +176,37 @@ class UsersFirestore {
         } catch (e: Exception) {
             Log.e(USER_REPOSITORY, "Error configuring user", e)
             throw DBException("Unable to create user $nickname")
+        }
+    }
+
+    /**
+     * Retrieves the 5 most recent HistoryEntries for the current user,
+     * ordered by creation time (newest first).
+     *
+     * @param userId whose history is retrieved
+     * @return A list of up to 5 [HistoryEntry].
+     * @throws DBException if retrieval fails.
+     */
+    suspend fun getAllHistoryEntries(userId: String): List<HistoryEntry> {
+        return try {
+            val result = db.collection("users").document(userId)
+                .collection("historyEntries")
+                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .limit(5)
+                .get()
+                .await()
+
+            result.documents.mapNotNull { doc ->
+                val name = doc.getString("nameOfSheet")
+                val time = doc.getString("formattedTime")
+                if (name != null && time != null) {
+                    HistoryEntry(name, time)
+                } else {
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            throw DBException("History entries could not be retrieved: ${e.message}")
         }
     }
 

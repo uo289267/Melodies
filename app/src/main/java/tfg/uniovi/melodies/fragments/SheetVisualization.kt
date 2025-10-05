@@ -31,6 +31,7 @@ import com.caverock.androidsvg.SVGExternalFileResolver
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentSheetVisualizationBinding
+import tfg.uniovi.melodies.entities.HistoryEntry
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.viewmodels.CHECK
 import tfg.uniovi.melodies.fragments.viewmodels.NoteCheckingState
@@ -43,6 +44,7 @@ import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.startListening
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.stopListening
 import tfg.uniovi.melodies.utils.ShowAlertDialog
 import tfg.uniovi.melodies.utils.parser.XMLParserException
+import kotlin.text.*
 
 
 //LOG TAGS
@@ -70,6 +72,8 @@ class SheetVisualization : Fragment() {
     private lateinit var musicXMLSheet: MusicXMLSheet
     private var totalPages = 1
     private var webViewLoaded = false
+    private var elapsedFormatted: String = ""
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -195,15 +199,32 @@ class SheetVisualization : Fragment() {
             if (state == NoteCheckingState.FINISHED) {
                 sheetVisualizationViewModel.updateNoteCheckingState(NoteCheckingState.NONE)
 
+                val message = getString(R.string.sheet_visualization_finish_msg) +
+                        " " + musicXMLSheet.name +
+                        "\n\n⏱️ Tiempo total: $elapsedFormatted"
+
                 ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(
                     requireContext(),
                     getString(R.string.sheet_visualization_finish),
-                    getString(R.string.sheet_visualization_finish_msg)+ musicXMLSheet.name,
+                    message,
                     CHECK,
-                    "${musicXMLSheet.name} was finished",
+                    "${musicXMLSheet.name} was finished in $elapsedFormatted",
                     returnToHome
                 )
             }
+
+        }
+        sheetVisualizationViewModel.elapsedTimeMs.observe(viewLifecycleOwner) { elapsed ->
+            val totalSeconds = (elapsed / 1000).toInt()
+            val minutes = totalSeconds / 60
+            val seconds = totalSeconds % 60
+
+            elapsedFormatted = when {
+                minutes > 0 -> "$minutes min $seconds s"
+                else -> "$seconds s"
+            }
+            sheetVisualizationViewModel.saveNewHistoryEntry(HistoryEntry(musicXMLSheet.name, elapsedFormatted))
+            Log.d("SHEET_TIME", "Tiempo total en tocar la canción: $elapsedFormatted (mm:ss)")
         }
     }
 
