@@ -75,7 +75,7 @@ class Home : Fragment() {
         }
         folderViewModel.loadFolders()
         // Adapter
-        adapter = FolderAdapter(allFolders, navigationFunction, onLongClickDelete,onLongClickRename)
+        adapter = FolderAdapter(allFolders, navigationFunction, onLongClickDelete,onLongClickRename, viewLifecycleOwner)
         binding.recyclerView.adapter = adapter
         return binding.root
 

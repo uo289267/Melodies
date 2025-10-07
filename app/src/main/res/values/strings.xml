@@ -91,5 +91,6 @@
     <string name="nickname_hint">Enter new nickname…</string>
     <string name="name_already_exists">This name already exists</string>
     <string name="last_sheets_played">Last sheets played</string>
+    <string name="unexpected_error">An unexpected error occurred</string>
 
 </resources>

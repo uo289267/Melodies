@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import android.util.Log
+import tfg.uniovi.melodies.R
 import java.io.File
 import java.io.FileWriter
 import java.io.PrintWriter
@@ -20,7 +21,7 @@ class MelodiesApp : Application() {
             Handler(Looper.getMainLooper()).post {
                 Toast.makeText(
                     applicationContext,
-                    "Unexpected error: ${exception.message}",
+                    getString(R.string.unexpected_error),
                     Toast.LENGTH_LONG
                 ).show()
             }

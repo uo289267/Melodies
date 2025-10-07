@@ -41,6 +41,7 @@ class ProfileViewModel(private val usersBD: UsersFirestore):ViewModel(){
 
 
     fun renameUserNewNickname(userId: String, newNickname: String) {
+
         viewModelScope.launch {
             try {
                 usersBD.updateUserNickname(userId, newNickname) // suspend call

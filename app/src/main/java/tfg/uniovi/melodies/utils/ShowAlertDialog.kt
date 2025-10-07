@@ -11,8 +11,13 @@ import tfg.uniovi.melodies.R
 import android.widget.EditText
 import android.widget.ProgressBar
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.fragments.viewmodels.ProfileViewModel
+import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
+import tfg.uniovi.melodies.repositories.UsersFirestore
 
 /**
  * Static class that allows to easily create and show [AlertDialog]
@@ -131,11 +136,89 @@ object ShowAlertDialog {
        dialog.show()
    }
 */
+    fun showRenameFolderDialog(
+        context: Context,
+        lifecycleOwner: LifecycleOwner,
+        folderDB: FoldersAndSheetsFirestore, // BD específica para folders
+        currentFolderName: String?,
+        titleRes: String,
+        messageRes: String,
+        optionalButtonText: String? = null,
+        onOptionalButtonClick: (() -> Unit)? = null,
+        onConfirm: (String) -> Unit
+    ) {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.input_dialog, null)
+        val input = dialogView.findViewById<EditText>(R.id.input)
+        val progressBar = dialogView.findViewById<ProgressBar>(R.id.progress)
+
+        // Prellenar con nombre actual si existe
+        input.setText(currentFolderName)
+        input.setSelection(currentFolderName?.length ?: 0)
+
+        val builder = AlertDialog.Builder(context)
+            .setTitle(titleRes)
+            .setMessage(messageRes)
+            .setView(dialogView)
+            .setPositiveButton(android.R.string.ok, null)
+            .setNegativeButton(android.R.string.cancel) { d, _ -> d.dismiss() }
+
+        if (optionalButtonText != null && onOptionalButtonClick != null) {
+            builder.setNeutralButton(optionalButtonText) { _, _ -> onOptionalButtonClick() }
+        }
+
+        val dialog = builder.create()
+
+        dialog.setOnShowListener {
+            val button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            button.setOnClickListener {
+                val newName = input.text.toString().trim()
+
+                // Validaciones locales
+                if (newName.isEmpty()) {
+                    input.error = context.getString(R.string.rename_nick_empty_err)
+                    return@setOnClickListener
+                }
+                if (newName.length > 30) {
+                    input.error = context.getString(R.string.rename_nick_length_err)
+                    return@setOnClickListener
+                }
+
+                // Bloquear botón y mostrar progreso
+                button.isEnabled = false
+                progressBar.visibility = View.VISIBLE
+
+                lifecycleOwner.lifecycleScope.launch {
+                    try {
+                        // Comprobación de disponibilidad del nombre de carpeta
+                        val taken = folderDB.isFolderNameInUse(newName) // suspend function
+
+                        button.isEnabled = true
+                        progressBar.visibility = View.GONE
+
+                        if (taken == true) {
+                            input.error = "Folder name taken" //TODO
+                        } else {
+                            dialog.dismiss()
+                            onConfirm(newName)
+                        }
+                    } catch (e: Exception) {
+                        button.isEnabled = true
+                        progressBar.visibility = View.GONE
+                        input.error = "Error" //TODO
+                        Log.e("RenameFolderDialog", "Error checking folder name", e)
+                    }
+                }
+            }
+        }
+
+        dialog.show()
+    }
+
 
     fun showInputNewNicknameDialog(
         context: Context,
         lifecycleOwner: LifecycleOwner,
-        profileViewModel: ProfileViewModel,
+        usersBD: UsersFirestore,
         titleRes: String,
         messageRes: String,
         validations: List<Pair<(String) -> Boolean, String>> = emptyList(),
@@ -166,42 +249,42 @@ object ShowAlertDialog {
             button.setOnClickListener {
                 val nickname = input.text.toString().trim()
 
-                // validaciones síncronas
                 val failed = validations.firstOrNull { (check, _) -> !check(nickname) }
                 if (failed != null) {
                     input.error = failed.second
                     return@setOnClickListener
                 }
 
-                // bloquear botón y mostrar progreso
                 button.isEnabled = false
                 progressBar.visibility = View.VISIBLE
 
-                profileViewModel.checkNicknameAvailability(nickname)
-
-                val observer = object : Observer<Boolean> {
-                    override fun onChanged(value: Boolean) {
-                        // quitamos el observer después del primer resultado
-                        profileViewModel.isNicknameTaken.removeObserver(this)
+                lifecycleOwner.lifecycleScope.launch {
+                    try {
+                        val taken = usersBD.nicknameExists(nickname) // suspend
 
                         button.isEnabled = true
                         progressBar.visibility = View.GONE
 
-                        if (value) {
+                        if (taken) {
                             input.error = context.getString(R.string.nickname_unable)
                         } else {
                             dialog.dismiss()
                             onConfirm(nickname)
                         }
+                    } catch (e: Exception) {
+                        // Error de red u otro problema
+                        button.isEnabled = true
+                        progressBar.visibility = View.GONE
+                        input.error = context.getString(R.string.nickname_unable)
+                        Log.e("NicknameDialog", "Error checking nickname", e)
                     }
                 }
-
-                profileViewModel.isNicknameTaken.observe(lifecycleOwner, observer)
-
             }
         }
 
         dialog.show()
     }
+
+
 
 }

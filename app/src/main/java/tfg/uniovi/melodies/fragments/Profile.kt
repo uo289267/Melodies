@@ -20,6 +20,7 @@ import tfg.uniovi.melodies.fragments.adapters.HistoryEntryAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.ProfileViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.ProfileViewModelProviderFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
+import tfg.uniovi.melodies.repositories.UsersFirestore
 import tfg.uniovi.melodies.utils.SheetItemToucherHelper
 import tfg.uniovi.melodies.utils.ShowAlertDialog.showInputNewNicknameDialog
 
@@ -55,7 +56,7 @@ class Profile : Fragment() {
             showInputNewNicknameDialog(
                 context = requireContext(),
                 lifecycleOwner = viewLifecycleOwner,
-                profileViewModel = profileViewModel,
+                usersBD = UsersFirestore(),
                 titleRes = ContextCompat.getString(requireContext(), R.string.nickname_rename),
                 messageRes = ContextCompat.getString(requireContext(), R.string.nickname_new_name)
                         +" "+profileViewModel.nickname.value+" "+
