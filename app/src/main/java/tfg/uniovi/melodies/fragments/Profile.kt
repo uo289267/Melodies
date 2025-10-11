@@ -53,23 +53,27 @@ class Profile : Fragment() {
         }
         binding.btnEdit.setOnClickListener {
 
-            showInputNewNicknameDialog(
-                context = requireContext(),
-                lifecycleOwner = viewLifecycleOwner,
-                usersBD = UsersFirestore(),
-                titleRes = ContextCompat.getString(requireContext(), R.string.nickname_rename),
-                messageRes = ContextCompat.getString(requireContext(), R.string.nickname_new_name)
-                        +" "+profileViewModel.nickname.value+" "+
-                        ContextCompat.getString(requireContext(), R.string.nickname_new_name2),
-                validations = listOf(
-                    {newNick:String -> newNick.isNotEmpty() } to getString(R.string.rename_nick_empty_err),
-                    {newNick:String -> newNick.length <= 20 } to getString(R.string.rename_nick_length_err),
-                ),
-                onConfirm = { nickname ->
-                    Log.d(RENAME, "New nick: $nickname")
-                    profileViewModel.renameUserNewNickname(userId, nickname)
-                }
-            )}
+            profileViewModel.nickname.value?.let { it1 ->
+                showInputNewNicknameDialog(
+                    context = requireContext(),
+                    lifecycleOwner = viewLifecycleOwner,
+                    usersBD = UsersFirestore(),
+                    titleRes = ContextCompat.getString(requireContext(), R.string.nickname_rename),
+                    messageRes = ContextCompat.getString(requireContext(), R.string.nickname_new_name)
+                            +" "+profileViewModel.nickname.value+" "+
+                            ContextCompat.getString(requireContext(), R.string.nickname_new_name2),
+                    validations = listOf(
+                        {newNick:String -> newNick.isNotEmpty() } to getString(R.string.rename_nick_empty_err),
+                        {newNick:String -> newNick.length <= 20 } to getString(R.string.rename_nick_length_err),
+                    ),
+                    currentNickname = it1,
+                    onConfirm = { nickname ->
+                        Log.d(RENAME, "New nick: $nickname")
+                        profileViewModel.renameUserNewNickname(userId, nickname)
+                    }
+                )
+            }
+        }
 
             val apiUrl = "$AVATAR_HTTPS$userId"
         binding.ivProfileAvatar.load(apiUrl)

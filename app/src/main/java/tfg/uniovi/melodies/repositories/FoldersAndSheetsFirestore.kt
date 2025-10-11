@@ -263,6 +263,41 @@ class FoldersAndSheetsFirestore (private val userId: String){
         }
     }
     /**
+     * Checks whether a sheet (music score) with the given name already exists
+     * within a specific folder in the current user's Firestore database.
+     *
+     * This function queries the path:
+     * `users/{userId}/folders/{folderId}/sheets`
+     * looking for documents whose `name` field matches the provided sheet name.
+     *
+     * @param sheetName The name of the sheet to check for duplicates.
+     * @param folderId The ID of the folder in which to check for existing sheets.
+     * @return `true` if a sheet with the same name already exists,
+     *         `false` if no sheet with that name was found,
+     *         or `null` if an unexpected error occurs before throwing an exception.
+     *
+     * @throws DBException If an unexpected error occurs during the Firestore query.
+     *
+     * @see getSheetById for retrieving a specific sheet by its ID and folder.
+     */
+    suspend fun isSheetNameInUse(sheetName: String, folderId: String): Boolean? {
+        return try {
+            val result = usersCollection.document(userId)
+                .collection("folders")
+                .document(folderId)
+                .collection("sheets")
+                .whereEqualTo("name", sheetName)
+                .get()
+                .await()
+            result.documents.forEach { Log.d("DBG", it.data.toString()) }
+            !result.isEmpty
+        } catch (e: Exception) {
+            Log.d(FIRESTORE, "Error while finding duplicates of $sheetName in folder $folderId, ${e.message}")
+            throw DBException("Unexpected exception while looking for duplicates of $sheetName in folder $folderId")
+        }
+    }
+
+    /**
      * Converts a raw Firestore document data map into a [MusicXMLSheet] instance.
      *
      * @param data The raw Firestore document data as a map of field names to values.

@@ -2,6 +2,7 @@ package tfg.uniovi.melodies.fragments.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.MusicXMLSheet
@@ -13,16 +14,20 @@ class SheetInFolderAdapter : RecyclerView.Adapter<SheetInFolderViewHolder> {
     private val navigateFunction: (SheetVisualizationDto) -> Unit
     private val onLongClickRename: (SheetVisualizationDto, String) -> Unit
     private val onDelete: (SheetVisualizationDto) -> Unit
+    private val lifecycleOwner: LifecycleOwner
+
     constructor(
         sheetList: List<MusicXMLSheet>,
         navigateFunction: (SheetVisualizationDto) -> Unit,
         onLongClickRename: (SheetVisualizationDto, String) -> Unit,
-        onDelete : (SheetVisualizationDto) -> Unit
+        onDelete : (SheetVisualizationDto) -> Unit,
+        lifecycleOwner: LifecycleOwner
         ){
         this.sheetList = sheetList.toMutableList()
         this.navigateFunction = navigateFunction
         this.onLongClickRename = onLongClickRename
         this.onDelete = onDelete
+        this.lifecycleOwner = lifecycleOwner
     }
 
 
@@ -41,7 +46,7 @@ class SheetInFolderAdapter : RecyclerView.Adapter<SheetInFolderViewHolder> {
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): SheetInFolderViewHolder {
         val layout = R.layout.recycler_song_in_library_item
         val view = LayoutInflater.from(viewGroup.context).inflate(layout, viewGroup, false)
-        return SheetInFolderViewHolder(view, navigateFunction, onLongClickRename, onDelete)
+        return SheetInFolderViewHolder(view, navigateFunction, onLongClickRename, onDelete, lifecycleOwner)
     }
 
     override fun onBindViewHolder(viewHolder: SheetInFolderViewHolder, position: Int) {

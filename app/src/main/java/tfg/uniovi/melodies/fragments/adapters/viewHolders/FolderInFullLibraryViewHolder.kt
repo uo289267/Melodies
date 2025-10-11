@@ -30,7 +30,7 @@ class FolderInFullLibraryViewHolder(
         val onDelete = { dto: SheetVisualizationDto ->
             libraryViewModel.deleteSheet(dto.sheetId, dto.folderId)
         }
-        val adapter = SheetInFolderAdapter( emptyList(), navigateFunction, onLongClickRename, onDelete)
+        val adapter = SheetInFolderAdapter( emptyList(), navigateFunction, onLongClickRename, onDelete, lifecycleOwner)
         recyclerSongsPerFolder.adapter =  adapter
         recyclerSongsPerFolder.layoutManager = LinearLayoutManager(view.context)
         recyclerSongsPerFolder.addItemDecoration(RecyclerViewItemDecoration(view.context

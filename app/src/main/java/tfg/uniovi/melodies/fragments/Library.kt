@@ -75,7 +75,7 @@ class Library : Fragment() {
             libraryViewModel.deleteSheet(dto.sheetId, dto.folderId)
         }
 
-        adapter = SheetInFolderAdapter(sheetList, navigationFunction, onLongClickRename, onDelete)
+        adapter = SheetInFolderAdapter(sheetList, navigationFunction, onLongClickRename, onDelete, viewLifecycleOwner)
         binding.recyclerViewLibrary.adapter = adapter
         val itemTouchHelper = SheetItemToucherHelper.create(adapter, libraryViewModel, requireContext())
         itemTouchHelper.attachToRecyclerView(binding.recyclerViewLibrary)
