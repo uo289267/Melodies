@@ -1,6 +1,5 @@
 package tfg.uniovi.melodies.fragments.viewmodels
 
-import android.graphics.Color
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

@@ -20,21 +20,6 @@ private const val USER_REPOSITORY = "UserRepository"
 class UsersFirestore {
     private val db = Firebase.firestore
     /**
-     * Checks if a user already exists in Firestore.
-     *
-     * @param userId The ID of the user to check.
-     * @return `true` if the user exists, `false` otherwise.
-     */
-    suspend fun userExists(userId: String): Boolean {
-        return try {
-            val snapshot = db.collection("users").document(userId).get().await()
-            snapshot.exists()
-        } catch (e: Exception) {
-            Log.e(USER_REPOSITORY, "Error checking user existence", e)
-            false
-        }
-    }
-    /**
      * Checks if a nickname is already taken in Firestore.
      *
      * @param nickname The nickname to check for uniqueness.

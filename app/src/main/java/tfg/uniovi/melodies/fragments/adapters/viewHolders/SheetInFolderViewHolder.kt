@@ -5,16 +5,12 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
-import tfg.uniovi.melodies.preferences.PreferenceManager
-import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
 import tfg.uniovi.melodies.utils.ShowAlertDialog
 
 private const val SHEET_RENAME = "SHEET_RENAME"

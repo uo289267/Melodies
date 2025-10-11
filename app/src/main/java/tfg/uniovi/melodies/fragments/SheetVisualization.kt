@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -13,6 +15,8 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -22,11 +26,6 @@ import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.caverock.androidsvg.SVG
-import android.graphics.Bitmap // Necesario para el FileResolver
-import android.graphics.Typeface
-import android.view.ViewTreeObserver
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import com.caverock.androidsvg.SVGExternalFileResolver
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import tfg.uniovi.melodies.R
@@ -44,7 +43,6 @@ import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.startListening
 import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.stopListening
 import tfg.uniovi.melodies.utils.ShowAlertDialog
 import tfg.uniovi.melodies.utils.parser.XMLParserException
-import kotlin.text.*
 
 
 //LOG TAGS
@@ -71,7 +69,6 @@ class SheetVisualization : Fragment() {
     private lateinit var sheetVisualizationViewModel: SheetVisualizationViewModel
     private lateinit var musicXMLSheet: MusicXMLSheet
     private var totalPages = 1
-    private var webViewLoaded = false
     private var elapsedFormatted: String = ""
 
 
@@ -134,7 +131,6 @@ class SheetVisualization : Fragment() {
                             getString(R.string.sheet_visualization_invalid_xml_msg),
                             PARSING,
                             "alert dialog showed because xml missing attributes and/or elements")
-                        sheetVisualizationViewModel.updateCanCheckNote(false)
                     }
                     val encondedXML =
                         Base64.encodeToString(it.stringSheet.toByteArray(), Base64.NO_WRAP)

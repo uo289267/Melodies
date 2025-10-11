@@ -64,9 +64,6 @@ class SheetVisualizationViewModel(
     val currentPage: LiveData<Int>
         get() = _currentPage
 
-    private val _canCheckNote =  MutableLiveData(true)
-    val canCheckNote: LiveData<Boolean> get() = _canCheckNote
-
     private val _shouldNavigateToNextPage = MutableLiveData(false)
     val shouldNavigateToNextPage: LiveData<Boolean> get() = _shouldNavigateToNextPage
 
@@ -119,14 +116,11 @@ class SheetVisualizationViewModel(
                     currentNoteIndex = it.first
             }
             _shouldNavigateToNextPage.postValue(false)
-            if(noteCheckingState.value!= NoteCheckingState.CHECKING && _canCheckNote.value == true)
+            if(noteCheckingState.value!= NoteCheckingState.CHECKING )
                 checkNextNote()
         }
     }
 
-    fun updateCanCheckNote(canCheckNote: Boolean){
-        _canCheckNote.value=canCheckNote
-    }
 
     /**
      * Calculates and maps into the notesPerPage map the notes in current page

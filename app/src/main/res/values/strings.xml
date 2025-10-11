@@ -95,5 +95,8 @@
     <string name="name_already_exists">This name already exists</string>
     <string name="last_sheets_played">Last sheets played</string>
     <string name="unexpected_error">An unexpected error occurred</string>
+    <string name="new_user_create_account">New User? Create account</string>
+    <string name="sheet_name">Sheet Name</string>
+    <string name="x_min_x_s">X min X s</string>
 
 </resources>

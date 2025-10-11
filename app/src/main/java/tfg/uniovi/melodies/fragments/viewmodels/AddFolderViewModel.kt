@@ -1,6 +1,5 @@
 package tfg.uniovi.melodies.fragments.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,7 +19,6 @@ class AddFolderViewModelProviderFactory(
     }
 }
 
-private const val FOLDER = "FOLDER"
 
 class AddFolderViewModel (private val folderBD: FoldersAndSheetsFirestore)
     : ViewModel() {

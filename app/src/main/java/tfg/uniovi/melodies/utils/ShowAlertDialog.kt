@@ -164,7 +164,7 @@ object ShowAlertDialog {
                                 progressBar.visibility = View.GONE
                                 button.isEnabled = true
                                 input.error = context.getString(R.string.error_generic)
-                                Log.e("RENAME", "Error checking sheet name", result.exception)
+                                Log.e(RENAME, "Error checking sheet name", result.exception)
                             }
                         }
                     }
@@ -230,7 +230,7 @@ object ShowAlertDialog {
                 }
                 // Validaciones locales
                 if (newName.isEmpty()) {
-                    input.error = context.getString(R.string.error_blank_folder_name);
+                    input.error = context.getString(R.string.error_blank_folder_name)
                     return@setOnClickListener
                 }
                 if (newName.length > MAX_LENGTH_FOLDER_NAME) {
@@ -353,7 +353,7 @@ object ShowAlertDialog {
                             progressBar.visibility = View.GONE
                             button.isEnabled = true
                             input.error = context.getString(R.string.nickname_unable)
-                            Log.e("RENAME", "Error checking nickname", result.exception)
+                            Log.e(RENAME, "Error checking nickname", result.exception)
                         }
                     }
                 }

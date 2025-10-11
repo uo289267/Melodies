@@ -14,13 +14,11 @@ import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentRegisterBinding
 import tfg.uniovi.melodies.fragments.viewmodels.RegisterViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.RegisterViewModelProviderFactory
-import tfg.uniovi.melodies.utils.ShowAlertDialog.showAlertDialogOnlyWithPositiveButton
 import tfg.uniovi.melodies.utils.TextWatcherAdapter
 
 /**
  * A simple [Fragment] subclass.
- * Use the [Register.newInstance] factory method to
- * create an instance of this fragment.
+ * Use the factory method to create an instance of this fragment.
  */
 class Register : Fragment() {
 

@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Nombre de la partitura"
+        android:text="@string/sheet_name"
         android:textStyle="bold"
         android:textSize="15sp" />
 
@@ -19,7 +19,7 @@
         android:id="@+id/tvHistoryTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="X min X s"
+        android:text="@string/x_min_x_s"
         android:textSize="13sp"
         android:gravity="end" />
 </LinearLayout>

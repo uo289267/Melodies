@@ -19,12 +19,13 @@ import tfg.uniovi.melodies.entities.notes.Rest
  * **Notes about octaves:**
  * - All input sheets are expected to have a base octave of 4.
  */
+private const val NEUTRAL_OCTAVE: Int = 4
 class XMLParser() {
     //ALL SHEETS PROVIDED NEED TO HAVE THEIR BASE OCTAVE TO BE 4
     companion object {
         const val BASE_OCTAVE_FLUTE: Int = 5
     }
-    private val NEUTRAL_OCTAVE: Int = 4
+
 
     private lateinit var musicxml: Document
     private val notes = mutableListOf<ScoreElement>()
@@ -80,10 +81,10 @@ class XMLParser() {
                     val name = stepElement.textContent[0]
                     var octave = octaveElement.textContent.toInt()
                     //From standard 4 to 5 as flute plays in 4 or 6
-                    if(octave == NEUTRAL_OCTAVE)
-                        octave = BASE_OCTAVE_FLUTE
+                    octave = if(octave == NEUTRAL_OCTAVE)
+                        BASE_OCTAVE_FLUTE
                     else{
-                        octave = octave-NEUTRAL_OCTAVE+BASE_OCTAVE_FLUTE
+                        octave-NEUTRAL_OCTAVE+BASE_OCTAVE_FLUTE
                     }
                     var sharp = false
                     if (alter != null) {
@@ -190,14 +191,6 @@ class XMLParser() {
      */
     fun getAllNotes(): List<ScoreElement> {
         return this.notes
-    }
-    /**
-     * Returns the total number of parsed notes and rests.
-     *
-     * @return Number of [ScoreElement] objects.
-     */
-    fun getTotalNumberOfNotes(): Int {
-        return this.notes.size
     }
     /**
      * Finds the composer/author of the MusicXML document.

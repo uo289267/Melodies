@@ -65,7 +65,7 @@ class FullLibrary : Fragment() {
             fullLibraryViewModel.loadFolders()
         }
         adapter = FolderInFullLibraryAdapter(folderList,navigationFunction, this,
-            libraryViewModelProviderFactory, onLongClickRename)
+            libraryViewModelProviderFactory)
         binding.recyclerViewFullLibrary.adapter = adapter
         binding.recyclerViewFullLibrary.layoutManager = LinearLayoutManager(context)
 

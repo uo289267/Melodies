@@ -1,7 +1,6 @@
 package tfg.uniovi.melodies.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -9,7 +8,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -18,14 +16,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentLibraryBinding
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.adapters.SheetInFolderAdapter
-import tfg.uniovi.melodies.fragments.adapters.touchHelpers.MyItemTouchHelper
-import tfg.uniovi.melodies.fragments.adapters.viewHolders.DELETE
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModelProviderFactory
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto

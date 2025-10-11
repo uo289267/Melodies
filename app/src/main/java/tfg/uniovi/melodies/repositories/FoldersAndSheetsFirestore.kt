@@ -316,29 +316,6 @@ class FoldersAndSheetsFirestore (private val userId: String){
         )
     }
     /**
-     * Retrieves all sheets from a query result of folders.
-     *
-     * Iterates through all documents (folders) in the query and
-     * fetches the sheets stored in each one.
-     *
-     * @param querySnapshot The snapshot containing folder documents.
-     * @param folderId The ID of the folder associated with the sheets.
-     * @return A list of [MusicXMLSheet].
-     */
-    private suspend fun getAllSheets(querySnapshot: QuerySnapshot,folderId: String ): List<MusicXMLSheet> {
-        val allSheets = mutableListOf<MusicXMLSheet>()
-
-        for (document in querySnapshot.documents) {
-            val sheetsSnapshot = document.reference.collection("sheets").get().await()
-            val sheets = sheetsSnapshot.documents.mapNotNull { sheetDoc ->
-                sheetDoc.data?.let { docToMusicXMLSheet(it, folderId) }
-            }
-            allSheets.addAll(sheets)
-        }
-
-        return allSheets
-    }
-    /**
      * Converts a Firestore document into a [Folder].
      *
      * @param doc The Firestore document snapshot.
