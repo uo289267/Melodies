@@ -3,6 +3,7 @@ package tfg.uniovi.melodies.repositories
 import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
@@ -22,9 +23,11 @@ private const val FIRESTORE = "FIRESTORE"
  *
  * @property userId The ID of the authenticated Firebase user.
  */
-class FoldersAndSheetsFirestore (private val userId: String){
-    private val db = Firebase.firestore
-    private val usersCollection = db.collection("users")
+class FoldersAndSheetsFirestore (private val userId: String,
+                                 private val usersCollection: CollectionReference? = null ){
+
+    private val usersColl: CollectionReference = usersCollection ?: Firebase.firestore.collection("users")
+
 
     /**
      * Retrieves a folder given its ID.
@@ -35,7 +38,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      */
     suspend fun getFolderById(folderId: String): Folder? {
         return try {
-            val document = usersCollection.document(userId)
+            val document = usersColl.document(userId)
                             .collection("folders")
                             .document(folderId).get().await()
             if (document.exists()) {
@@ -57,7 +60,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      */
     suspend fun getSheetById(sheetId: String, folderId: String): MusicXMLSheet?{
         return try{
-            val document = usersCollection.document(userId)
+            val document = usersColl.document(userId)
                             .collection("folders")
                             .document(folderId)
                             .collection("sheets")
@@ -78,7 +81,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      */
     suspend fun getAllFolders(): List<Folder> {
         return try {
-            val result = usersCollection.document(userId)
+            val result = usersColl.document(userId)
                 .collection("folders").orderBy("creationTime",
                                                             Query.Direction.ASCENDING)
                                                             .get().await()
@@ -103,7 +106,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
             "creationTime" to Timestamp.now(),
             "color" to dto.color.name)
         return try {
-            val documentReference = usersCollection.document(userId)
+            val documentReference = usersColl.document(userId)
                 .collection("folders").add(data).await()
             documentReference.id // Return the new document ID
         } catch (e: Exception) {
@@ -123,7 +126,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
             "musicxml" to dto.stringSheet,
             "name" to dto.name)
         return try {
-            val documentReference = usersCollection.document(userId)
+            val documentReference = usersColl.document(userId)
                 .collection("folders")
                 .document(dto.folderId)
                 .collection("sheets")
@@ -145,7 +148,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      */
     suspend fun setNewFolderName(folderId: String, newName: String){
         try{
-            val documentReference = usersCollection.document(userId)
+            val documentReference = usersColl.document(userId)
                 .collection("folders")
                 .document(folderId)
             documentReference
@@ -165,7 +168,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      */
     suspend fun setNewSheetName(sheetId: String, folderId: String, newName: String) {
        try{
-            val documentReference = usersCollection.document(userId)
+            val documentReference = usersColl.document(userId)
                 .collection("folders")
                 .document(folderId)
                 .collection("sheets")
@@ -185,7 +188,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      */
     suspend fun deleteFolder(folderId: String) {
         try {
-            usersCollection.document(userId)
+            usersColl.document(userId)
                 .collection("folders").document(folderId).delete().await()
         } catch (e: Exception) {
             throw DBException("$folderId could not be deleted: $e.message")
@@ -200,7 +203,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      */
     suspend fun deleteSheet(sheetId: String, folderId: String) {
         try {
-            usersCollection.document(userId)
+            usersColl.document(userId)
                 .collection("folders")
                 .document(folderId)
                 .collection("sheets")
@@ -221,7 +224,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      */
     suspend fun getAllSheetsFromFolder(folderId: String): List<MusicXMLSheet> {
         return try {
-            val result = usersCollection.document(userId)
+            val result = usersColl.document(userId)
                 .collection("folders")
                 .document(folderId) // Filter with folderId
                 .collection("sheets")
@@ -251,7 +254,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      */
     suspend fun isFolderNameInUse(folderName: String): Boolean? {
         return try{
-            val result = usersCollection.document(userId)
+            val result = usersColl.document(userId)
                 .collection("folders")
                 .whereEqualTo("name",folderName)
                 .get()
@@ -282,7 +285,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      */
     suspend fun isSheetNameInUse(sheetName: String, folderId: String): Boolean? {
         return try {
-            val result = usersCollection.document(userId)
+            val result = usersColl.document(userId)
                 .collection("folders")
                 .document(folderId)
                 .collection("sheets")
@@ -352,7 +355,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      */
     suspend fun getFolderColor(folderId: String): Colors? {
         return try {
-            val document = usersCollection.document(userId)
+            val document = usersColl.document(userId)
                 .collection("folders")
                 .document(folderId)
                 .get()
@@ -386,7 +389,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
                 "createdAt" to Timestamp.now()
             )
 
-            usersCollection.document(userId)
+            usersColl.document(userId)
                 .collection("historyEntries")
                 .add(data)
                 .await()
