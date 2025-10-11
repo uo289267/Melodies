@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.entities.MusicXMLSheet
@@ -49,21 +50,38 @@ class LibraryViewModel(
             _folderName.postValue(name)
         }
     }
-
-    fun deleteSheetAt(position: Int) {
+    fun deleteSheet(sheetId: String, folderId: String) {
         viewModelScope.launch {
             val currentList = _sheets.value?.toMutableList() ?: return@launch
-            val sheet = currentList.getOrNull(position) ?: return@launch
-            folderBD.deleteSheet(sheet.id, folderId)
-            currentList.removeAt(position)
+            val sheet = currentList.firstOrNull { it.id == sheetId && it.folderId == folderId }
+                ?: return@launch
+
+            folderBD.deleteSheet(sheet.id, sheet.folderId)
+            currentList.remove(sheet)
             _sheets.postValue(currentList)
         }
+    }
+
+    fun deleteSheetAt(position: Int) {
+        val currentList = _sheets.value ?: return
+        val sheet = currentList.getOrNull(position) ?: return
+        deleteSheet(sheet.id, sheet.folderId)
     }
 
     fun renameSheet(sheetId: String, folderId: String, newName: String){
         viewModelScope.launch {
             folderBD.setNewSheetName(sheetId,folderId, newName)
         }
+    }
+    fun isSheetNameAvailable(name: String, folderId: String): LiveData<Result<Boolean>> = liveData {
+            emit(Result.Loading)
+            try {
+                val taken = folderBD.isSheetNameInUse(name, folderId)
+                emit(Result.Success(!taken!!))
+            } catch (e: Exception) {
+                emit(Result.Error(e))
+            }
+
     }
 
 }

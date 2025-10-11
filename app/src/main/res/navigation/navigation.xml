@@ -36,6 +36,13 @@
         <action
             android:id="@+id/action_library_to_sheetVisualization"
             app:destination="@id/sheetVisualization" />
+        <action
+            android:id="@+id/action_library_to_importing"
+            app:destination="@id/importing">
+            <argument
+                android:name="folderIdImport"
+                app:argType="string" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/addFolder"
@@ -68,6 +75,11 @@
         <action
             android:id="@+id/action_importing_to_home_fragment"
             app:destination="@id/home_fragment" />
+        <argument
+            android:name="folderIdImport"
+            app:argType="string"
+            android:defaultValue=""
+            />
     </fragment>
     <fragment
         android:id="@+id/logIn"
@@ -77,6 +89,9 @@
         <action
             android:id="@+id/action_logIn_to_home_fragment"
             app:destination="@id/home_fragment" />
+        <action
+            android:id="@+id/action_logIn_to_register"
+            app:destination="@id/register" />
     </fragment>
     <fragment
         android:id="@+id/profile"
@@ -86,5 +101,14 @@
         <action
             android:id="@+id/action_profile_to_logIn"
             app:destination="@id/logIn" />
+    </fragment>
+    <fragment
+        android:id="@+id/register"
+        android:name="tfg.uniovi.melodies.fragments.Register"
+        android:label="fragment_register"
+        tools:layout="@layout/fragment_register" >
+        <action
+            android:id="@+id/action_register_to_home_fragment"
+            app:destination="@id/home_fragment" />
     </fragment>
 </navigation>

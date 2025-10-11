@@ -51,6 +51,7 @@
 
         <LinearLayout
             android:id="@+id/horizontalLayout"
+            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
@@ -62,6 +63,7 @@
 
             <Button
                 android:id="@+id/prevButton"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -72,6 +74,7 @@
 
             <Button
                 android:id="@+id/nextButton"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"

@@ -30,6 +30,7 @@ private const val CREATE_FOLDER_TAG = "CREATE_FOLDER"
  * Allows entering a folder name, choosing a color, validating inputs,
  * and interacting with the ViewModels to save the folder.
  */
+const val MAX_LENGTH_FOLDER_NAME: Int= 30
 class AddFolder : Fragment() {
 
     private lateinit var  binding: FragmentAddFolderBinding
@@ -82,13 +83,17 @@ class AddFolder : Fragment() {
         addFolderViewModel.folderDTO.observe(viewLifecycleOwner){dto ->
             modifyFolderName(binding.folderNameInput, dto.name)
         }
+        addFolderViewModel.folderCreated.observe(viewLifecycleOwner) { created ->
+            if (created) {
+                findNavController().popBackStack() // navega atrás solo cuando se haya guardado
+            }
+        }
 
         addFolderViewModel.folderNameExists.observe(viewLifecycleOwner){
             exists ->
             if(!exists){
                 Log.e(CREATE_FOLDER_TAG, "Folder was created")
                 addFolderViewModel.createFolder()
-                findNavController().popBackStack()
             }else{
                 binding.folderName.setError(getString(R.string.error_folder_name_exists_already))
             }
@@ -130,7 +135,7 @@ class AddFolder : Fragment() {
 
             val currentFolderName = binding.folderNameInput.text.toString().trim()
             if(currentFolderName.isNotEmpty()){
-                if(currentFolderName.length > 30)
+                if(currentFolderName.length > MAX_LENGTH_FOLDER_NAME)
                     binding.folderName.setError(getString(R.string.too_long_folder_name))
                 else
                     addFolderViewModel.checkIfFolderNameExists()

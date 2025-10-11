@@ -60,15 +60,18 @@ class Home : Fragment() {
             adapter.updateFolders(list)
             if(allFolders.isNotEmpty()){
                 binding.tvNoFolders.visibility = View.GONE
+                binding.ivNoFolders.visibility = View.GONE
                 binding.recyclerView.visibility = View.VISIBLE
             }else{
                 binding.tvNoFolders.visibility = View.VISIBLE
+                binding.ivNoFolders.visibility = View.VISIBLE
                 binding.recyclerView.visibility =View.GONE
             }
         }
+
         folderViewModel.loadFolders()
         // Adapter
-        adapter = FolderAdapter(allFolders, navigationFunction, folderViewModel)
+        adapter = FolderAdapter(allFolders, navigationFunction, viewLifecycleOwner, folderViewModel)
         binding.recyclerView.adapter = adapter
         return binding.root
 

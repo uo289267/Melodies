@@ -10,9 +10,13 @@ import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 import tfg.uniovi.melodies.entities.Colors
 import tfg.uniovi.melodies.entities.Folder
+import tfg.uniovi.melodies.entities.HistoryEntry
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.viewmodels.FolderDTO
 import tfg.uniovi.melodies.fragments.viewmodels.MusicXMLDTO
+
+private const val FIRESTORE = "FIRESTORE"
+
 /**
  * Repository for managing folders and MusicXML sheets in Firestore.
  *
@@ -26,7 +30,8 @@ class FoldersAndSheetsFirestore (private val userId: String){
      * Retrieves a folder given its ID.
      *
      * @param folderId The ID of the folder.
-     * @return The [Folder] if it exists, or `null` otherwise.
+     * @return The [Folder] if it exists
+     * @throws DBException if folder is not found
      */
     suspend fun getFolderById(folderId: String): Folder? {
         return try {
@@ -39,9 +44,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
                 null
             }
         } catch (e: Exception) {
-            println("Error getting song: $e")
-            null
-            // TODO lanzar custom exception?
+            throw DBException("Folder with id $folderId could not be found: $e.message")
         }
     }
 
@@ -65,9 +68,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
                 null
             }
         } catch (e: Exception) {
-            println("Error getting song: $e")
-            null
-            // TODO lanzar custom exception?
+            throw DBException("Sheet with id $sheetId could not be found: $e.message")
         }
     }
     /**
@@ -85,9 +86,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
                 doc?.let { doc2folder(it) }
             }
         } catch (e: Exception) {
-            Log.e("FIRESTORE", "Error getting folders", e)
-            emptyList()
-            // TODO lanzar custom exception?
+            throw DBException("Folders could not be retrieved: $e.message")
         }
     }
 
@@ -96,6 +95,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      *
      * @param dto A [FolderDTO] object containing the folder data.
      * @return The generated folder ID, or `null` if an error occurs.
+     * @throws DBException if the new folder was not added
      */
     suspend fun addFolder(dto : FolderDTO) : String?{
         val data = hashMapOf(
@@ -107,10 +107,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
                 .collection("folders").add(data).await()
             documentReference.id // Return the new document ID
         } catch (e: Exception) {
-            // Handle error
-            println("Error adding song: $e")
-            null
-            // TODO lanzar custom exception?
+            throw DBException("${dto.name} could not be added: $e.message")
         }
     }
     /**
@@ -118,6 +115,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      *
      * @param dto A [MusicXMLDTO] object containing the sheet data.
      * @return The generated sheet ID, or `null` if an error occurs.
+     * @throws DBException if the new sheet was not added
      */
     suspend fun addMusicXMLSheet(dto : MusicXMLDTO) : String?{
         val data = hashMapOf(
@@ -134,10 +132,27 @@ class FoldersAndSheetsFirestore (private val userId: String){
 
             documentReference.id
         } catch (e: Exception) {
-            // Handle error
-            println("Error adding song: $e")
-            null
-            // TODO lanzar custom exception?
+            throw DBException("${dto.name} could not be added: $e.message")
+        }
+    }
+    /**
+     * Updates the name of a folder in the Firestore database.
+     *
+     * @param folderId The unique identifier of the folder whose name will be updated.
+     * @param newName The new name to assign to the folder.
+     *
+     * @throws DBException If the new name update fails
+     */
+    suspend fun setNewFolderName(folderId: String, newName: String){
+        try{
+            val documentReference = usersCollection.document(userId)
+                .collection("folders")
+                .document(folderId)
+            documentReference
+                .update("name", newName)
+                .await()
+        } catch (e: Exception) {
+            throw DBException("$folderId could not be renamed to $newName: $e.message")
         }
     }
     /**
@@ -146,6 +161,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      * @param sheetId The ID of the sheet to rename.
      * @param folderId The ID of the folder containing the sheet.
      * @param newName The new name to set for the sheet.
+     * @throws DBException if new name update fails
      */
     suspend fun setNewSheetName(sheetId: String, folderId: String, newName: String) {
        try{
@@ -158,24 +174,21 @@ class FoldersAndSheetsFirestore (private val userId: String){
                 .update("name", newName)
                 .await()
         } catch (e: Exception) {
-            // Handle error
-            println("Error renaming song $sheetId: $e")
-           // TODO lanzar custom exception?
+           throw DBException("$sheetId could not be renamed to $newName: $e.message")
         }
     }
     /**
      * Deletes a folder given its ID.
      *
      * @param folderId The ID of the folder to delete.
+     * @throws DBException if folder deletion fails
      */
     suspend fun deleteFolder(folderId: String) {
         try {
             usersCollection.document(userId)
                 .collection("folders").document(folderId).delete().await()
         } catch (e: Exception) {
-            // Handle error
-            println("Error deleting song: $e")
-            // TODO lanzar custom exception?
+            throw DBException("$folderId could not be deleted: $e.message")
         }
     }
     /**
@@ -183,6 +196,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      *
      * @param sheetId The ID of the sheet to delete.
      * @param folderId The ID of the folder containing the sheet.
+     * @throws DBException if sheet deletion fails
      */
     suspend fun deleteSheet(sheetId: String, folderId: String) {
         try {
@@ -194,9 +208,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
                 .delete()
                 .await()
         } catch (e: Exception) {
-            // Handle error
-            println("Error deleting song: $e")
-            // TODO lanzar custom exception?
+            throw DBException("$sheetId could not be deleted: $e.message")
         }
     }
 
@@ -205,6 +217,7 @@ class FoldersAndSheetsFirestore (private val userId: String){
      *
      * @param folderId The ID of the folder.
      * @return A list of [MusicXMLSheet], or an empty list if an error occurs.
+     * @throws DBException if fails to retrieve sheets from folders
      */
     suspend fun getAllSheetsFromFolder(folderId: String): List<MusicXMLSheet> {
         return try {
@@ -214,20 +227,28 @@ class FoldersAndSheetsFirestore (private val userId: String){
                 .collection("sheets")
                 .get()
                 .await()
-            Log.d("FIRESTORE", folderId)
+            Log.d(FIRESTORE, "Getting all sheets from $folderId folder")
 
             result.documents.mapNotNull { doc ->
                 doc?.let { doc2sheet(it, folderId) }
             }
 
         } catch (e: Exception) {
-            // Handle error
-            println("Error getting all songs: $e")
-            emptyList()
-            // TODO lanzar custom exception?
+            throw DBException("$folderId sheets could not be retrieved: $e.message")
         }
     }
 
+    /**
+     * Checks whether a folder name is already in use by the current user in Firestore.
+     * - Returns `true` if at least one folder with the given name exists.
+     * - Returns `false` if no folder with the given name exists.
+     * - Throws [DBException] if an unexpected error occurs (e.g., network failure without cache,
+     *   or insufficient Firestore permissions).
+     *
+     * @param folderName The folder name to check for duplicates.
+     * @return `true` if the folder name is already in use, `false` if it is available.
+     * @throws DBException If the Firestore query fails unexpectedly.
+     */
     suspend fun isFolderNameInUse(folderName: String): Boolean? {
         return try{
             val result = usersCollection.document(userId)
@@ -237,15 +258,53 @@ class FoldersAndSheetsFirestore (private val userId: String){
                 .await()
             !result.isEmpty
         } catch (e : Exception){
-            Log.d("FIREBASE","Error while finding duplicates of $folderName name , ${e.message}")
-            false
+            Log.d(FIRESTORE,"Error while finding duplicates of $folderName name , ${e.message}")
+            throw DBException("Unexpected exception while looking for duplicates of $folderName")
         }
     }
     /**
-     * Checks if a folder name is already in use.
+     * Checks whether a sheet (music score) with the given name already exists
+     * within a specific folder in the current user's Firestore database.
      *
-     * @param folderName The name of the folder to check.
-     * @return `true` if the name is already in use, `false` otherwise.
+     * This function queries the path:
+     * `users/{userId}/folders/{folderId}/sheets`
+     * looking for documents whose `name` field matches the provided sheet name.
+     *
+     * @param sheetName The name of the sheet to check for duplicates.
+     * @param folderId The ID of the folder in which to check for existing sheets.
+     * @return `true` if a sheet with the same name already exists,
+     *         `false` if no sheet with that name was found,
+     *         or `null` if an unexpected error occurs before throwing an exception.
+     *
+     * @throws DBException If an unexpected error occurs during the Firestore query.
+     *
+     * @see getSheetById for retrieving a specific sheet by its ID and folder.
+     */
+    suspend fun isSheetNameInUse(sheetName: String, folderId: String): Boolean? {
+        return try {
+            val result = usersCollection.document(userId)
+                .collection("folders")
+                .document(folderId)
+                .collection("sheets")
+                .whereEqualTo("name", sheetName)
+                .get()
+                .await()
+            result.documents.forEach { Log.d("DBG", it.data.toString()) }
+            !result.isEmpty
+        } catch (e: Exception) {
+            Log.d(FIRESTORE, "Error while finding duplicates of $sheetName in folder $folderId, ${e.message}")
+            throw DBException("Unexpected exception while looking for duplicates of $sheetName in folder $folderId")
+        }
+    }
+
+    /**
+     * Converts a raw Firestore document data map into a [MusicXMLSheet] instance.
+     *
+     * @param data The raw Firestore document data as a map of field names to values.
+     * @param folderId The ID of the parent folder that contains this sheet.
+     * @return A [MusicXMLSheet] object populated with the provided data.
+     *
+     * @throws NullPointerException If any expected field is missing or null in the data map.
      */
     private fun docToMusicXMLSheet(data: Map<String, Any>, folderId: String): MusicXMLSheet {
         return MusicXMLSheet(
@@ -255,29 +314,6 @@ class FoldersAndSheetsFirestore (private val userId: String){
             data["id"].toString(),
             folderId
         )
-    }
-    /**
-     * Retrieves all sheets from a query result of folders.
-     *
-     * Iterates through all documents (folders) in the query and
-     * fetches the sheets stored in each one.
-     *
-     * @param querySnapshot The snapshot containing folder documents.
-     * @param folderId The ID of the folder associated with the sheets.
-     * @return A list of [MusicXMLSheet].
-     */
-    private suspend fun getAllSheets(querySnapshot: QuerySnapshot,folderId: String ): List<MusicXMLSheet> {
-        val allSheets = mutableListOf<MusicXMLSheet>()
-
-        for (document in querySnapshot.documents) {
-            val sheetsSnapshot = document.reference.collection("sheets").get().await()
-            val sheets = sheetsSnapshot.documents.mapNotNull { sheetDoc ->
-                sheetDoc.data?.let { docToMusicXMLSheet(it, folderId) }
-            }
-            allSheets.addAll(sheets)
-        }
-
-        return allSheets
     }
     /**
      * Converts a Firestore document into a [Folder].
@@ -306,6 +342,62 @@ class FoldersAndSheetsFirestore (private val userId: String){
             folderId
         )
     }
+
+    /**
+     * Retrieves the color of a folder given its ID.
+     *
+     * @param folderId The ID of the folder whose color is to be retrieved.
+     * @return The [Colors] value representing the folder's color, or null if not found.
+     * @throws DBException if the folder could not be retrieved or has no color field.
+     */
+    suspend fun getFolderColor(folderId: String): Colors? {
+        return try {
+            val document = usersCollection.document(userId)
+                .collection("folders")
+                .document(folderId)
+                .get()
+                .await()
+
+            if (document.exists()) {
+                val colorName = document.getString("color")
+                colorName?.let { Colors.valueOf(it.uppercase()) }
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            throw DBException("Could not retrieve color for folder $folderId: ${e.message}")
+        }
+    }
+
+    /**
+     * Saves a new HistoryEntry for the current user.
+     *
+     * Each entry is stored under:
+     * users/{userId}/historyEntries/{autoGeneratedId}
+     *
+     * @param historyEntry The [HistoryEntry] to save.
+     * @throws DBException if the entry could not be saved.
+     */
+    suspend fun saveNewHistoryEntry(historyEntry: HistoryEntry) {
+        try {
+            val data = hashMapOf(
+                "nameOfSheet" to historyEntry.nameOfSheet,
+                "formattedTime" to historyEntry.formattedTime,
+                "createdAt" to Timestamp.now()
+            )
+
+            usersCollection.document(userId)
+                .collection("historyEntries")
+                .add(data)
+                .await()
+
+            Log.d(FIRESTORE, "New history entry saved for user $userId: ${historyEntry.nameOfSheet}")
+
+        } catch (e: Exception) {
+            throw DBException("History entry could not be saved: ${e.message}")
+        }
+    }
+
 
 
 

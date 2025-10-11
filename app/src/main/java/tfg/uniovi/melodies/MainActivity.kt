@@ -41,11 +41,13 @@ class MainActivity : AppCompatActivity() {
     private fun checkUserAndNavigate() {
         val userId = PreferenceManager.getUserId(this)
         if (userId != null) {
-            // User had logged in -> go to home
-            navController.navigate(R.id.home_fragment)
-        } else {
-            // User has not logged in -> go to login
-            navController.navigate(R.id.logIn)
+            if (userId.isNotEmpty()) {
+                // User had logged in -> go to home
+                navController.navigate(R.id.home_fragment)
+            } else {
+                // User has not logged in -> go to login
+                navController.navigate(R.id.logIn)
+            }
         }
     }
 

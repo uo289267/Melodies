@@ -1,6 +1,7 @@
 package tfg.uniovi.melodies.fragments
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
@@ -14,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentImportBinding
 import tfg.uniovi.melodies.entities.Folder
@@ -28,7 +30,7 @@ import tfg.uniovi.melodies.utils.parser.XMLParser
 private const val IMPORT_TAG = "IMPORT"
 private const val EXTENSION_APP_XML = "application/xml"
 private const val EXTENSION_TXT_XML = "text/xml"
-
+const val MAX_LENGTH_SHEET_NAME: Int = 20
 /**
  * Fragment responsible for importing one or more MusicXML files into a selected folder.
  * Allows the user to pick files from storage, parse and validate them,
@@ -36,6 +38,7 @@ private const val EXTENSION_TXT_XML = "text/xml"
  */
 class Import : Fragment() {
     private lateinit var binding : FragmentImportBinding
+    private val args : ImportArgs by navArgs()
     private val openMultipleMusicXmlLauncher =
         registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris: List<Uri> ->
             uris.forEachIndexed { index, uri ->
@@ -52,7 +55,7 @@ class Import : Fragment() {
                         val doc = String2MusicXML.string2doc(xmlContent)
                         val parser = XMLParser(doc)
                         importViewModel.addMusicXMLSheet(xmlContent,
-                            parser.findNameTitle(requireContext(),doc),
+                            parser.findNameTitle(requireContext(),doc).substring(0, MAX_LENGTH_SHEET_NAME),
                             parser.findAuthor(requireContext(),doc))
                     } catch (e: Exception) {
                         ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(
@@ -87,10 +90,13 @@ class Import : Fragment() {
         binding = FragmentImportBinding.inflate(inflater, container, false)
         imageButtonSetUp()
         binding.spFolder.adapter =  SpinnerFoldersAdapter(requireContext(), mutableListOf())
+
         viewModelSetUp()
         btnImportSetUp()
         viewModelFolderChosenSetUp()
         configureSpinner()
+
+        super.onCreate(savedInstanceState)
         return binding.root
     }
     /**
@@ -106,6 +112,7 @@ class Import : Fragment() {
 
             if (index != -1) {
                 binding.spFolder.setSelection(index)
+
             }
         }
     }
@@ -123,7 +130,8 @@ class Import : Fragment() {
                     Log.d(IMPORT_TAG, "New musicxml has been added to ${folderChosen!!.name}")
                     Toast.makeText(
                         context,
-                        getString(R.string.import_successful),
+                        importViewModel.musicXMLSheets.value?.size.toString()+" "
+                                +getString(R.string.import_successful),
                         Toast.LENGTH_SHORT
                     )
                         .show()
@@ -165,6 +173,22 @@ class Import : Fragment() {
             this.folders = folders
             val adapter = binding.spFolder.adapter as SpinnerFoldersAdapter
             adapter.updateFolders(folders)
+            // Aquí ya sí podemos usar folderId de los args
+            val folderId = args.folderIdImport
+            if(folderId.isNotEmpty()){
+                folderChosen = folders.find { it.folderId == folderId }
+                // Si hay una carpeta encontrada, actualizar Spinner y ViewModel
+                folderChosen?.let {
+                    val index = folders.indexOf(it)
+                    if (index != -1){
+                        binding.spFolder.setSelection(index)
+                        importViewModel.getColorOfSelectedFolder(folderId)
+                    }
+                    importViewModel.updateFolderChosen(it)
+                }
+            }
+
+
         }
         importViewModel.loadFolders()
         importViewModel.musicXMLSheets.observe(viewLifecycleOwner) { sheets ->
@@ -179,10 +203,16 @@ class Import : Fragment() {
                 for (sheet in sheets) {
                     fileNames += sheet.name + "\n"
                 }
+
                 binding.tvNameOfFiles.text = fileNames
             }
         }
 
+        importViewModel.folderChosenColor.observe(viewLifecycleOwner){
+            val backgroundColor = Color.parseColor(importViewModel.folderChosenColor.value?.hex)
+            binding.btnImport.setBackgroundColor(backgroundColor)
+
+        }
 
     }
     /**
@@ -212,6 +242,7 @@ class Import : Fragment() {
             ) {
                 folderChosen = folders[position]
                 importViewModel.updateFolderChosen(folderChosen!!)
+                importViewModel.getColorOfSelectedFolder(folderChosen!!.folderId)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {

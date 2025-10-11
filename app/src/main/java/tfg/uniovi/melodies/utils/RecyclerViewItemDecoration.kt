@@ -6,11 +6,12 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+private const val  LEFT_MARGIN : Int = 40
 /**
  * Custom [RecyclerView.ItemDecoration] that draws a horizontal divider between items.
  *
  * The divider:
- * - Uses a drawable resource provided in [resId].
+ * - Uses a drawable resource.
  * - Leaves equal left and right margins.
  * - Is not drawn after the last item.
  *
@@ -22,7 +23,7 @@ class RecyclerViewItemDecoration (context: Context,
 ) : RecyclerView.ItemDecoration() {
 
     private var mDivider: Drawable = ContextCompat.getDrawable(context, resId)!!
-    private val LEFT_MARGIN : Int = 40
+
     /**
      * Draws the divider between each child view of the RecyclerView,
      * except after the last one.

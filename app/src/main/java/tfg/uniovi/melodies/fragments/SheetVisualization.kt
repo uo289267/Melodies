@@ -1,7 +1,11 @@
 package tfg.uniovi.melodies.fragments
 
 import android.Manifest
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -11,6 +15,8 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -20,14 +26,11 @@ import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.caverock.androidsvg.SVG
-import android.graphics.Bitmap // Necesario para el FileResolver
-import android.graphics.Typeface
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import com.caverock.androidsvg.SVGExternalFileResolver
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentSheetVisualizationBinding
+import tfg.uniovi.melodies.entities.HistoryEntry
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.viewmodels.CHECK
 import tfg.uniovi.melodies.fragments.viewmodels.NoteCheckingState
@@ -66,6 +69,8 @@ class SheetVisualization : Fragment() {
     private lateinit var sheetVisualizationViewModel: SheetVisualizationViewModel
     private lateinit var musicXMLSheet: MusicXMLSheet
     private var totalPages = 1
+    private var elapsedFormatted: String = ""
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +82,7 @@ class SheetVisualization : Fragment() {
     override fun onPause() {
         super.onPause()
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
     override fun onStop() {
@@ -91,6 +97,7 @@ class SheetVisualization : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSheetVisualizationBinding.inflate(inflater, container, false)
+
         SVG.registerExternalFileResolver(AssetFileResolver())
         sheetVisualizationViewModel = ViewModelProvider(this, SheetVisualizationViewModelFactory(
             PreferenceManager.getUserId(requireContext())!!
@@ -98,7 +105,6 @@ class SheetVisualization : Fragment() {
 
         return binding.root
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.post {
@@ -108,10 +114,6 @@ class SheetVisualization : Fragment() {
         setupNavigationButtons()
         viewModelSetUp()
         toolBarSetUp()
-
-        if (sheetVisualizationViewModel.musicXMLSheet.value!=null) {
-            binding.webView.reload()
-        }
     }
 
     private fun viewModelSetUp() {
@@ -129,7 +131,6 @@ class SheetVisualization : Fragment() {
                             getString(R.string.sheet_visualization_invalid_xml_msg),
                             PARSING,
                             "alert dialog showed because xml missing attributes and/or elements")
-                        sheetVisualizationViewModel.updateCanCheckNote(false)
                     }
                     val encondedXML =
                         Base64.encodeToString(it.stringSheet.toByteArray(), Base64.NO_WRAP)
@@ -181,20 +182,45 @@ class SheetVisualization : Fragment() {
             findNavController().navigate(R.id.home_fragment)
         }
 
-
         sheetVisualizationViewModel.noteCheckingState.observe(viewLifecycleOwner) { state ->
             Log.d(CHECK, "Changed to state $state")
+            if (state == NoteCheckingState.CHECKING) {
+                val currentOrientation = resources.configuration.orientation
+                requireActivity().requestedOrientation = if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                } else {
+                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+            }
             if (state == NoteCheckingState.FINISHED) {
                 sheetVisualizationViewModel.updateNoteCheckingState(NoteCheckingState.NONE)
+
+                val message = getString(R.string.sheet_visualization_finish_msg) +
+                        " " + musicXMLSheet.name +
+                        "\n\n⏱️ Tiempo total: $elapsedFormatted"
+
                 ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(
                     requireContext(),
                     getString(R.string.sheet_visualization_finish),
-                    getString(R.string.sheet_visualization_finish_msg)+ musicXMLSheet.name,
+                    message,
                     CHECK,
-                    "${musicXMLSheet.name} was finished",
+                    "${musicXMLSheet.name} was finished in $elapsedFormatted",
                     returnToHome
                 )
             }
+
+        }
+        sheetVisualizationViewModel.elapsedTimeMs.observe(viewLifecycleOwner) { elapsed ->
+            val totalSeconds = (elapsed / 1000).toInt()
+            val minutes = totalSeconds / 60
+            val seconds = totalSeconds % 60
+
+            elapsedFormatted = when {
+                minutes > 0 -> "$minutes min $seconds s"
+                else -> "$seconds s"
+            }
+            sheetVisualizationViewModel.saveNewHistoryEntry(HistoryEntry(musicXMLSheet.name, elapsedFormatted))
+            Log.d("SHEET_TIME", "Tiempo total en tocar la canción: $elapsedFormatted (mm:ss)")
         }
     }
 
@@ -205,9 +231,8 @@ class SheetVisualization : Fragment() {
      */
     private fun setBottomNavMenuVisibility(visibility: Int){
         if(visibility == View.GONE || visibility == View.VISIBLE){
-            val navView =
-                requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-            navView.visibility = visibility
+            val navView = activity?.findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+            navView?.visibility = visibility
         }
     }
 
