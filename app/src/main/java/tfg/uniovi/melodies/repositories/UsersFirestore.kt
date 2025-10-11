@@ -6,7 +6,11 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
+import tfg.uniovi.melodies.entities.HistoryEntry
 import tfg.uniovi.melodies.preferences.PreferenceManager
+
+private const val USER_REPOSITORY = "UserRepository"
+
 /**
  * Repository for managing user-related data in Firestore.
  *
@@ -16,43 +20,124 @@ import tfg.uniovi.melodies.preferences.PreferenceManager
 class UsersFirestore {
     private val db = Firebase.firestore
     /**
-     * Checks if a user already exists in Firestore.
+     * Checks if a nickname is already taken in Firestore.
      *
-     * @param userId The ID of the user to check.
-     * @return `true` if the user exists, `false` otherwise.
+     * @param nickname The nickname to check for uniqueness.
+     * @return `true` if the nickname exists, `false` otherwise.
      */
-    suspend fun userExists(userId: String): Boolean {
+    suspend fun nicknameExists(nickname: String): Boolean {
         return try {
-            val snapshot = db.collection("users").document(userId).get().await()
-            snapshot.exists()
+            val querySnapshot = db.collection("users")
+                .whereEqualTo("nickname", nickname)
+                .limit(1)
+                .get()
+                .await()
+
+            !querySnapshot.isEmpty
         } catch (e: Exception) {
-            Log.e("UserRepository", "Error checking user existence", e)
+            Log.e(USER_REPOSITORY, "Error checking nickname existence", e)
             false
         }
     }
     /**
+     * Updates the nickname of a user in Firestore.
+     *
+     * @param userId The ID of the user document.
+     * @param newNickname The new nickname to set.
+     * @return true if the update was successful, false otherwise.
+     * @throws DBException if nickname update fails
+     */
+    suspend fun updateUserNickname(userId: String, newNickname: String) {
+        try {
+            val userRef = db.collection("users").document(userId)
+
+            userRef.update("nickname", newNickname).await()
+            Log.d(USER_REPOSITORY, "Nickname updated for user $userId -> $newNickname")
+        } catch (e: Exception) {
+            Log.e(USER_REPOSITORY, "Error updating nickname", e)
+            throw DBException("Error while updating $userId updating: ${e.message}")
+        }
+    }
+
+    /**
+     * Retrieves the user ID associated with a given nickname in Firestore.
+     *
+     * @param nickname The nickname to search for.
+     * @return The user ID if found, or `null` if no user with that nickname exists or if an error occurs.
+     */
+    suspend fun getUserIdFromNickname(nickname: String): String? {
+        return try {
+            val querySnapshot = db.collection("users")
+                .whereEqualTo("nickname", nickname)
+                .limit(1)
+                .get()
+                .await()
+
+            if (!querySnapshot.isEmpty) {
+                querySnapshot.documents[0].id
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.e(USER_REPOSITORY, "Error retrieving userId from nickname", e)
+            null
+        }
+    }
+    /**
+     * Retrieves the nickname associated with a given user ID in Firestore.
+     *
+     * @param userId The user ID to search for.
+     * @return The nickname if found, or `null` if the user doesn't exist or an error occurs.
+     */
+    suspend fun getNicknameFromUserId(userId: String): String? {
+        return try {
+            val documentSnapshot = db.collection("users")
+                .document(userId)
+                .get()
+                .await()
+
+            if (documentSnapshot.exists()) {
+                documentSnapshot.getString("nickname")
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.e(USER_REPOSITORY, "Error retrieving nickname from userId", e)
+            null
+        }
+    }
+
+
+    /**
      * Sets up user data in Firestore if the user does not already exist.
      *
-     * - Creates a new user document with a server timestamp.
+     * - Creates a new user document with:
+     *   - A server timestamp (`createdAt`).
+     *   - The provided `nickname`.
      * - Creates a default folder named **"Basic Sheets"**.
      * - Copies default sheets from the `defaultSheets` collection into the user's folder.
      * - Saves the generated user ID in [PreferenceManager].
      *
+     * @param nickname The nickname to associate with the newly created user.
      * @param context The application context used to access [PreferenceManager].
      * @return The newly created user ID, or `null` if the user already exists or if an error occurs.
+     * @throws DBException when setup fails
      */
-    suspend fun setupUserDataIfNeeded(context: Context): String? {
+
+    suspend fun setupUserDataIfNeeded(nickname: String, context: Context): String? {
         val storedUserId = PreferenceManager.getUserId(context)
         if (storedUserId != null) {
-            Log.d("UserRepository", "User already exists with ID $storedUserId")
-            return null //the user has already been created
+            if (storedUserId.isNotEmpty()) {
+                Log.d(USER_REPOSITORY, "User already exists with ID $storedUserId")
+                return null //the user has already been created
+            }
         }
 
         return try {
             val userRef = db.collection("users").document() // ID automático
             val userId = userRef.id
             // Create user document
-            val userData = mapOf("createdAt" to FieldValue.serverTimestamp())
+            val userData = mapOf("createdAt" to FieldValue.serverTimestamp(), "nickname" to nickname)
             userRef.set(userData).await()
             // Create folder "Basic Sheets"
             val folderRef = userRef.collection("folders").document()
@@ -71,11 +156,42 @@ class UsersFirestore {
             }
 
             PreferenceManager.saveUserId(context, userId)
-            Log.d("UserRepository", "Sheets copied to user $userId")
+            Log.d(USER_REPOSITORY, "Sheets copied to user $userId")
             userId
         } catch (e: Exception) {
-            Log.e("UserRepository", "Error configuring user", e)
-            null
+            Log.e(USER_REPOSITORY, "Error configuring user", e)
+            throw DBException("Unable to create user $nickname")
+        }
+    }
+
+    /**
+     * Retrieves the 5 most recent HistoryEntries for the current user,
+     * ordered by creation time (newest first).
+     *
+     * @param userId whose history is retrieved
+     * @return A list of up to 5 [HistoryEntry].
+     * @throws DBException if retrieval fails.
+     */
+    suspend fun getAllHistoryEntries(userId: String): List<HistoryEntry> {
+        return try {
+            val result = db.collection("users").document(userId)
+                .collection("historyEntries")
+                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .limit(5)
+                .get()
+                .await()
+
+            result.documents.mapNotNull { doc ->
+                val name = doc.getString("nameOfSheet")
+                val time = doc.getString("formattedTime")
+                if (name != null && time != null) {
+                    HistoryEntry(name, time)
+                } else {
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            throw DBException("History entries could not be retrieved: ${e.message}")
         }
     }
 

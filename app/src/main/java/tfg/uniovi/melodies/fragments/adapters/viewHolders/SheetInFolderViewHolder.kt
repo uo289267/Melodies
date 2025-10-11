@@ -1,18 +1,15 @@
 package tfg.uniovi.melodies.fragments.adapters.viewHolders
 
-import android.content.Context
-import android.text.InputType
 import android.util.Log
 import android.view.View
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat.getString
+import android.widget.Toast
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.MusicXMLSheet
+import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 import tfg.uniovi.melodies.utils.ShowAlertDialog
 
@@ -21,7 +18,8 @@ private const val SHEET_RENAME = "SHEET_RENAME"
 class SheetInFolderViewHolder(
     private val view: View,
     private val navigateFunction: (SheetVisualizationDto) -> Unit,
-    private val onLongClickRename: (SheetVisualizationDto, String) -> Unit
+    private val lifecycleOwner: LifecycleOwner,
+    private val viewModel: LibraryViewModel
     ): RecyclerView.ViewHolder(view){
         private var tvSheetTitle : TextView = view.findViewById(R.id.tv_title)
         private var tvSheetAuthor: TextView = view.findViewById(R.id.tv_author)
@@ -37,8 +35,7 @@ class SheetInFolderViewHolder(
         }
 
         itemView.setOnLongClickListener {
-            showInputDialog()
-
+            currentSheet?.let { it1 -> showInputDialog(it1) }
             true
         }
 
@@ -49,47 +46,35 @@ class SheetInFolderViewHolder(
         tvSheetTitle.text = sheet.name
     }
 
-    private fun showInputDialog() {
-        val input = EditText(view.context).apply {
-            inputType = InputType.TYPE_CLASS_TEXT
-            setSingleLine()
+
+    private fun showInputDialog(sheet: MusicXMLSheet) {
+        ShowAlertDialog.showRenameSheetDialog(
+            context = view.context,
+            lifecycleOwner = lifecycleOwner,
+            viewModel = viewModel,
+            currentSheet = sheet,
+            titleRes = view.context.getString(R.string.rename) + " " + sheet.name,
+            messageRes = view.context.getString(R.string.rename_quest),
+            optionalButtonText = view.context.getString(R.string.delete_btn),
+            onOptionalButtonClick = {
+                currentSheet?.let {
+                    viewModel.deleteSheet(it.id, it.folderId)
+                }
+                Toast.makeText(
+                    view.context,
+                    sheet.name + " " + view.context.getString(R.string.delete_successful),
+                    Toast.LENGTH_SHORT
+                ).show()
+                Log.d(DELETE, "Sheet ${currentSheet?.name} was deleted")
+            }
+        ) { newName ->
+            Log.d(SHEET_RENAME, "Renaming sheet to: $newName")
+            viewModel.renameSheet(currentSheet!!.id, currentSheet!!.folderId,newName)
+            viewModel.loadSheets()
         }
 
-        val dialog = AlertDialog.Builder(view.context)
-            .setTitle(getString(view.context, R.string.rename))
-            .setMessage(getString(view.context, R.string.rename_quest))
-            .setView(input)
-            .setIcon(R.drawable.icon_alert)
-            .setPositiveButton(android.R.string.ok, null) // we handle later
-            .setNegativeButton(android.R.string.cancel) { dialogInterface, _ ->
-                dialogInterface.dismiss()
-            }
-            .create()
 
-        input.requestFocus()
-        dialog.setOnShowListener {
-            val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
-
-            val button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            button.setOnClickListener {
-                val text = input.text.toString().trim()
-                if (text.isEmpty()) {
-                    input.error = getString(view.context, R.string.rename_empty_err)
-                }
-                else if(text.length > 20){
-                    input.error = getString(view.context, R.string.rename_length_err)
-                }
-                else {
-                    input.error = null
-                    Log.d(SHEET_RENAME, "Renaming sheet to: $text")
-                    onLongClickRename(SheetVisualizationDto(currentSheet!!.id, currentSheet!!.folderId), text)
-                    dialog.dismiss()
-                }
-            }
-        }
-
-        dialog.show()
     }
+
 
 }

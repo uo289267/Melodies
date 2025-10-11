@@ -31,12 +31,26 @@
         app:layout_constraintEnd_toEndOf="parent"
 
         />
+    <ImageView
+        android:id="@+id/iv_no_folders"
+        android:layout_width="400dp"
+        android:layout_height="350dp"
+        android:src="@drawable/no_data"
+        android:contentDescription="@string/no_sheets_have_been_imported_yet"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/tv_no_folders"
+        />
     <TextView
         android:id="@+id/tv_no_folders"
-        android:layout_width="match_parent"
+        android:layout_width="500dp"
+        android:textSize="20sp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="@string/no_sheets_have_been_imported_yet"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_no_folders"
+        android:text="@string/no_folders_have_been_created_yet"
         android:textAlignment="center"
         android:textStyle="italic"
         />

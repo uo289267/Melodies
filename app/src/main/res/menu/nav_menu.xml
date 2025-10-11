@@ -7,7 +7,7 @@
         android:title="@string/home" />
     <item
         android:id="@+id/importing"
-        android:icon="@drawable/importing"
+        android:icon="@drawable/importar"
         android:title="@string/import_" />
     <item
         android:id="@+id/fullLibrary"

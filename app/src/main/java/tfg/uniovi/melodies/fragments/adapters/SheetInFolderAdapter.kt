@@ -2,25 +2,21 @@ package tfg.uniovi.melodies.fragments.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.adapters.viewHolders.SheetInFolderViewHolder
+import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 
-class SheetInFolderAdapter : RecyclerView.Adapter<SheetInFolderViewHolder> {
-    private val sheetList: MutableList<MusicXMLSheet>
-    private val navigateFunction: (SheetVisualizationDto) -> Unit
-    private val onLongClickRename: (SheetVisualizationDto, String) -> Unit
-    constructor(
-        sheetList: List<MusicXMLSheet>,
-        navigateFunction: (SheetVisualizationDto) -> Unit,
-        onLongClickRename: (SheetVisualizationDto, String) -> Unit
-        ){
-        this.sheetList = sheetList.toMutableList()
-        this.navigateFunction = navigateFunction
-        this.onLongClickRename = onLongClickRename
-    }
+class SheetInFolderAdapter(
+    sheetList: List<MusicXMLSheet>,
+    private val navigateFunction: (SheetVisualizationDto) -> Unit,
+    private val lifecycleOwner: LifecycleOwner,
+    private val viewModel: LibraryViewModel
+) : RecyclerView.Adapter<SheetInFolderViewHolder>() {
+    private val sheetList: MutableList<MusicXMLSheet> = sheetList.toMutableList()
 
 
     fun updateSheets(newSheets: List<MusicXMLSheet>){
@@ -38,7 +34,7 @@ class SheetInFolderAdapter : RecyclerView.Adapter<SheetInFolderViewHolder> {
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): SheetInFolderViewHolder {
         val layout = R.layout.recycler_song_in_library_item
         val view = LayoutInflater.from(viewGroup.context).inflate(layout, viewGroup, false)
-        return SheetInFolderViewHolder(view, navigateFunction, onLongClickRename)
+        return SheetInFolderViewHolder(view, navigateFunction, lifecycleOwner, viewModel)
     }
 
     override fun onBindViewHolder(viewHolder: SheetInFolderViewHolder, position: Int) {
@@ -53,6 +49,10 @@ class SheetInFolderAdapter : RecyclerView.Adapter<SheetInFolderViewHolder> {
         sheetList.removeAt(position)
         notifyItemRemoved(position)
 
+    }
+
+    fun getNameOfSheetAtPosition(position: Int): String {
+        return sheetList[position].name
     }
 
 }

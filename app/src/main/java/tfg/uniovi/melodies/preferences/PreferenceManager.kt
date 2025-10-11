@@ -5,7 +5,6 @@ import android.content.Context
  * Utility object for managing app preferences related to the user.
  *
  * Handles saving, retrieving, and clearing the current user's ID
- * in [SharedPreferences].
  */
 object PreferenceManager {
     private const val PREFS_NAME = "my_app_prefs"
