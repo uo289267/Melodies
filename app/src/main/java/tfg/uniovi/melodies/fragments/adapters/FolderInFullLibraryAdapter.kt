@@ -10,27 +10,14 @@ import tfg.uniovi.melodies.fragments.adapters.viewHolders.FolderInFullLibraryVie
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 
-class FolderInFullLibraryAdapter : RecyclerView.Adapter<FolderInFullLibraryViewHolder> {
-    private val folderList : MutableList<Folder>
-    private val navigateFunction: (SheetVisualizationDto) -> Unit
-    private val libraryViewModelProviderFactory : (String) -> LibraryViewModel
+class FolderInFullLibraryAdapter(
+    folderList: List<Folder>,
+    private val navigateFunction: (SheetVisualizationDto) -> Unit,
+    private val lifecycleOwner: LifecycleOwner,
+    private val libraryViewModelProviderFactory: (String) -> LibraryViewModel
+) : RecyclerView.Adapter<FolderInFullLibraryViewHolder>() {
+    private val folderList : MutableList<Folder> = folderList.toMutableList()
     private val viewPool = RecyclerView.RecycledViewPool()
-    private val lifecycleOwner : LifecycleOwner
-    private val onLongClickRename: (SheetVisualizationDto, String) -> Unit
-
-    constructor(
-        folderList: List<Folder>,
-        navigateFunction: (SheetVisualizationDto) -> Unit,
-        lifecycleOwner: LifecycleOwner,
-        libraryViewModelProviderFactory: (String) -> LibraryViewModel,
-        onLongClickRename: (SheetVisualizationDto, String) -> Unit,
-    ){
-        this.folderList = folderList.toMutableList()
-        this.navigateFunction = navigateFunction
-        this.libraryViewModelProviderFactory = libraryViewModelProviderFactory
-        this.lifecycleOwner = lifecycleOwner
-        this.onLongClickRename = onLongClickRename
-    }
 
     fun updateFullLibrary(newFolders: List<Folder>){
         val oldSize = folderList.size
@@ -49,7 +36,7 @@ class FolderInFullLibraryAdapter : RecyclerView.Adapter<FolderInFullLibraryViewH
     ): FolderInFullLibraryViewHolder {
         val layout = R.layout.recycler_folder_in_full_library_item
         val view = LayoutInflater.from(viewGroup.context).inflate(layout, viewGroup, false)
-        return FolderInFullLibraryViewHolder(view, navigateFunction, lifecycleOwner, onLongClickRename)
+        return FolderInFullLibraryViewHolder(view, navigateFunction, lifecycleOwner)
     }
 
     override fun onBindViewHolder(viewHolder: FolderInFullLibraryViewHolder, position: Int) {

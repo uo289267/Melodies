@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.entities.MusicXMLSheet
@@ -71,6 +72,16 @@ class LibraryViewModel(
         viewModelScope.launch {
             folderBD.setNewSheetName(sheetId,folderId, newName)
         }
+    }
+    fun isSheetNameAvailable(name: String, folderId: String): LiveData<Result<Boolean>> = liveData {
+            emit(Result.Loading)
+            try {
+                val taken = folderBD.isSheetNameInUse(name, folderId)
+                emit(Result.Success(!taken!!))
+            } catch (e: Exception) {
+                emit(Result.Error(e))
+            }
+
     }
 
 }

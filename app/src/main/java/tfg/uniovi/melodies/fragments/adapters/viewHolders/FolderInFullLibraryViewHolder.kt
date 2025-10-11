@@ -19,18 +19,13 @@ class FolderInFullLibraryViewHolder(
     private val view: View,
     private val navigateFunction: (SheetVisualizationDto) -> Unit,
     private val lifecycleOwner: LifecycleOwner,
-    private val onLongClickRename: (SheetVisualizationDto, String) -> Unit
-
 ): RecyclerView.ViewHolder (view) {
     private var tvFolderTitle : TextView = view.findViewById(R.id.tv_folder_title)
     var recyclerSongsPerFolder : RecyclerView = view.findViewById(R.id.recycler_sheets_in_folder)
 
     fun bind(folder: Folder, libraryViewModel: LibraryViewModel){
         tvFolderTitle.text = folder.name
-        val onDelete = { dto: SheetVisualizationDto ->
-            libraryViewModel.deleteSheet(dto.sheetId, dto.folderId)
-        }
-        val adapter = SheetInFolderAdapter( emptyList(), navigateFunction, onLongClickRename, onDelete, lifecycleOwner)
+        val adapter = SheetInFolderAdapter( emptyList(), navigateFunction, lifecycleOwner, libraryViewModel)
         recyclerSongsPerFolder.adapter =  adapter
         recyclerSongsPerFolder.layoutManager = LinearLayoutManager(view.context)
         recyclerSongsPerFolder.addItemDecoration(RecyclerViewItemDecoration(view.context

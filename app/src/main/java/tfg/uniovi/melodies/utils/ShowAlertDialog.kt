@@ -1,24 +1,21 @@
 package tfg.uniovi.melodies.utils
 
 import android.content.Context
-import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AlertDialog
-import tfg.uniovi.melodies.R
 import android.widget.EditText
 import android.widget.ProgressBar
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
+import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.entities.MusicXMLSheet
+import tfg.uniovi.melodies.fragments.MAX_LENGTH_FOLDER_NAME
+import tfg.uniovi.melodies.fragments.MAX_LENGTH_SHEET_NAME
+import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
+import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.ProfileViewModel
-import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
-import tfg.uniovi.melodies.repositories.UsersFirestore
+import tfg.uniovi.melodies.fragments.viewmodels.Result
 
 /**
  * Static class that allows to easily create and show [AlertDialog]
@@ -88,7 +85,7 @@ object ShowAlertDialog {
      *
      * @param context The Context used to show the dialog.
      * @param lifecycleOwner The LifecycleOwner used to launch coroutines.
-     * @param sheetDB The database interface for folders and sheets.
+     * @param viewModel viewModel The viewModel to check nickname availability.
      * @param currentSheet The MusicXMLSheet object being renamed.
      * @param titleRes The resource ID for the dialog title.
      * @param messageRes The resource ID for the dialog message.
@@ -99,7 +96,7 @@ object ShowAlertDialog {
     fun showRenameSheetDialog(
         context: Context,
         lifecycleOwner: LifecycleOwner,
-        sheetDB: FoldersAndSheetsFirestore,
+        viewModel: LibraryViewModel,
         currentSheet: MusicXMLSheet,
         titleRes: String,
         messageRes: String,
@@ -111,7 +108,7 @@ object ShowAlertDialog {
         val input = dialogView.findViewById<EditText>(R.id.input)
         val progressBar = dialogView.findViewById<ProgressBar>(R.id.progress)
 
-        // Prellenar con nombre actual si existe
+
         input.setText(currentSheet.name)
         input.setSelection(currentSheet.name.length)
 
@@ -132,46 +129,45 @@ object ShowAlertDialog {
             val button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             button.setOnClickListener {
                 val newName = input.text.toString().trim()
+
                 if (newName == currentSheet.name) {
                     dialog.dismiss()
                     return@setOnClickListener
                 }
-                // Validaciones locales
                 if (newName.isEmpty()) {
                     input.error = context.getString(R.string.rename_nick_empty_err)
                     return@setOnClickListener
                 }
-                if (newName.length > 20) {
+                if (newName.length > MAX_LENGTH_SHEET_NAME) {
                     input.error = context.getString(R.string.rename_nick_length_err)
                     return@setOnClickListener
                 }
 
-                // Bloquear botón y mostrar progreso
                 button.isEnabled = false
                 progressBar.visibility = View.VISIBLE
 
-                lifecycleOwner.lifecycleScope.launch {
-                    try {
-                            // Comprobación de disponibilidad del nombre de sheet
-                            val taken = sheetDB.isSheetNameInUse(newName, currentSheet.folderId)
-
-                            button.isEnabled = true
-                            progressBar.visibility = View.GONE
-
-                            if (taken == true) {
-                                input.error = context.getString(R.string.sheet_name_taken_err)
-                            } else {
-                                dialog.dismiss()
-                                onConfirm(newName)
+                viewModel.isSheetNameAvailable(newName, currentSheet.folderId)
+                    .observe(lifecycleOwner) { result:Result<Boolean>->
+                        when (result) {
+                            is Result.Loading -> progressBar.visibility = View.VISIBLE
+                            is Result.Success -> {
+                                progressBar.visibility = View.GONE
+                                button.isEnabled = true
+                                if (result.data) {
+                                    dialog.dismiss()
+                                    onConfirm(newName)
+                                } else {
+                                    input.error = context.getString(R.string.sheet_name_taken_err)
+                                }
                             }
-
-                    } catch (e: Exception) {
-                        button.isEnabled = true
-                        progressBar.visibility = View.GONE
-                        input.error = context.getString(R.string.error_generic)
-                        Log.e(RENAME, "Error checking sheet name", e)
+                            is Result.Error -> {
+                                progressBar.visibility = View.GONE
+                                button.isEnabled = true
+                                input.error = context.getString(R.string.error_generic)
+                                Log.e("RENAME", "Error checking sheet name", result.exception)
+                            }
+                        }
                     }
-                }
             }
         }
 
@@ -185,7 +181,7 @@ object ShowAlertDialog {
      *
      * @param context The Context used to show the dialog.
      * @param lifecycleOwner The LifecycleOwner used to launch coroutines.
-     * @param folderDB The database interface for folders and sheets.
+     * @param viewModel The viewModel to check new folder name availability
      * @param currentFolderName The current folder name to pre-fill the input.
      * @param titleRes The resource ID for the dialog title.
      * @param messageRes The resource ID for the dialog message.
@@ -196,7 +192,7 @@ object ShowAlertDialog {
     fun showRenameFolderDialog(
         context: Context,
         lifecycleOwner: LifecycleOwner,
-        folderDB: FoldersAndSheetsFirestore,
+        viewModel: FolderViewModel,
         currentFolderName: String?,
         titleRes: String,
         messageRes: String,
@@ -208,7 +204,6 @@ object ShowAlertDialog {
         val input = dialogView.findViewById<EditText>(R.id.input)
         val progressBar = dialogView.findViewById<ProgressBar>(R.id.progress)
 
-        // Prellenar con nombre actual si existe
         input.setText(currentFolderName)
         input.setSelection(currentFolderName?.length ?: 0)
 
@@ -235,37 +230,35 @@ object ShowAlertDialog {
                 }
                 // Validaciones locales
                 if (newName.isEmpty()) {
-                    input.error = context.getString(R.string.rename_nick_empty_err)
+                    input.error = context.getString(R.string.error_blank_folder_name);
                     return@setOnClickListener
                 }
-                if (newName.length > 30) {
-                    input.error = context.getString(R.string.rename_nick_length_err)
+                if (newName.length > MAX_LENGTH_FOLDER_NAME) {
+                    input.error = context.getString(R.string.too_long_folder_name)
                     return@setOnClickListener
                 }
 
-                // Bloquear botón y mostrar progreso
                 button.isEnabled = false
                 progressBar.visibility = View.VISIBLE
 
-                lifecycleOwner.lifecycleScope.launch {
-                    try {
-                        // Comprobación de disponibilidad del nombre de carpeta
-                        val taken = folderDB.isFolderNameInUse(newName) // suspend function
-
-                        button.isEnabled = true
-                        progressBar.visibility = View.GONE
-
-                        if (taken == true) {
-                            input.error =  context.getString(R.string.folder_name_taken_err)
-                        } else {
-                            dialog.dismiss()
-                            onConfirm(newName)
+                viewModel.isFolderNameAvailable(newName).observe(lifecycleOwner) { result ->
+                    when (result) {
+                        is Result.Loading -> progressBar.visibility = View.VISIBLE
+                        is Result.Success -> {
+                            progressBar.visibility = View.GONE
+                            button.isEnabled = true
+                            if(result.data) {
+                                dialog.dismiss()
+                                onConfirm(newName)
+                            } else {
+                                input.error = context.getString(R.string.folder_name_taken_err)
+                            }
                         }
-                    } catch (e: Exception) {
-                        button.isEnabled = true
-                        progressBar.visibility = View.GONE
-                        input.error =  context.getString(R.string.error_generic)
-                        Log.e(RENAME, "Error checking folder name", e)
+                        is Result.Error -> {
+                            progressBar.visibility = View.GONE
+                            button.isEnabled = true
+                            input.error = context.getString(R.string.error_generic)
+                        }
                     }
                 }
             }
@@ -281,7 +274,7 @@ object ShowAlertDialog {
      *
      * @param context The Context used to show the dialog.
      * @param lifecycleOwner The LifecycleOwner used to launch coroutines.
-     * @param usersBD The database interface for user data.
+     * @param viewModel The viewModel to check nickname availability.
      * @param currentNickname The current nickname to pre-fill the input.
      * @param titleRes The resource ID for the dialog title.
      * @param messageRes The resource ID for the dialog message.
@@ -293,7 +286,7 @@ object ShowAlertDialog {
     fun showInputNewNicknameDialog(
         context: Context,
         lifecycleOwner: LifecycleOwner,
-        usersBD: UsersFirestore,
+        viewModel: ProfileViewModel,
         currentNickname: String,
         titleRes: String,
         messageRes: String,
@@ -328,7 +321,6 @@ object ShowAlertDialog {
             button.setOnClickListener {
                 val nickname = input.text.toString().trim()
 
-                // Si no cambió el nombre, dismiss directamente
                 if (nickname == currentNickname) {
                     dialog.dismiss()
                     return@setOnClickListener
@@ -343,24 +335,26 @@ object ShowAlertDialog {
                 button.isEnabled = false
                 progressBar.visibility = View.VISIBLE
 
-                lifecycleOwner.lifecycleScope.launch {
-                    try {
-                        val taken = usersBD.nicknameExists(nickname)
-
-                        button.isEnabled = true
-                        progressBar.visibility = View.GONE
-
-                        if (taken) {
-                            input.error = context.getString(R.string.nickname_unable)
-                        } else {
-                            dialog.dismiss()
-                            onConfirm(nickname)
+                // Observamos LiveData del ViewModel
+                viewModel.isNicknameAvailable(nickname).observe(lifecycleOwner) { result ->
+                    when (result) {
+                        is Result.Loading -> progressBar.visibility = View.VISIBLE
+                        is Result.Success -> {
+                            progressBar.visibility = View.GONE
+                            button.isEnabled = true
+                            if (result.data) {
+                                dialog.dismiss()
+                                onConfirm(nickname)
+                            } else {
+                                input.error = context.getString(R.string.nickname_unable)
+                            }
                         }
-                    } catch (e: Exception) {
-                        button.isEnabled = true
-                        progressBar.visibility = View.GONE
-                        input.error = context.getString(R.string.nickname_unable)
-                        Log.e(RENAME, "Error checking nickname", e)
+                        is Result.Error -> {
+                            progressBar.visibility = View.GONE
+                            button.isEnabled = true
+                            input.error = context.getString(R.string.nickname_unable)
+                            Log.e("RENAME", "Error checking nickname", result.exception)
+                        }
                     }
                 }
             }

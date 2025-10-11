@@ -20,14 +20,13 @@ import tfg.uniovi.melodies.fragments.adapters.HistoryEntryAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.ProfileViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.ProfileViewModelProviderFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
-import tfg.uniovi.melodies.repositories.UsersFirestore
-import tfg.uniovi.melodies.utils.SheetItemToucherHelper
 import tfg.uniovi.melodies.utils.ShowAlertDialog.showInputNewNicknameDialog
 
 private const val LOGOUT_TAG = "LOGOUT"
 private const val AVATAR_HTTPS = "https://anonymous-animals.azurewebsites.net/avatar/"
 private const val RENAME = "RENAME"
 
+const val MAX_LENGTH_NICK : Int = 20
 class Profile : Fragment() {
     private lateinit var binding: FragmentProfileBinding
     private lateinit var profileViewModel: ProfileViewModel
@@ -52,19 +51,18 @@ class Profile : Fragment() {
             binding.tvNickname.text = nickname
         }
         binding.btnEdit.setOnClickListener {
-
             profileViewModel.nickname.value?.let { it1 ->
                 showInputNewNicknameDialog(
                     context = requireContext(),
                     lifecycleOwner = viewLifecycleOwner,
-                    usersBD = UsersFirestore(),
+                    viewModel = profileViewModel,
                     titleRes = ContextCompat.getString(requireContext(), R.string.nickname_rename),
                     messageRes = ContextCompat.getString(requireContext(), R.string.nickname_new_name)
                             +" "+profileViewModel.nickname.value+" "+
                             ContextCompat.getString(requireContext(), R.string.nickname_new_name2),
                     validations = listOf(
                         {newNick:String -> newNick.isNotEmpty() } to getString(R.string.rename_nick_empty_err),
-                        {newNick:String -> newNick.length <= 20 } to getString(R.string.rename_nick_length_err),
+                        {newNick:String -> newNick.length <= MAX_LENGTH_NICK } to getString(R.string.rename_nick_length_err),
                     ),
                     currentNickname = it1,
                     onConfirm = { nickname ->

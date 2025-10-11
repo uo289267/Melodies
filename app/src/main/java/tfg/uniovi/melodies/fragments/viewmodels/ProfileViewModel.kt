@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.entities.HistoryEntry
@@ -22,20 +23,12 @@ class ProfileViewModel(private val usersBD: UsersFirestore):ViewModel(){
     val nickname : LiveData<String>
         get() = _nickname
 
-    private val _isNicknameTaken = MutableLiveData(false)
-        val isNicknameTaken : LiveData<Boolean>
-        get() = _isNicknameTaken
 
     private val _historyEntries = MutableLiveData<List<HistoryEntry>>()
     val historyEntries: LiveData<List<HistoryEntry>> = _historyEntries
     fun loadNickname(userId: String){
         viewModelScope.launch {
             _nickname.value=usersBD.getNicknameFromUserId(userId)
-        }
-    }
-    fun checkNicknameAvailability(newNickname: String) {
-        viewModelScope.launch {
-            _isNicknameTaken.value = usersBD.nicknameExists(newNickname)
         }
     }
 
@@ -58,6 +51,16 @@ class ProfileViewModel(private val usersBD: UsersFirestore):ViewModel(){
             val entries = usersBD.getAllHistoryEntries(userId) // Las 5 más recientes
             _historyEntries.postValue(entries)
 
+        }
+    }
+
+    fun isNicknameAvailable(nickname: String): LiveData<Result<Boolean>> = liveData {
+        emit(Result.Loading)
+        try {
+            val taken = usersBD.nicknameExists(nickname) // suspend
+            emit(Result.Success(!taken))
+        } catch (e: Exception) {
+            emit(Result.Error(e))
         }
     }
 }

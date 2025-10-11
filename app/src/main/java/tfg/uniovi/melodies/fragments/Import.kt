@@ -30,7 +30,7 @@ import tfg.uniovi.melodies.utils.parser.XMLParser
 private const val IMPORT_TAG = "IMPORT"
 private const val EXTENSION_APP_XML = "application/xml"
 private const val EXTENSION_TXT_XML = "text/xml"
-
+const val MAX_LENGTH_SHEET_NAME: Int = 20
 /**
  * Fragment responsible for importing one or more MusicXML files into a selected folder.
  * Allows the user to pick files from storage, parse and validate them,
@@ -55,7 +55,7 @@ class Import : Fragment() {
                         val doc = String2MusicXML.string2doc(xmlContent)
                         val parser = XMLParser(doc)
                         importViewModel.addMusicXMLSheet(xmlContent,
-                            parser.findNameTitle(requireContext(),doc),
+                            parser.findNameTitle(requireContext(),doc).substring(0, MAX_LENGTH_SHEET_NAME),
                             parser.findAuthor(requireContext(),doc))
                     } catch (e: Exception) {
                         ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(
@@ -203,6 +203,7 @@ class Import : Fragment() {
                 for (sheet in sheets) {
                     fileNames += sheet.name + "\n"
                 }
+
                 binding.tvNameOfFiles.text = fileNames
             }
         }

@@ -57,14 +57,14 @@ class LogIn : Fragment() {
         }
         binding.btnEnterPreviousAccount.setOnClickListener {
             val currentNickname = binding.inputNickname.text.toString().trim()
-            if (currentNickname.isNotEmpty() && currentNickname.length<20) {
+            if (currentNickname.isNotEmpty() && currentNickname.length<MAX_LENGTH_NICK) {
                 logInViewModel.updateNickname(currentNickname)
                 logInViewModel.checkIfUserExists()
             }
             else if(currentNickname.isEmpty()){
                 binding.layoutUserId.error = getString(R.string.login_wrong_blank_err)
             }
-            else if(currentNickname.length!=20) {
+            else if(currentNickname.length!=MAX_LENGTH_NICK) {
                 binding.layoutUserId.error = getString(R.string.login_wrong_length_err)
             }else{
                 binding.layoutUserId.error = getString(R.string.error_user_doesnt_exist)

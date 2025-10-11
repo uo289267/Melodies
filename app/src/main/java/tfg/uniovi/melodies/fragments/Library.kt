@@ -67,15 +67,7 @@ class Library : Fragment() {
             findNavController().navigate(destination)
         }
 
-        val onLongClickRename = {sheetIdNFolderId : SheetVisualizationDto, newName : String ->
-            libraryViewModel.renameSheet(sheetIdNFolderId.sheetId, sheetIdNFolderId.folderId, newName)
-            libraryViewModel.loadSheets()
-        }
-        val onDelete = { dto: SheetVisualizationDto ->
-            libraryViewModel.deleteSheet(dto.sheetId, dto.folderId)
-        }
-
-        adapter = SheetInFolderAdapter(sheetList, navigationFunction, onLongClickRename, onDelete, viewLifecycleOwner)
+        adapter = SheetInFolderAdapter(sheetList, navigationFunction, viewLifecycleOwner, libraryViewModel)
         binding.recyclerViewLibrary.adapter = adapter
         val itemTouchHelper = SheetItemToucherHelper.create(adapter, libraryViewModel, requireContext())
         itemTouchHelper.attachToRecyclerView(binding.recyclerViewLibrary)
