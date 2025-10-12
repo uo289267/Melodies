@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 import tfg.uniovi.melodies.entities.HistoryEntry
@@ -17,8 +18,7 @@ private const val USER_REPOSITORY = "UserRepository"
  * Handles the creation and initialization of user documents,
  * checking for existence, and setting up default folders and sheets.
  */
-class UsersFirestore {
-    private val db = Firebase.firestore
+class UsersFirestore (private val db: FirebaseFirestore = Firebase.firestore) {
     /**
      * Checks if a nickname is already taken in Firestore.
      *
