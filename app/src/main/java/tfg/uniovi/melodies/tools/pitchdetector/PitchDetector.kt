@@ -102,7 +102,7 @@ object PitchDetector {
      * @param frequency The frequency in Hz.
      * @return The corresponding note name and octave (e.g., `"F#3"`).
      */
-    private fun convertFrequencyToNote(frequency: Float): String {
+    internal fun convertFrequencyToNote(frequency: Float): String {
         val noteMultiplier = OCTAVE_MULTIPLIER.pow(1.0 / NOTES.size)
         val frequencyRelativeToKnownNote = frequency / KNOWN_NOTE_FREQUENCY
         val distanceFromKnownNote = round(log(frequencyRelativeToKnownNote, noteMultiplier)).toInt()

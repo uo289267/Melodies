@@ -29,8 +29,8 @@ class XMLParser() {
 
     private lateinit var musicxml: Document
     private val notes = mutableListOf<ScoreElement>()
-    private var quarterNoteDuration : Long? = null
-    private var divisionsPerQuarter: Int? = null
+    internal var quarterNoteDuration : Long? = null
+    internal var divisionsPerQuarter: Int? = null
 
 
     constructor(musicxml: Document) : this() {
@@ -49,7 +49,7 @@ class XMLParser() {
     fun parseAllNotes() {
         try {
             this.quarterNoteDuration = getQuarterNoteDurationMsFromMetronome()
-            this.divisionsPerQuarter = getDivisionsPerQuarter()
+            this.divisionsPerQuarter = fetchDivisionsPerQuarter()
 
             val notes: NodeList = musicxml.getElementsByTagName("note")
             val pendingRests = mutableListOf<Rest>()
@@ -113,7 +113,7 @@ class XMLParser() {
      *
      * @return Duration of a quarter note in milliseconds, or `null` if not found.
      */
-    private fun getQuarterNoteDurationMsFromMetronome(): Long? {
+    internal fun getQuarterNoteDurationMsFromMetronome(): Long? {
         val beatUnitMap = mapOf(
             "whole" to 4.0,
             "half" to 2.0,
@@ -158,7 +158,7 @@ class XMLParser() {
      *
      * @return Number of divisions per quarter note, or `null` if not found.
      */
-    private fun getDivisionsPerQuarter(): Int? {
+    internal fun fetchDivisionsPerQuarter(): Int? {
         val measures = musicxml.getElementsByTagName("measure")
         for (i in 0 until measures.length) {
             val measure = measures.item(i) as Element
@@ -179,7 +179,7 @@ class XMLParser() {
      * @param noteDuration Duration of the note in MusicXML divisions.
      * @return Duration in milliseconds.
      */
-    private fun calculateNoteDurationMs(
+    internal fun calculateNoteDurationMs(
         noteDuration: Int
     ): Int {
         return ((noteDuration.toDouble() / this.divisionsPerQuarter!!) * this.quarterNoteDuration!!).toInt()

@@ -35,6 +35,10 @@ class Rest(duration: Long)
         this.followingNote = followingNote
     }
 
+    fun getFollowingNote(): Note? {
+        return this.followingNote
+    }
+
     override fun toString(): String {
         return "Rest(${getDuration()} ms)"
     }
