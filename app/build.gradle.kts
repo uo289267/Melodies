@@ -69,6 +69,7 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.5")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
+    androidTestImplementation(libs.androidx.espresso.contrib)
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
     implementation("androidx.webkit:webkit:1.14.0")
     implementation ("com.caverock:androidsvg:1.4")
@@ -76,6 +77,8 @@ dependencies {
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.2.0")
     testImplementation("org.robolectric:robolectric:4.13")
     testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.9.10")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.7.0")
     testImplementation(kotlin("test"))
 
 

@@ -38,11 +38,15 @@ class Register : Fragment() {
         binding = FragmentRegisterBinding.inflate(inflater,container,false)
         binding.inputNickname.addTextChangedListener(userIdInputWatcher)
         registerViewModel = ViewModelProvider(this, RegisterViewModelProviderFactory())[RegisterViewModel::class.java]
-        registerViewModel.nickname.observe(viewLifecycleOwner){ userId ->
-            modifyNicknameEditText(binding.inputNickname, userId)
+        registerViewModel.nickname.observe(viewLifecycleOwner){ newName ->
+            modifyNicknameEditText(binding.inputNickname, newName)
         }
         binding.btnRegister.setOnClickListener{
-            registerViewModel.checkIfUserExists()
+            val currentNickname = binding.inputNickname.text.toString().trim()
+            if(currentNickname.isEmpty())
+                binding.layoutUserId.error = getString(R.string.login_wrong_blank_err)
+            else
+                registerViewModel.checkIfUserExists()
         }
         registerViewModel.userExists.observe(viewLifecycleOwner){ exists->
             if(exists)

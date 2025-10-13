@@ -335,7 +335,6 @@ object ShowAlertDialog {
                 button.isEnabled = false
                 progressBar.visibility = View.VISIBLE
 
-                // Observamos LiveData del ViewModel
                 viewModel.isNicknameAvailable(nickname).observe(lifecycleOwner) { result ->
                     when (result) {
                         is Result.Loading -> progressBar.visibility = View.VISIBLE

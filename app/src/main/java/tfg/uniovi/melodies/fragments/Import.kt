@@ -54,9 +54,12 @@ class Import : Fragment() {
                     try {
                         val doc = String2MusicXML.string2doc(xmlContent)
                         val parser = XMLParser(doc)
-                        importViewModel.addMusicXMLSheet(xmlContent,
-                            parser.findNameTitle(requireContext(),doc).substring(0, MAX_LENGTH_SHEET_NAME),
-                            parser.findAuthor(requireContext(),doc))
+                        val title = parser.findNameTitle(requireContext(), doc)
+                        val safeTitle = if (title.length > MAX_LENGTH_SHEET_NAME)
+                            title.substring(0, MAX_LENGTH_SHEET_NAME)
+                        else
+                            title
+                        importViewModel.addMusicXMLSheet(xmlContent, safeTitle, parser.findAuthor(requireContext(), doc))
                     } catch (e: Exception) {
                         ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(
                             requireContext(),
