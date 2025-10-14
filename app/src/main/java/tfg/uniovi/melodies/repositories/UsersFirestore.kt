@@ -163,6 +163,39 @@ class UsersFirestore (private val db: FirebaseFirestore = Firebase.firestore) {
             throw DBException("Unable to create user $nickname")
         }
     }
+    suspend fun deleteUserAndAllData(nickname: String) {
+        // Buscar el documento del usuario cuyo campo "nickname" coincida
+        val userQuery = db.collection("users")
+            .whereEqualTo("nickname", nickname)
+            .get()
+            .await()
+
+        if (userQuery.isEmpty) {
+            println("⚠️ No se encontró ningún usuario con nickname '$nickname'")
+            return
+        }
+
+        // Suponemos que el nickname es único → tomamos el primero
+        val userDoc = userQuery.documents.first()
+        val userRef = userDoc.reference
+
+        // Eliminar subcolección "folders" y sus "sheets"
+        val folders = userRef.collection("folders").get().await()
+        for (folder in folders.documents) {
+            val sheets = folder.reference.collection("sheets").get().await()
+            for (sheet in sheets.documents) {
+                sheet.reference.delete().await()
+            }
+            folder.reference.delete().await()
+        }
+
+        // Finalmente eliminar el documento del usuario
+        userRef.delete().await()
+
+        println("✅ Usuario '$nickname' y todos sus datos eliminados correctamente.")
+    }
+
+
 
     /**
      * Retrieves the 5 most recent HistoryEntries for the current user,

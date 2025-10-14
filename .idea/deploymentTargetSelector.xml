@@ -13,28 +13,20 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="NicknameTest">
+      <SelectionState runConfigName="importWithoutFoldersShowsAlertDialog()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="NicknameDecline">
+      <SelectionState runConfigName="DeleteSheetFromLibraryTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="NicknameEmpty">
+      <SelectionState runConfigName="DeleteSheetFromFullLibraryTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="NicknameTooLong">
+      <SelectionState runConfigName="DeleteSheetFromLibrarySwipeTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="NicknameUnable">
+      <SelectionState runConfigName="deleteFirstSheetWithSwipe()">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-10-13T16:12:09.528342Z">
-          <Target type="DEFAULT_BOOT">
-            <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=R52M8016B2X" />
-            </handle>
-          </Target>
-        </DropdownSelection>
-        <DialogSelection />
       </SelectionState>
     </selectionStates>
   </component>
