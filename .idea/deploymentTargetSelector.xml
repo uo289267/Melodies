@@ -13,19 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="importWithoutFoldersShowsAlertDialog()">
+      <SelectionState runConfigName="CreateFolderUnableTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="DeleteSheetFromLibraryTest">
+      <SelectionState runConfigName="RenameFolderSuccessTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="DeleteSheetFromFullLibraryTest">
+      <SelectionState runConfigName="RenameFolderEmptyTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="DeleteSheetFromLibrarySwipeTest">
+      <SelectionState runConfigName="RenameFolderUnableTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="deleteFirstSheetWithSwipe()">
+      <SelectionState runConfigName="RenameFolderTooLongTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

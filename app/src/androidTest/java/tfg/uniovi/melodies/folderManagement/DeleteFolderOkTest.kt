@@ -1,40 +1,33 @@
-package tfg.uniovi.melodies.sheetManagement
-
+package tfg.uniovi.melodies.folderManagement
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
+import androidx.test.espresso.action.ViewActions.longClick
 import androidx.test.espresso.action.ViewActions.replaceText
-import androidx.test.espresso.action.ViewActions.swipeLeft
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItem
-import androidx.test.espresso.contrib.RecyclerViewActions.scrollTo
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
-import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.Matchers.not
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import tfg.uniovi.melodies.MainActivity
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.repositories.UsersFirestore
 
-@LargeTest
-@RunWith(AndroidJUnit4::class)
-class DeleteSheetFromLibrarySwipeTest {
-
+class DeleteFolderOkTest {
     private lateinit var userRepository: UsersFirestore
     private lateinit var device: UiDevice
 
@@ -44,7 +37,7 @@ class DeleteSheetFromLibrarySwipeTest {
         runBlocking {
             val context = ApplicationProvider.getApplicationContext<Context>()
             userRepository = UsersFirestore()
-            userRepository.setupUserDataIfNeeded("delete", context)
+            userRepository.setupUserDataIfNeeded("deleteFolder", context)
         }
     }
 
@@ -52,9 +45,9 @@ class DeleteSheetFromLibrarySwipeTest {
     fun cleanup() {
         runBlocking {
             try {
-                userRepository.deleteUserAndAllData("delete")
+                userRepository.deleteUserAndAllData("deleteFolder")
             } catch (e: Exception) {
-                println("Error deleting test user: ${e.message}")
+                println("⚠️ Error deleting test user: ${e.message}")
             }
         }
     }
@@ -63,39 +56,43 @@ class DeleteSheetFromLibrarySwipeTest {
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     @Test
-    fun deleteFirstSheetWithSwipeWithoutScroll() {
-        // Log in with user "delete"
+    fun createAndDeleteFolder() {
+        val folderName = "Folder to Delete"
+
+        // Step 1: Log in
         onView(withId(R.id.input_nickname)).perform(
-            androidx.test.espresso.action.ViewActions.replaceText("delete"),
-            androidx.test.espresso.action.ViewActions.closeSoftKeyboard()
+            replaceText("deleteFolder"),
+            closeSoftKeyboard()
         )
         onView(withId(R.id.btnEnterPreviousAccount)).perform(click())
         Thread.sleep(1000)
         onView(withId(android.R.id.button1)).perform(click())
 
-        // Go to Full Library via bottom nav
-        onView(withId(R.id.fullLibrary)).perform(click())
-        Thread.sleep(1000)
+        // Step 2: Click FAB to create new folder
+        onView(withId(R.id.fab_add_new_folder)).perform(click())
+        onView(withId(R.id.folder_name_input))
+            .perform(replaceText(folderName), closeSoftKeyboard())
+        onView(withId(R.id.btn_create_folder)).perform(click())
 
-        // Use UiDevice to find the sheet by text
-        // Esperar a que aparezca el objeto
-        val sheet = device.wait(Until.findObject(By.text("Canción de Cuna")), 2000)
+        // Step 3: Wait for folder to appear
+        Thread.sleep(2000)
+        onView(withId(R.id.recyclerView))
+            .perform(
+                actionOnItem<RecyclerView.ViewHolder>(
+                    hasDescendant(withText(folderName)), longClick()
+                )
+            )
 
-        if (sheet != null) {
-            // Swipe left on the sheet
-            sheet.swipe(Direction.LEFT, 1.0f)  // Dirección LEFT, 1.0f es la distancia (100%)
+        // Step 4: Wait for the delete dialog
+        device.wait(Until.hasObject(By.textContains("Delete folder")), 2000)
 
-            // Wait for delete dialog
-            device.wait(Until.hasObject(By.textContains("Delete sheet")), 2000)
+        // Step 5: Click the "Delete folder" button
+        val deleteButton = device.findObject(By.textContains("Delete folder"))
+        deleteButton?.click()
 
-            // Click Delete sheet
-            device.findObject(By.textContains("Delete sheet"))?.click()
-
-            // Wait until it disappears
-            device.wait(Until.gone(By.text("Canción de Cuna")), 3000)
-        } else {
-            throw RuntimeException("Sheet 'Canción de Cuna' not found in Full Library")
-        }
+        // Step 6: Wait a bit and verify folder is gone
+        Thread.sleep(2000)
+        onView(withId(R.id.recyclerView))
+            .check(matches(not(hasDescendant(withText(folderName)))))
     }
-
 }

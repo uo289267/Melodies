@@ -41,7 +41,19 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-
+    packaging {
+        resources {
+            pickFirsts.addAll(
+                listOf(
+                    "META-INF/LICENSE.md",
+                    "META-INF/LICENSE",
+                    "META-INF/NOTICE.md",
+                    "META-INF/NOTICE",
+                    "META-INF/LICENSE-notice.md"
+                )
+            )
+        }
+    }
     testOptions {
         unitTests.all {
             it.useJUnitPlatform()
@@ -90,7 +102,7 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.5.2")
     androidTestImplementation("androidx.test:rules:1.7.0")
     androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
-
+    androidTestImplementation("io.mockk:mockk-android:1.13.5")
     testImplementation("io.mockk:mockk:1.13.5")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")

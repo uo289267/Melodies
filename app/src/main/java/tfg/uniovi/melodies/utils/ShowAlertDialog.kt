@@ -135,11 +135,11 @@ object ShowAlertDialog {
                     return@setOnClickListener
                 }
                 if (newName.isEmpty()) {
-                    input.error = context.getString(R.string.rename_nick_empty_err)
+                    input.error = context.getString(R.string.rename_empty_err)
                     return@setOnClickListener
                 }
                 if (newName.length > MAX_LENGTH_SHEET_NAME) {
-                    input.error = context.getString(R.string.rename_nick_length_err)
+                    input.error = context.getString(R.string.rename_length_err)
                     return@setOnClickListener
                 }
 

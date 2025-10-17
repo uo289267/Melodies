@@ -4,16 +4,15 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.longClick
-import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
-import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
-import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -26,12 +25,14 @@ import tfg.uniovi.melodies.repositories.UsersFirestore
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class DeleteSheetFromFullLibraryTest {
+class DeleteSheetSwipeOkTest {
 
     private lateinit var userRepository: UsersFirestore
+    private lateinit var device: UiDevice
 
     @Before
     fun setup() {
+        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         runBlocking {
             val context = ApplicationProvider.getApplicationContext<Context>()
             userRepository = UsersFirestore()
@@ -45,7 +46,7 @@ class DeleteSheetFromFullLibraryTest {
             try {
                 userRepository.deleteUserAndAllData("delete")
             } catch (e: Exception) {
-                println("⚠️ Error deleting test user: ${e.message}")
+                println("Error deleting test user: ${e.message}")
             }
         }
     }
@@ -54,25 +55,39 @@ class DeleteSheetFromFullLibraryTest {
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     @Test
-    fun deleteSheetFromFullLibrary() {
-        // Step 1: Log in as "delete"
-        onView(withId(R.id.input_nickname)).perform(replaceText("delete"), closeSoftKeyboard())
+    fun deleteFirstSheetWithSwipeWithoutScroll() {
+        // Log in with user "delete"
+        onView(withId(R.id.input_nickname)).perform(
+            androidx.test.espresso.action.ViewActions.replaceText("delete"),
+            androidx.test.espresso.action.ViewActions.closeSoftKeyboard()
+        )
         onView(withId(R.id.btnEnterPreviousAccount)).perform(click())
         Thread.sleep(1000)
         onView(withId(android.R.id.button1)).perform(click())
 
-        // Step 2: Go to FullLibrary tab via Bottom Navigation
+        // Go to Full Library via bottom nav
         onView(withId(R.id.fullLibrary)).perform(click())
+        Thread.sleep(1000)
 
-        // Step 3: Long click on "Canción de Cuna"
-        onView(withText("Canción de Cuna")).perform(longClick())
+        // Use UiDevice to find the sheet by text
+        // Esperar a que aparezca el objeto
+        val sheet = device.wait(Until.findObject(By.text("Canción de Cuna")), 2000)
 
-        // Step 4: Click "Delete sheet" in the dialog
-        onView(withText(R.string.delete_btn)).perform(click())
+        if (sheet != null) {
+            // Swipe left on the sheet
+            sheet.swipe(Direction.LEFT, 1.0f)  // Dirección LEFT, 1.0f es la distancia (100%)
 
-        // Step 5: Verify that "Canción de Cuna" no longer exists
-        Thread.sleep(2000)
-        onView(withText("Canción de Cuna")).check(doesNotExist())
+            // Wait for delete dialog
+            device.wait(Until.hasObject(By.textContains("OK")), 2000)
 
+            // Click Delete sheet
+            device.findObject(By.textContains("OK"))?.click()
+
+            // Wait until it disappears
+            device.wait(Until.gone(By.text("Canción de Cuna")), 3000)
+        } else {
+            throw RuntimeException("Sheet 'Canción de Cuna' not found in Full Library")
+        }
     }
+
 }
