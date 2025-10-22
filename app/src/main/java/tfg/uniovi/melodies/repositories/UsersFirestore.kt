@@ -132,6 +132,9 @@ class UsersFirestore (private val db: FirebaseFirestore = Firebase.firestore) {
                 return null //the user has already been created
             }
         }
+        if(nicknameExists(nickname)){
+            return null
+        }
 
         return try {
             val userRef = db.collection("users").document() // ID automático

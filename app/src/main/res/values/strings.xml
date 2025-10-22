@@ -68,7 +68,7 @@
     <string name="delete_confirm"> Folder was deleted</string>
     <string name="enter">Enter</string>
     <string name="upload">Upload</string>
-    <string name="copy_to_clipboard">copy to clipboard</string>
+    <string name="rename_btn">change nickname</string>
     <string name="folder">folder</string>
     <string name="folder_color">folder color</string>
     <string name="melodies">MELODIES</string>

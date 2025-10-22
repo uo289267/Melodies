@@ -21,6 +21,7 @@ class XMLParserTests {
         val note = notes[0] as Note
         assertEquals('C', note.name)
         assertEquals(5, note.octave)
+
         assertEquals(false, note.sharp)
     }
 

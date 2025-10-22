@@ -13,19 +13,13 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="CreateFolderUnableTest">
+      <SelectionState runConfigName="Tests in 'tfg.uniovi.melodies'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="RenameFolderSuccessTest">
+      <SelectionState runConfigName="RenameSheetFromLibraryTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="RenameFolderEmptyTest">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="RenameFolderUnableTest">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="RenameFolderTooLongTest">
+      <SelectionState runConfigName="LogInNicknameEmpty">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

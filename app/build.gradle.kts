@@ -55,6 +55,8 @@ android {
         }
     }
     testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+        animationsDisabled = true
         unitTests.all {
             it.useJUnitPlatform()
         }
@@ -99,7 +101,8 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.contrib){
         exclude(group = "com.google.protobuf", module = "protobuf-lite")
     }
-    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestUtil("androidx.test:orchestrator:1.6.1")
+    androidTestImplementation("androidx.test:runner:1.7.0")
     androidTestImplementation("androidx.test:rules:1.7.0")
     androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
     androidTestImplementation("io.mockk:mockk-android:1.13.5")
