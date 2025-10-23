@@ -1,3 +1,5 @@
+import org.gradle.internal.classpath.Instrumented.systemProperty
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -18,14 +20,40 @@ android {
 
         buildFeatures {
             viewBinding = true
+            buildConfig = true
         }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    flavorDimensions += "environment"
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            // CLAVE: Definir la variable ENVIRONMENT para este flavor
+            buildConfigField("String", "ENVIRONMENT", "\"dev\"")
+        }
 
+        // Entorno de Staging (staging)
+        create("staging") {
+            dimension = "environment"
+            // CLAVE: Definir la variable ENVIRONMENT como "test"
+            buildConfigField("String", "ENVIRONMENT", "\"test\"")
+        }
+
+        // Entorno de Producción (prod)
+        create("prod") {
+            dimension = "environment"
+            // CLAVE: Definir la variable ENVIRONMENT como "prod"
+            buildConfigField("String", "ENVIRONMENT", "\"prod\"")
+        }
+    }
     buildTypes {
-        release {
+        debug{
             isMinifyEnabled = false
+        }
+        release {
+            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -85,6 +113,7 @@ dependencies {
 
     // --- Fuerza la versión correcta de protobuf ---
     implementation("com.google.protobuf:protobuf-javalite:3.25.1")
+    implementation(libs.mockk.agent.android)
     androidTestImplementation("com.google.protobuf:protobuf-javalite:3.25.1")
 
     // --- Librerías de terceros ---

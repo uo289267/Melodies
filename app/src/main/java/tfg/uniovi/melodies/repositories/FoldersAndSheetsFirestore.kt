@@ -14,6 +14,7 @@ import tfg.uniovi.melodies.entities.HistoryEntry
 import tfg.uniovi.melodies.entities.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.viewmodels.FolderDTO
 import tfg.uniovi.melodies.fragments.viewmodels.MusicXMLDTO
+import tfg.uniovi.melodies.repositories.config.FirestoreConfig
 
 private const val FIRESTORE = "FIRESTORE"
 
@@ -25,7 +26,8 @@ private const val FIRESTORE = "FIRESTORE"
 class FoldersAndSheetsFirestore (private val userId: String,
                                  private val usersCollection: CollectionReference? = null ){
 
-    private val usersColl: CollectionReference = usersCollection ?: Firebase.firestore.collection("users")
+    private val usersColl: CollectionReference = usersCollection ?: Firebase.firestore.collection(
+        FirestoreConfig.getUsersCollectionName())
 
 
     /**
