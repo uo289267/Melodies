@@ -1,4 +1,4 @@
-package tfg.uniovi.melodies.entities
+package tfg.uniovi.melodies.model
 
 import org.w3c.dom.Document
 import tfg.uniovi.melodies.utils.parser.String2MusicXML

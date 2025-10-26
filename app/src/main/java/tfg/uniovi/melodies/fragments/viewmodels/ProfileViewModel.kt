@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import tfg.uniovi.melodies.entities.HistoryEntry
+import tfg.uniovi.melodies.model.HistoryEntry
 import tfg.uniovi.melodies.repositories.UsersFirestore
 
 class ProfileViewModelProviderFactory: ViewModelProvider.Factory {

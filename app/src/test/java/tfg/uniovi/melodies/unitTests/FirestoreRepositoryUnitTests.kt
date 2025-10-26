@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import tfg.uniovi.melodies.entities.Colors
-import tfg.uniovi.melodies.entities.HistoryEntry
+import tfg.uniovi.melodies.model.Colors
+import tfg.uniovi.melodies.model.HistoryEntry
 import tfg.uniovi.melodies.fragments.viewmodels.FolderDTO
 import tfg.uniovi.melodies.fragments.viewmodels.MusicXMLDTO
 import tfg.uniovi.melodies.preferences.PreferenceManager

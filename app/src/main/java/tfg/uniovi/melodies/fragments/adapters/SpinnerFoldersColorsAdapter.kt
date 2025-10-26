@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getString
 import tfg.uniovi.melodies.R
-import tfg.uniovi.melodies.entities.Colors
+import tfg.uniovi.melodies.model.Colors
 
 class SpinnerFoldersColorsAdapter (context: Context, private val folderColors : List<Triple<Int,Int, Colors>>):
     ArrayAdapter<Triple<Int, Int, Colors>>(context,0,folderColors) {

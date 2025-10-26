@@ -1,4 +1,4 @@
-package tfg.uniovi.melodies.entities.notes.interfaces
+package tfg.uniovi.melodies.model.notes.interfaces
 
 /**
  * Interface that allows to compare Notes data to check it is the same note

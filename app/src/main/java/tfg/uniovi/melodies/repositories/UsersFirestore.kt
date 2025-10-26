@@ -7,7 +7,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
-import tfg.uniovi.melodies.entities.HistoryEntry
+import tfg.uniovi.melodies.model.HistoryEntry
 import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.repositories.config.FirestoreConfig
 

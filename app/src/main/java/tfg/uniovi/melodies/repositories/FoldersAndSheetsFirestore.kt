@@ -8,10 +8,10 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
-import tfg.uniovi.melodies.entities.Colors
-import tfg.uniovi.melodies.entities.Folder
-import tfg.uniovi.melodies.entities.HistoryEntry
-import tfg.uniovi.melodies.entities.MusicXMLSheet
+import tfg.uniovi.melodies.model.Colors
+import tfg.uniovi.melodies.model.Folder
+import tfg.uniovi.melodies.model.HistoryEntry
+import tfg.uniovi.melodies.model.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.viewmodels.FolderDTO
 import tfg.uniovi.melodies.fragments.viewmodels.MusicXMLDTO
 import tfg.uniovi.melodies.repositories.config.FirestoreConfig

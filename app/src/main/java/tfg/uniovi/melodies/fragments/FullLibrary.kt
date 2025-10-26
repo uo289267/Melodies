@@ -19,7 +19,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentFullLibraryBinding
-import tfg.uniovi.melodies.entities.Folder
+import tfg.uniovi.melodies.model.Folder
 import tfg.uniovi.melodies.fragments.adapters.FolderInFullLibraryAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.FullLibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.FullLibraryViewModelProviderFactory

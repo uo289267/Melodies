@@ -6,9 +6,9 @@ import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.NodeList
 import tfg.uniovi.melodies.R
-import tfg.uniovi.melodies.entities.notes.Note
-import tfg.uniovi.melodies.entities.notes.interfaces.ScoreElement
-import tfg.uniovi.melodies.entities.notes.Rest
+import tfg.uniovi.melodies.model.notes.Note
+import tfg.uniovi.melodies.model.notes.interfaces.ScoreElement
+import tfg.uniovi.melodies.model.notes.Rest
 /**
  * Parser for MusicXML documents that extracts notes and metadata.
  *

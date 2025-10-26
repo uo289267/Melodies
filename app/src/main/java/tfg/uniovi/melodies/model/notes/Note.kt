@@ -1,7 +1,7 @@
-package tfg.uniovi.melodies.entities.notes
+package tfg.uniovi.melodies.model.notes
 
-import tfg.uniovi.melodies.entities.notes.abstractClasses.ScoreElementAbstract
-import tfg.uniovi.melodies.entities.notes.interfaces.NoteComparable
+import tfg.uniovi.melodies.model.notes.abstractClasses.ScoreElementAbstract
+import tfg.uniovi.melodies.model.notes.interfaces.NoteComparable
 /**
  * Represents a musical note in a score.
  * Stores its duration, name (pitch class), octave, and whether it is sharp.

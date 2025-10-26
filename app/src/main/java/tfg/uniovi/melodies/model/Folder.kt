@@ -1,4 +1,4 @@
-package tfg.uniovi.melodies.entities
+package tfg.uniovi.melodies.model
 
 /**
  * Represents a folder entity used to organize scores or other musical sheets.

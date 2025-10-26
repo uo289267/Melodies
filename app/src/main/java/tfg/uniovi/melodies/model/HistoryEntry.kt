@@ -1,4 +1,4 @@
-package tfg.uniovi.melodies.entities
+package tfg.uniovi.melodies.model
 
 class HistoryEntry (
     val nameOfSheet: String,

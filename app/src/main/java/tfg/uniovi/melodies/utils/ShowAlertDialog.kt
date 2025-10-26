@@ -9,7 +9,7 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LifecycleOwner
 import tfg.uniovi.melodies.R
-import tfg.uniovi.melodies.entities.MusicXMLSheet
+import tfg.uniovi.melodies.model.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.MAX_LENGTH_FOLDER_NAME
 import tfg.uniovi.melodies.fragments.MAX_LENGTH_SHEET_NAME
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel

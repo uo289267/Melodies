@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import tfg.uniovi.melodies.R
-import tfg.uniovi.melodies.entities.Folder
+import tfg.uniovi.melodies.model.Folder
 
 private const val MAX_CHARS_SHOWN = 13
 

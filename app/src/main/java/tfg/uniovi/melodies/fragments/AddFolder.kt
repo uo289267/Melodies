@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentAddFolderBinding
-import tfg.uniovi.melodies.entities.Colors
+import tfg.uniovi.melodies.model.Colors
 import tfg.uniovi.melodies.fragments.adapters.SpinnerFoldersColorsAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.AddFolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.AddFolderViewModelProviderFactory

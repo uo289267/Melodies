@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
-import tfg.uniovi.melodies.entities.HistoryEntry
+import tfg.uniovi.melodies.model.HistoryEntry
 
 class HistoryEntryAdapter(private val entries: List<HistoryEntry>) :
     RecyclerView.Adapter<HistoryEntryAdapter.HistoryViewHolder>() {

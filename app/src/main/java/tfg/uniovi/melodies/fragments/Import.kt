@@ -18,7 +18,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentImportBinding
-import tfg.uniovi.melodies.entities.Folder
+import tfg.uniovi.melodies.model.Folder
 import tfg.uniovi.melodies.fragments.adapters.SpinnerFoldersAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.ImportViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.ImportViewModelProviderFactory

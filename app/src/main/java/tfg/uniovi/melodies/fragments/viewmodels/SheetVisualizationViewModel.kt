@@ -9,9 +9,9 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import tfg.uniovi.melodies.entities.HistoryEntry
-import tfg.uniovi.melodies.entities.MusicXMLSheet
-import tfg.uniovi.melodies.entities.notes.interfaces.ScoreElement
+import tfg.uniovi.melodies.model.HistoryEntry
+import tfg.uniovi.melodies.model.MusicXMLSheet
+import tfg.uniovi.melodies.model.notes.interfaces.ScoreElement
 import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
 import tfg.uniovi.melodies.tools.pitchdetector.SheetChecker2
 import tfg.uniovi.melodies.utils.parser.XMLParser

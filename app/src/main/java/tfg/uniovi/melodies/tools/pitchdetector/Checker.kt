@@ -3,8 +3,8 @@ package tfg.uniovi.melodies.tools.pitchdetector
 
 
 import android.util.Log
-import tfg.uniovi.melodies.entities.notes.NoteDominant
-import tfg.uniovi.melodies.entities.notes.interfaces.ScoreElement
+import tfg.uniovi.melodies.model.notes.NoteDominant
+import tfg.uniovi.melodies.model.notes.interfaces.ScoreElement
 import tfg.uniovi.melodies.utils.parser.XMLParser
 
 private const val DURATION_PERCENTAGE = 0.95

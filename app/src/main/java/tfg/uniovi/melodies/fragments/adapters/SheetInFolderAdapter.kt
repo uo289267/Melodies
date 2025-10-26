@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
-import tfg.uniovi.melodies.entities.MusicXMLSheet
+import tfg.uniovi.melodies.model.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.adapters.viewHolders.SheetInFolderViewHolder
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto

@@ -30,8 +30,8 @@ import com.caverock.androidsvg.SVGExternalFileResolver
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentSheetVisualizationBinding
-import tfg.uniovi.melodies.entities.HistoryEntry
-import tfg.uniovi.melodies.entities.MusicXMLSheet
+import tfg.uniovi.melodies.model.HistoryEntry
+import tfg.uniovi.melodies.model.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.viewmodels.CHECK
 import tfg.uniovi.melodies.fragments.viewmodels.NoteCheckingState
 import tfg.uniovi.melodies.fragments.viewmodels.PAGING

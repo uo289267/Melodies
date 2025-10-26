@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
-import tfg.uniovi.melodies.entities.Folder
+import tfg.uniovi.melodies.model.Folder
 import tfg.uniovi.melodies.fragments.adapters.viewHolders.FolderViewHolder
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
 
