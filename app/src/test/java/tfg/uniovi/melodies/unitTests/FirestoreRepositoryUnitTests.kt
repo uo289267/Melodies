@@ -6,6 +6,8 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.*
 import io.mockk.*
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -26,7 +28,7 @@ import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
 import tfg.uniovi.melodies.repositories.UsersFirestore
 import kotlin.test.assertFailsWith
 
-
+//change active build variant to stagingDebug
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @RunWith(RobolectricTestRunner::class)
 class FirestoreRepositoryUnitTests {
@@ -57,7 +59,7 @@ class FirestoreRepositoryUnitTests {
         every { mockUsersCollection.document("userId") } returns mockUserDoc
 
         mockDb = mockk()
-        every { mockDb.collection("users") } returns mockUsersCollection
+        every { mockDb.collection("users_test") } returns mockUsersCollection
 
         userRepo = UsersFirestore(mockDb)
         repo = FoldersAndSheetsFirestore("userId", mockUsersCollection)
@@ -100,6 +102,30 @@ class FirestoreRepositoryUnitTests {
 
         every { mockSheets.document(sheetId) } returns mockDocRef
     }
+    private fun mockUserNickname(
+        nickname: String,
+        exists: Boolean
+    ) {
+        val mockQuery = mockk<Query>()
+        val mockQuerySnapshot = mockk<QuerySnapshot>()
+
+        // Mock de la colección "users" y la query
+        every { mockUsersCollection.whereEqualTo("nickname", nickname) } returns mockQuery
+        every { mockQuery.get() } returns Tasks.forResult(mockQuerySnapshot)
+
+        // Mock del resultado de la query
+        every { mockQuerySnapshot.isEmpty } returns !exists
+
+        if (exists) {
+            val mockDoc = mockk<QueryDocumentSnapshot>()
+            every { mockDoc.data } returns mutableMapOf("nickname" to nickname) as Map<String, Any>
+            every { mockQuerySnapshot.documents } returns listOf(mockDoc)
+        } else {
+            every { mockQuerySnapshot.documents } returns emptyList()
+        }
+    }
+
+
     /*Get Folder by Id*/
 
     @Test
@@ -1031,7 +1057,7 @@ class FirestoreRepositoryUnitTests {
 
         // Mock del documento de usuario y colección users
         every { mockUsersCollection.document("userId") } returns mockUserDoc
-        every { mockDb.collection("users") } returns mockUsersCollection
+        every { mockDb.collection("users_test") } returns mockUsersCollection
 
         val userRepo = UsersFirestore(mockDb)
         val entries = userRepo.getAllHistoryEntries("userId")
@@ -1062,7 +1088,7 @@ class FirestoreRepositoryUnitTests {
         every { mockUserDoc.collection("historyEntries") } returns mockHistoryColl
 
         every { mockUsersCollection.document("userId") } returns mockUserDoc
-        every { mockDb.collection("users") } returns mockUsersCollection
+        every { mockDb.collection("users_test") } returns mockUsersCollection
 
         val repo = UsersFirestore(mockDb)
         val entries = repo.getAllHistoryEntries("userId")
@@ -1076,7 +1102,7 @@ class FirestoreRepositoryUnitTests {
         val mockUsersCollection = mockk<CollectionReference>()
 
         // Configuramos que la llamada a document() lance una excepción
-        every { mockDb.collection("users") } returns mockUsersCollection
+        every { mockDb.collection("users_test") } returns mockUsersCollection
         every { mockUsersCollection.document("userId") } throws RuntimeException("Firestore failure")
 
         val userRepo = UsersFirestore(mockDb)
@@ -1107,7 +1133,7 @@ class FirestoreRepositoryUnitTests {
         every { mockQuery.get() } returns Tasks.forResult(querySnapshot)
         every { mockQuery.limit(1) } returns mockQuery
         every { mockUsersCollection.whereEqualTo("nickname", nickname) } returns mockQuery
-        every { mockDb.collection("users") } returns mockUsersCollection
+        every { mockDb.collection("users_test") } returns mockUsersCollection
 
         val repo = UsersFirestore(mockDb)
         val result = repo.nicknameExists(nickname)
@@ -1130,7 +1156,7 @@ class FirestoreRepositoryUnitTests {
         every { mockQuery.get() } returns Tasks.forResult(querySnapshot)
         every { mockQuery.limit(1) } returns mockQuery
         every { mockUsersCollection.whereEqualTo("nickname", nickname) } returns mockQuery
-        every { mockDb.collection("users") } returns mockUsersCollection
+        every { mockDb.collection("users_test") } returns mockUsersCollection
 
         val result = userRepo.nicknameExists(nickname)
 
@@ -1145,7 +1171,7 @@ class FirestoreRepositoryUnitTests {
         val mockDb = mockk<FirebaseFirestore>()
         val mockUsersCollection = mockk<CollectionReference>()
 
-        every { mockDb.collection("users") } returns mockUsersCollection
+        every { mockDb.collection("users_test") } returns mockUsersCollection
         every { mockUsersCollection.whereEqualTo("nickname", nickname) } throws RuntimeException("Firestore failure")
 
         val result = userRepo.nicknameExists(nickname)
@@ -1256,17 +1282,34 @@ class FirestoreRepositoryUnitTests {
         assertEquals(null, result)
         verify(exactly = 0) { mockDb.collection(any()) }
     }
+
+    @Test
+    fun setupUserDataIfNeededReturnsNullIfNicknameExists() = runTest {
+        val userRepo = spyk(UsersFirestore(mockDb)) // spyk permite usar código real + mocks internos
+
+        every { PreferenceManager.getUserId(mockContext) } returns null
+        coEvery { userRepo.nicknameExists("nickname") } returns true
+
+        val result = userRepo.setupUserDataIfNeeded("nickname", mockContext)
+        assertEquals(null, result)
+
+    }
     @Test
     fun `setupUserDataIfNeeded creates user successfully`() = runTest {
+        // 🔹 Mock SharedPreferences
         val mockPrefs = mockk<SharedPreferences>()
         val mockEditor = mockk<SharedPreferences.Editor>()
-
         every { mockContext.getSharedPreferences(any(), any()) } returns mockPrefs
         every { mockPrefs.edit() } returns mockEditor
         every { mockEditor.putString(any(), any()) } returns mockEditor
         every { mockEditor.apply() } just Runs
         every { mockPrefs.getString(any(), any()) } returns null
 
+        // 🔹 Mock FieldValue.serverTimestamp() de forma relajada
+        mockkStatic(FieldValue::class)
+        every { FieldValue.serverTimestamp() } returns mockk(relaxed = true)
+
+        // 🔹 Mock Firestore
         val mockDb = mockk<FirebaseFirestore>()
         val mockUserRef = mockk<DocumentReference>()
         val mockFolderRef = mockk<DocumentReference>()
@@ -1281,24 +1324,29 @@ class FirestoreRepositoryUnitTests {
         val folderSlot = slot<Map<String, Any>>()
         val addedSheets = mutableListOf<Map<String, Any>>()
 
-        every { mockDb.collection("users") } returns mockk {
+        // 🔹 Users collection
+        every { mockDb.collection("users_test") } returns mockk {
             every { document() } returns mockUserRef
         }
         every { mockUserRef.id } returns "user123"
         every { mockUserRef.set(capture(userSlot)) } returns Tasks.forResult(null)
         every { mockUserRef.collection("folders") } returns mockFoldersColl
+
+        // 🔹 Folders collection
         every { mockFoldersColl.document() } returns mockFolderRef
         every { mockFolderRef.set(capture(folderSlot)) } returns Tasks.forResult(null)
         every { mockFolderRef.collection("sheets") } returns mockSheetsColl
+
+        // 🔹 Sheets collection
         every { mockSheetsColl.add(any()) } answers {
-            val data = firstArg<Map<String, Any>>()
-            addedSheets.add(data)
-            Tasks.forResult(mockk()) // Task result not null
+            addedSheets.add(firstArg())
+            Tasks.forResult(mockk())
         }
 
+        // 🔹 Default sheets collection
         every { mockDb.collection("defaultSheets") } returns mockDefaultSheetsColl
         every { mockDefaultSheetsColl.get() } returns Tasks.forResult(mockQuerySnapshot)
-        every { mockQuerySnapshot.iterator() } returns mutableListOf(mockSheetDoc1, mockSheetDoc2).iterator()
+        every { mockQuerySnapshot.iterator() } returns listOf(mockSheetDoc1, mockSheetDoc2).iterator() as MutableIterator<QueryDocumentSnapshot>
         every { mockSheetDoc1.data } returns mapOf(
             "name" to "Sheet One",
             "musicxml" to "<score-partwise>...</score-partwise>",
@@ -1310,9 +1358,14 @@ class FirestoreRepositoryUnitTests {
             "author" to "Author2"
         )
 
-        val repo = UsersFirestore(mockDb)
+        // 🔹 Spyk del repo y mock de nicknameExists()
+        val repo = spyk(UsersFirestore(mockDb))
+        coEvery { repo.nicknameExists("nickname123") } returns false
+
+        // 🔹 Ejecutamos la función real
         val userId = repo.setupUserDataIfNeeded("nickname123", mockContext)
 
+        // 🔹 Verificaciones
         assertEquals("user123", userId)
 
         // User data
@@ -1324,15 +1377,19 @@ class FirestoreRepositoryUnitTests {
         assertEquals("YELLOW", folderSlot.captured["color"])
         assertTrue(folderSlot.captured.containsKey("creationTime"))
 
-        // Sheets added
+        // Sheets añadidas
         assertEquals(2, addedSheets.size)
         assertTrue(addedSheets.any { it["name"] == "Sheet One" && it["author"] == "Author1" })
         assertTrue(addedSheets.any { it["name"] == "Sheet Two" && it["author"] == "Author2" })
 
-        // Verify SharedPreferences write
+        // Verificamos SharedPreferences
         verify { mockEditor.putString("user_id", "user123") }
         verify { mockEditor.apply() }
     }
+
+
+
+
 
 
 
@@ -1342,7 +1399,7 @@ class FirestoreRepositoryUnitTests {
 
         val mockUserDoc = mockk<DocumentReference>()
         every { mockUserDoc.id } returns "newUserId"
-        every { mockDb.collection("users").document() } returns mockUserDoc
+        every { mockDb.collection("users_test").document() } returns mockUserDoc
         every { mockUserDoc.set(any<Map<String, Any>>()) } returns Tasks.forException(RuntimeException("Firestore error"))
 
         assertFailsWith<DBException> {

@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.model.MusicXMLSheet
@@ -172,6 +173,9 @@ object ShowAlertDialog {
         }
 
         dialog.show()
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL)?.setTextColor(
+            ContextCompat.getColor(context, R.color.md_theme_error)
+        )
     }
     /**
      * Shows a dialog to rename a folder.
@@ -208,7 +212,7 @@ object ShowAlertDialog {
         input.setSelection(currentFolderName?.length ?: 0)
 
         val builder = AlertDialog.Builder(context)
-            .setTitle(titleRes)
+            .setTitle("$titleRes $currentFolderName")
             .setMessage(messageRes)
             .setView(dialogView)
             .setPositiveButton(android.R.string.ok, null)
@@ -265,6 +269,9 @@ object ShowAlertDialog {
         }
 
         dialog.show()
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL)?.setTextColor(
+            ContextCompat.getColor(context, R.color.md_theme_error)
+        )
     }
     /**
      * Shows a dialog to input a new nickname for the user.

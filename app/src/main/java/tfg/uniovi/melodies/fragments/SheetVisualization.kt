@@ -131,6 +131,7 @@ class SheetVisualization : Fragment() {
                             getString(R.string.sheet_visualization_invalid_xml_msg),
                             PARSING,
                             "alert dialog showed because xml missing attributes and/or elements")
+                            sheetVisualizationViewModel.updateNoteCheckingState(NoteCheckingState.NOT_AVAILABLE)
                     }
                     val encondedXML =
                         Base64.encodeToString(it.stringSheet.toByteArray(), Base64.NO_WRAP)

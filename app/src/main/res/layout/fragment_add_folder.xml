@@ -14,7 +14,7 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/arrow_back"
+        app:navigationIcon="@drawable/back"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:title="@string/new_folder" />
     <com.google.android.material.textfield.TextInputLayout
@@ -23,7 +23,12 @@
         android:layout_width="400dp"
         android:layout_height="wrap_content"
         android:hint="@string/folder_s_name"
-        app:layout_constraintStart_toStartOf="parent"
+        app:boxBackgroundMode="outline"
+        app:boxStrokeColor="@color/md_theme_primary"
+        app:boxStrokeWidth="2dp"
+        app:boxStrokeWidthFocused="2dp"
+        app:boxStrokeErrorColor="@color/md_theme_error"
+    app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 

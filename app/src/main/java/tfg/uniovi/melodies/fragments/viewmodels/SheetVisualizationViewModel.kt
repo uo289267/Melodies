@@ -32,8 +32,8 @@ private const val PAGES = "PAGES"
 const val PAGING = "PAGING"
 const val CHECK = "CHECK"
 
-private const val COLOR_FOR_WRONG = "#FF0000" //red
-private const val COLOR_FOR_RIGHT = "#00FF00" //green
+private const val COLOR_FOR_WRONG = "#ed6b11"  //"#FF0000" //red
+private const val COLOR_FOR_RIGHT = "#C7C8CA"//"#00FF00" //green
 
 private const val PAGE_COMPLETION = "PAGE_COMPLETION"
 private const val SHEET_VISUALIZER = "SheetVisualizer"
@@ -116,7 +116,7 @@ class SheetVisualizationViewModel(
                     currentNoteIndex = it.first
             }
             _shouldNavigateToNextPage.postValue(false)
-            if(noteCheckingState.value!= NoteCheckingState.CHECKING )
+            if(noteCheckingState.value == NoteCheckingState.NONE )
                 checkNextNote()
         }
     }
@@ -213,9 +213,11 @@ class SheetVisualizationViewModel(
                     }
                     }
                 }
-            _elapsedTimeMs.postValue(System.currentTimeMillis() - startTime)
-            _noteCheckingState.postValue(NoteCheckingState.FINISHED)
-            Log.d(CHECK, "All notes finished! Total: ${_elapsedTimeMs.value?.div(1000.0)} segundos")
+            if(!_noteCheckingState.equals(NoteCheckingState.NONE)){
+                _elapsedTimeMs.postValue(System.currentTimeMillis() - startTime)
+                _noteCheckingState.postValue(NoteCheckingState.FINISHED)
+                Log.d(CHECK, "All notes finished! Total: ${_elapsedTimeMs.value?.div(1000.0)} segundos")
+            }
         }
     }
 
@@ -281,11 +283,10 @@ class SheetVisualizationViewModel(
             sheetBD.saveNewHistoryEntry(historyEntry)
         }
     }
-
 }
 
 enum class NoteCheckingState {
-    CHECKING, FINISHED, NONE
+    CHECKING, FINISHED, NONE, NOT_AVAILABLE
 }
 
 class SheetVisualizationDto (

@@ -15,7 +15,7 @@
         app:layout_constraintBottom_toTopOf="@+id/recycler_view_full_library"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/arrow_back"
+        app:navigationIcon="@drawable/back"
 
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:title="Library" />

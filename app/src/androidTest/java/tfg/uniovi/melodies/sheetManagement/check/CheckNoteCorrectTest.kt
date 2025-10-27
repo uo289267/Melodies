@@ -128,7 +128,7 @@ class CheckNoteCorrectTest {
             assertNotNull("SVG should not be null", svgContent)
             assertTrue("SVG should contain <svg>", svgContent!!.contains("<svg"))
             assertTrue("SVG should contain paths or groups", svgContent.contains("<path") || svgContent.contains("<g"))
-            assertTrue("SVG should contain green when note is correct", svgContent.contains("#00FF00"))
+            assertTrue("SVG should contain green when note is correct", svgContent.contains("#C7C8CA"))
 
         }
     }

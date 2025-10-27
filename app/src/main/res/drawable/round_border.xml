@@ -2,10 +2,10 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape>
-            <solid android:color="@color/white" /> <!-- Background color -->
+            <solid android:color="@color/md_theme_background" /> <!-- Background color -->
             <stroke
                 android:width="2dp"
-                android:color="@color/white" /> <!-- Border color -->
+                android:color="@color/md_theme_background" /> <!-- Border color -->
             <corners android:radius="8dp" /> <!-- Makes it round -->
         </shape>
     </item>
