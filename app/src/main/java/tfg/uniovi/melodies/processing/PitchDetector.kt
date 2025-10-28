@@ -1,4 +1,4 @@
-package tfg.uniovi.melodies.tools.pitchdetector
+package tfg.uniovi.melodies.processing
 
 import be.tarsos.dsp.AudioDispatcher
 import be.tarsos.dsp.io.android.AudioDispatcherFactory
@@ -7,7 +7,7 @@ import be.tarsos.dsp.pitch.PitchProcessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.getLastDetectedNote
+import tfg.uniovi.melodies.processing.PitchDetector.getLastDetectedNote
 import kotlin.math.log
 import kotlin.math.pow
 import kotlin.math.round
@@ -65,10 +65,8 @@ object PitchDetector {
             if (result.pitch != -1f) {
                 val pitchInHz = result.pitch
                 lastDetectedNote = convertFrequencyToNote(pitchInHz)
-                //Log.d("PITCH","Frecuencia: $pitchInHz Hz, Nota: $lastDetectedNote")
             }else{
                 lastDetectedNote = SILENCE
-                //Log.d("PITCH","SILENCE...")
             }
         }
 

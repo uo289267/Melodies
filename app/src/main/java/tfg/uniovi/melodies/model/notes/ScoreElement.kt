@@ -1,6 +1,6 @@
-package tfg.uniovi.melodies.model.notes.interfaces
+package tfg.uniovi.melodies.model.notes
 
-import tfg.uniovi.melodies.model.notes.NoteDominant
+import tfg.uniovi.melodies.model.notes.comparables.NoteDominant
 
 interface ScoreElement {
     fun check(noteToCheck: NoteDominant?): Boolean

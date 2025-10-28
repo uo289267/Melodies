@@ -11,10 +11,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import tfg.uniovi.melodies.model.HistoryEntry
 import tfg.uniovi.melodies.model.MusicXMLSheet
-import tfg.uniovi.melodies.model.notes.interfaces.ScoreElement
+import tfg.uniovi.melodies.model.notes.ScoreElement
 import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
-import tfg.uniovi.melodies.tools.pitchdetector.SheetChecker2
-import tfg.uniovi.melodies.utils.parser.XMLParser
+import tfg.uniovi.melodies.processing.SheetChecker
+import tfg.uniovi.melodies.processing.parser.XMLParser
 import java.io.Serializable
 
 class SheetVisualizationViewModelFactory(
@@ -52,7 +52,7 @@ class SheetVisualizationViewModel(
         get() = _svg
 
 
-    private val sheetChecker: SheetChecker2 = SheetChecker2()
+    private val sheetChecker: SheetChecker = SheetChecker()
     private var currentNoteIndex = 0  // Absolute index
     private var isCheckingNotes = false
     private var _noteList : MutableList<ScoreElement> = mutableListOf()

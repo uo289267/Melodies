@@ -1,4 +1,4 @@
-package tfg.uniovi.melodies.utils
+package tfg.uniovi.melodies.fragmentUtils
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView

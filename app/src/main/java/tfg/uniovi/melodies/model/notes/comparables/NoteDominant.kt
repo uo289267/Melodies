@@ -1,7 +1,8 @@
-package tfg.uniovi.melodies.model.notes
+package tfg.uniovi.melodies.model.notes.comparables
+
+import tfg.uniovi.melodies.model.notes.NoteComparable
 
 
-import tfg.uniovi.melodies.model.notes.interfaces.NoteComparable
 /**
  * Represents a dominant musical note, typically used for pitch detection or comparison.
  * Stores its name (pitch class), octave, and whether it is sharp.

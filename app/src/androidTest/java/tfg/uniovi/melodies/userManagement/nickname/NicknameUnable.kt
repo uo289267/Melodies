@@ -20,9 +20,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.tasks.await
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
@@ -36,7 +34,7 @@ import org.junit.runner.RunWith
 import tfg.uniovi.melodies.MainActivity
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.repositories.UsersFirestore
-import tfg.uniovi.melodies.utils.TestUtils
+import tfg.uniovi.melodies.fragmentUtils.TestUtils
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)

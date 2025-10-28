@@ -1,4 +1,4 @@
-package tfg.uniovi.melodies.utils
+package tfg.uniovi.melodies.fragments.utils
 
 import android.content.Context
 import android.util.Log

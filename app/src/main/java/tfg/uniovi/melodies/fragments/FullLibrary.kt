@@ -60,10 +60,6 @@ class FullLibrary : Fragment() {
         val folderList = emptyList<Folder>()
         fullLibraryViewModel = ViewModelProvider(this, FullLibraryViewModelProviderFactory(
             PreferenceManager.getUserId(requireContext())!!))[FullLibraryViewModel::class.java]
-        val onLongClickRename = {sheetIdNFolderId : SheetVisualizationDto, newName : String ->
-            fullLibraryViewModel.renameSheet(sheetIdNFolderId.sheetId, sheetIdNFolderId.folderId, newName)
-            fullLibraryViewModel.loadFolders()
-        }
         adapter = FolderInFullLibraryAdapter(folderList,navigationFunction, this,
             libraryViewModelProviderFactory)
         binding.recyclerViewFullLibrary.adapter = adapter

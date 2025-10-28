@@ -1,4 +1,4 @@
-package tfg.uniovi.melodies.utils
+package tfg.uniovi.melodies.fragments.utils
 
 import android.content.Context
 import android.util.Log
@@ -24,7 +24,10 @@ object SheetItemToucherHelper {
                     val nameOfSheet = adapter.getNameOfSheetAtPosition(position)
                     ShowAlertDialog.showAlertDialogOnlyWithPositiveNNegativeButton(
                         context = context,
-                        title = ContextCompat.getString(context, R.string.delete_title)+ " " + nameOfSheet,
+                        title = ContextCompat.getString(
+                            context,
+                            R.string.delete_title
+                        ) + " " + nameOfSheet,
                         message = ContextCompat.getString(context, R.string.delete_sheet_quest),
                         tagForLog = DELETE,
                         msgForPositiveBtnLog = "Deleting sheet at $position position",
@@ -35,7 +38,7 @@ object SheetItemToucherHelper {
                             Log.d(DELETE, "One sheet at position $position was deleted")
                             Toast.makeText(
                                 context,
-                                nameOfSheet+" "+context.getString(R.string.delete_successful),
+                                nameOfSheet + " " + context.getString(R.string.delete_successful),
                                 Toast.LENGTH_SHORT
                             ).show()
                         },

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.AddFolder">
 
     <androidx.appcompat.widget.Toolbar
@@ -17,19 +17,20 @@
         app:navigationIcon="@drawable/back"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:title="@string/new_folder" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/folder_name"
-        android:layout_marginTop="150dp"
         android:layout_width="400dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
         android:hint="@string/folder_s_name"
         app:boxBackgroundMode="outline"
         app:boxStrokeColor="@color/md_theme_primary"
+        app:boxStrokeErrorColor="@color/md_theme_error"
         app:boxStrokeWidth="2dp"
         app:boxStrokeWidthFocused="2dp"
-        app:boxStrokeErrorColor="@color/md_theme_error"
-    app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -43,7 +44,7 @@
         android:id="@+id/sp_folder_colors"
         android:layout_width="400dp"
         android:layout_height="60dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="32dp"
         android:background="@drawable/spinner_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -53,12 +54,11 @@
         android:id="@+id/btn_create_folder"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:text="@string/create"
+        android:layout_marginTop="20dp"
 
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/create"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sp_folder_colors"
-        app:layout_constraintVertical_bias="0.134" />
+        app:layout_constraintTop_toBottomOf="@+id/sp_folder_colors" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

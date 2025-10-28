@@ -3,9 +3,9 @@ package tfg.uniovi.melodies.unitTests
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.w3c.dom.Document
-import tfg.uniovi.melodies.model.notes.Note
-import tfg.uniovi.melodies.model.notes.Rest
-import tfg.uniovi.melodies.utils.parser.XMLParser
+import tfg.uniovi.melodies.model.notes.comparables.Note
+import tfg.uniovi.melodies.model.notes.rest.Rest
+import tfg.uniovi.melodies.processing.parser.XMLParser
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 

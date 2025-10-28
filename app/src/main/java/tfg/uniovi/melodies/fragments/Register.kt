@@ -9,12 +9,12 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentRegisterBinding
 import tfg.uniovi.melodies.fragments.viewmodels.RegisterViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.RegisterViewModelProviderFactory
-import tfg.uniovi.melodies.utils.TextWatcherAdapter
+import tfg.uniovi.melodies.fragments.utils.BottomNavUtils
+import tfg.uniovi.melodies.fragments.utils.TextWatcherAdapter
 
 /**
  * A simple [Fragment] subclass.
@@ -69,24 +69,12 @@ class Register : Fragment() {
     }
     override fun onResume() {
         super.onResume()
-        setBottomNavMenuVisibility(View.GONE)
+        BottomNavUtils.setBottomNavMenuVisibility(this,View.GONE)
     }
     override fun onStop() {
         super.onStop()
         //Pitch detector stop listening and processing audio
-        setBottomNavMenuVisibility(View.VISIBLE)
-    }
-    /**
-     * Changes the visibility of the Bottom Navigation
-     *
-     * @param visibility the value for the Bottom Navigation Menu Visibility (View.VISIBLE/View.GONE)
-     */
-    private fun setBottomNavMenuVisibility(visibility: Int){
-        if(visibility == View.GONE || visibility == View.VISIBLE ||visibility == View.INVISIBLE){
-            val navView =
-                requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-            navView.visibility = visibility
-        }
+        BottomNavUtils.setBottomNavMenuVisibility(this,View.VISIBLE)
     }
 
     /**

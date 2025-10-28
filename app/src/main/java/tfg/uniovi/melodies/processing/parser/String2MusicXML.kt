@@ -1,4 +1,4 @@
-package tfg.uniovi.melodies.utils.parser
+package tfg.uniovi.melodies.processing.parser
 
 import org.w3c.dom.Document
 import java.io.ByteArrayInputStream

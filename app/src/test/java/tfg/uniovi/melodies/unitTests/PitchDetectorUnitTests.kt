@@ -1,6 +1,6 @@
 package tfg.uniovi.melodies.unitTests
 import org.junit.jupiter.api.Test
-import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector
+import tfg.uniovi.melodies.processing.PitchDetector
 import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.jvm.isAccessible
 import kotlin.test.assertEquals

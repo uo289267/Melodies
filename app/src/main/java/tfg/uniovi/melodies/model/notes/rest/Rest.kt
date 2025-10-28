@@ -1,7 +1,10 @@
-package tfg.uniovi.melodies.model.notes
+package tfg.uniovi.melodies.model.notes.rest
+
+import tfg.uniovi.melodies.model.notes.comparables.NoteDominant
+import tfg.uniovi.melodies.model.notes.ScoreElementAbstract
+import tfg.uniovi.melodies.model.notes.comparables.Note
 
 
-import tfg.uniovi.melodies.model.notes.abstractClasses.ScoreElementAbstract
 /**
  * Represents a rest/silence in a score.
  * Stores its duration

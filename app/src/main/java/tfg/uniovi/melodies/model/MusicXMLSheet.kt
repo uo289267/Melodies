@@ -1,7 +1,7 @@
 package tfg.uniovi.melodies.model
 
 import org.w3c.dom.Document
-import tfg.uniovi.melodies.utils.parser.String2MusicXML
+import tfg.uniovi.melodies.processing.parser.String2MusicXML
 
 /**
  * Represents a MusicXML sheet stored in the application.

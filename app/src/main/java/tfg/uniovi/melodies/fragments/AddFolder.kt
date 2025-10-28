@@ -21,7 +21,7 @@ import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModelProviderFactory
 import tfg.uniovi.melodies.model.Colors
 import tfg.uniovi.melodies.preferences.PreferenceManager
-import tfg.uniovi.melodies.utils.TextWatcherAdapter
+import tfg.uniovi.melodies.fragments.utils.TextWatcherAdapter
 
 private const val CREATE_FOLDER_TAG = "CREATE_FOLDER"
 

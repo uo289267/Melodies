@@ -25,8 +25,8 @@ import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModelProviderFactory
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 import tfg.uniovi.melodies.preferences.PreferenceManager
-import tfg.uniovi.melodies.utils.RecyclerViewItemDecoration
-import tfg.uniovi.melodies.utils.SheetItemToucherHelper
+import tfg.uniovi.melodies.fragments.utils.RecyclerViewItemDecoration
+import tfg.uniovi.melodies.fragments.utils.SheetItemToucherHelper
 
 /**
  * Fragment that displays all MusicXML sheets within a selected folder.

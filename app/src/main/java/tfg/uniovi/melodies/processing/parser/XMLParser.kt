@@ -1,4 +1,4 @@
-package tfg.uniovi.melodies.utils.parser
+package tfg.uniovi.melodies.processing.parser
 
 import android.content.Context
 import androidx.core.content.ContextCompat.getString
@@ -6,9 +6,9 @@ import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.NodeList
 import tfg.uniovi.melodies.R
-import tfg.uniovi.melodies.model.notes.Note
-import tfg.uniovi.melodies.model.notes.interfaces.ScoreElement
-import tfg.uniovi.melodies.model.notes.Rest
+import tfg.uniovi.melodies.model.notes.comparables.Note
+import tfg.uniovi.melodies.model.notes.ScoreElement
+import tfg.uniovi.melodies.model.notes.rest.Rest
 /**
  * Parser for MusicXML documents that extracts notes and metadata.
  *
@@ -84,7 +84,7 @@ class XMLParser() {
                     octave = if(octave == NEUTRAL_OCTAVE)
                         BASE_OCTAVE_FLUTE
                     else{
-                        octave-NEUTRAL_OCTAVE+BASE_OCTAVE_FLUTE
+                        octave- NEUTRAL_OCTAVE + BASE_OCTAVE_FLUTE
                     }
                     var sharp = false
                     if (alter != null) {

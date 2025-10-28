@@ -2,7 +2,6 @@ package tfg.uniovi.melodies.sheetManagement.check
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.test.espresso.Espresso.onView
@@ -11,7 +10,6 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withParent
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -31,7 +29,6 @@ import junit.framework.TestCase.assertTrue
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
-import org.hamcrest.Matchers.anyOf
 import org.hamcrest.TypeSafeMatcher
 import org.junit.After
 import org.junit.Before
@@ -41,10 +38,8 @@ import org.junit.runner.RunWith
 import tfg.uniovi.melodies.MainActivity
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModel
-import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector
-import tfg.uniovi.melodies.utils.TestUtils
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import tfg.uniovi.melodies.processing.PitchDetector
+import tfg.uniovi.melodies.fragmentUtils.TestUtils
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest

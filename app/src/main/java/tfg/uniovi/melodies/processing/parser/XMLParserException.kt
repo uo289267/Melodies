@@ -1,4 +1,4 @@
-package tfg.uniovi.melodies.utils.parser
+package tfg.uniovi.melodies.processing.parser
 
 /**
  * Custom [Exception] thrown when parsing

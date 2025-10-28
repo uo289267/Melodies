@@ -23,9 +23,9 @@ import tfg.uniovi.melodies.fragments.adapters.SpinnerFoldersAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.ImportViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.ImportViewModelProviderFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
-import tfg.uniovi.melodies.utils.ShowAlertDialog
-import tfg.uniovi.melodies.utils.parser.String2MusicXML
-import tfg.uniovi.melodies.utils.parser.XMLParser
+import tfg.uniovi.melodies.fragments.utils.ShowAlertDialog
+import tfg.uniovi.melodies.processing.parser.String2MusicXML
+import tfg.uniovi.melodies.processing.parser.XMLParser
 
 private const val IMPORT_TAG = "IMPORT"
 private const val EXTENSION_APP_XML = "application/xml"
@@ -176,11 +176,9 @@ class Import : Fragment() {
             this.folders = folders
             val adapter = binding.spFolder.adapter as SpinnerFoldersAdapter
             adapter.updateFolders(folders)
-            // Aquí ya sí podemos usar folderId de los args
             val folderId = args.folderIdImport
             if(folderId.isNotEmpty()){
                 folderChosen = folders.find { it.folderId == folderId }
-                // Si hay una carpeta encontrada, actualizar Spinner y ViewModel
                 folderChosen?.let {
                     val index = folders.indexOf(it)
                     if (index != -1){

@@ -1,6 +1,4 @@
-package tfg.uniovi.melodies.model.notes.abstractClasses
-
-import tfg.uniovi.melodies.model.notes.interfaces.ScoreElement
+package tfg.uniovi.melodies.model.notes
 
 /**
  * All ScoreElements (Note, Rest) must at least have a duration in milliseconds

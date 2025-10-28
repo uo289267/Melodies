@@ -1,11 +1,11 @@
-package tfg.uniovi.melodies.tools.pitchdetector
+package tfg.uniovi.melodies.processing
 
 
 
 import android.util.Log
-import tfg.uniovi.melodies.model.notes.NoteDominant
-import tfg.uniovi.melodies.model.notes.interfaces.ScoreElement
-import tfg.uniovi.melodies.utils.parser.XMLParser
+import tfg.uniovi.melodies.model.notes.comparables.NoteDominant
+import tfg.uniovi.melodies.model.notes.ScoreElement
+import tfg.uniovi.melodies.processing.parser.XMLParser
 
 private const val DURATION_PERCENTAGE = 0.95
 
@@ -16,7 +16,7 @@ private const val DURATION_PERCENTAGE = 0.95
  * This class relies on PitchDetector to capture detected notes in real-time,
  * and validates if the detected onset and duration correspond to the expected score.
  */
-class SheetChecker2 {
+class SheetChecker {
     val notes = arrayOf("C", "D", "E", "F", "G", "A", "B")
 
     /**

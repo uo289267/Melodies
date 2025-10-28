@@ -18,7 +18,7 @@ import org.junit.Rule
 import org.junit.Test
 import tfg.uniovi.melodies.MainActivity
 import tfg.uniovi.melodies.R
-import tfg.uniovi.melodies.utils.TestUtils
+import tfg.uniovi.melodies.fragmentUtils.TestUtils
 
 class CreateFolderUnableTest {
     private lateinit var device: UiDevice

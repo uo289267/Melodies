@@ -32,7 +32,7 @@ import org.junit.Test
 import tfg.uniovi.melodies.MainActivity
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModel
-import tfg.uniovi.melodies.utils.TestUtils
+import tfg.uniovi.melodies.fragmentUtils.TestUtils
 
 class CheckNoteWrongTest {
 
