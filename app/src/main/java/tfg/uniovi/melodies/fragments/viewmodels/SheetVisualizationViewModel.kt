@@ -54,7 +54,6 @@ class SheetVisualizationViewModel(
 
     private val sheetChecker: SheetChecker = SheetChecker()
     private var currentNoteIndex = 0  // Absolute index
-    private var isCheckingNotes = false
     private var _noteList : MutableList<ScoreElement> = mutableListOf()
 
     private var totalPages = 1
@@ -239,7 +238,6 @@ class SheetVisualizationViewModel(
             _shouldNavigateToNextPage.postValue(true)
         } else {
             // Finished all pages
-            isCheckingNotes = false
             Log.d(PAGE_COMPLETION, "Todas las páginas completadas!")
         }
 

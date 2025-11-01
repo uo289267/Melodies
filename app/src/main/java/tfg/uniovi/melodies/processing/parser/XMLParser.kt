@@ -9,6 +9,8 @@ import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.model.notes.comparables.Note
 import tfg.uniovi.melodies.model.notes.ScoreElement
 import tfg.uniovi.melodies.model.notes.rest.Rest
+
+private const val NEUTRAL_OCTAVE: Int = 4
 /**
  * Parser for MusicXML documents that extracts notes and metadata.
  *
@@ -19,7 +21,6 @@ import tfg.uniovi.melodies.model.notes.rest.Rest
  * **Notes about octaves:**
  * - All input sheets are expected to have a base octave of 4.
  */
-private const val NEUTRAL_OCTAVE: Int = 4
 class XMLParser() {
     //ALL SHEETS PROVIDED NEED TO HAVE THEIR BASE OCTAVE TO BE 4
     companion object {

@@ -10,7 +10,7 @@ import tfg.uniovi.melodies.processing.parser.XMLParser
 private const val DURATION_PERCENTAGE = 0.95
 
 /**
- * SheetChecker2 is responsible for verifying if a played note matches the expected
+ * SheetChecker is responsible for verifying if a played note matches the expected
  * score element in both onset (start of the note) and duration.
  *
  * This class relies on PitchDetector to capture detected notes in real-time,

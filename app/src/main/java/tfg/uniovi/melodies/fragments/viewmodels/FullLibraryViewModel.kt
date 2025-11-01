@@ -33,10 +33,4 @@ class FullLibraryViewModel(
         }
     }
 
-    fun renameSheet(sheetId: String, folderId: String, newName: String) {
-        viewModelScope.launch {
-            folderBD.setNewSheetName(sheetId,folderId, newName)
-        }
-    }
-
 }

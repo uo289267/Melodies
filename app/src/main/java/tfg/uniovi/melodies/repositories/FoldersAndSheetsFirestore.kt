@@ -302,24 +302,6 @@ class FoldersAndSheetsFirestore (private val userId: String,
     }
 
     /**
-     * Converts a raw Firestore document data map into a [MusicXMLSheet] instance.
-     *
-     * @param data The raw Firestore document data as a map of field names to values.
-     * @param folderId The ID of the parent folder that contains this sheet.
-     * @return A [MusicXMLSheet] object populated with the provided data.
-     *
-     * @throws NullPointerException If any expected field is missing or null in the data map.
-     */
-    private fun docToMusicXMLSheet(data: Map<String, Any>, folderId: String): MusicXMLSheet {
-        return MusicXMLSheet(
-            data["name"].toString(),
-            data["musicxml"].toString(),
-            data["author"].toString(),
-            data["id"].toString(),
-            folderId
-        )
-    }
-    /**
      * Converts a Firestore document into a [Folder].
      *
      * @param doc The Firestore document snapshot.

@@ -99,10 +99,10 @@ class LogIn : Fragment() {
 
 
     /**
-     * Updates the user ID EditText field with a new value without triggering the text watcher.
+     * Updates the user nickname EditText field with a new value without triggering the text watcher.
      *
-     * @param etName The EditText view for the user ID input.
-     * @param newName The new user ID string to set in the EditText.
+     * @param etName The EditText view for the nickname input.
+     * @param newName The new nickname string to set in the EditText.
      */
     private fun modifyNicknameEditText(etName: EditText, newName:String){
         etName.apply {

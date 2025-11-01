@@ -38,8 +38,7 @@ val colors = listOf(
 )
 class AddFolder : Fragment() {
 
-    private lateinit var  binding: FragmentAddFolderBinding
-    private lateinit var foldersViewModel: FolderViewModel
+    private lateinit var binding: FragmentAddFolderBinding
     private lateinit var addFolderViewModel: AddFolderViewModel
 
     private val folderNameWatcher = object : TextWatcherAdapter() {
@@ -53,12 +52,6 @@ class AddFolder : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        //FolderViewModelProvider
-        val owner = findNavController().getViewModelStoreOwner(R.id.navigation)
-        val factory = FolderViewModelProviderFactory(PreferenceManager.getUserId(requireContext())!!)
-        foldersViewModel = ViewModelProvider(owner, factory)[FolderViewModel::class.java]
-
 
         val toolbar = activity?.findViewById<Toolbar>(R.id.toolbar)
         toolbar?.setNavigationOnClickListener{

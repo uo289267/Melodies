@@ -183,7 +183,6 @@ class Import : Fragment() {
                     val index = folders.indexOf(it)
                     if (index != -1){
                         binding.spFolder.setSelection(index)
-                        importViewModel.getColorOfSelectedFolder(folderId)
                     }
                     importViewModel.updateFolderChosen(it)
                 }
@@ -209,8 +208,8 @@ class Import : Fragment() {
             }
         }
 
-        importViewModel.folderChosenColor.observe(viewLifecycleOwner){
-            val backgroundColor = Color.parseColor(importViewModel.folderChosenColor.value?.hex)
+        importViewModel.folderChosen.observe(viewLifecycleOwner){
+            val backgroundColor = Color.parseColor(importViewModel.folderChosen.value?.color?.hex)
             binding.btnImport.setBackgroundColor(backgroundColor)
 
         }
@@ -243,7 +242,6 @@ class Import : Fragment() {
             ) {
                 folderChosen = folders[position]
                 importViewModel.updateFolderChosen(folderChosen!!)
-                importViewModel.getColorOfSelectedFolder(folderChosen!!.folderId)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
