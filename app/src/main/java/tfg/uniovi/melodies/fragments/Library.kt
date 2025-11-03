@@ -19,14 +19,14 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentLibraryBinding
-import tfg.uniovi.melodies.entities.MusicXMLSheet
+import tfg.uniovi.melodies.model.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.adapters.SheetInFolderAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModelProviderFactory
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
 import tfg.uniovi.melodies.preferences.PreferenceManager
-import tfg.uniovi.melodies.utils.RecyclerViewItemDecoration
-import tfg.uniovi.melodies.utils.SheetItemToucherHelper
+import tfg.uniovi.melodies.fragments.utils.RecyclerViewItemDecoration
+import tfg.uniovi.melodies.fragments.utils.SheetItemToucherHelper
 
 /**
  * Fragment that displays all MusicXML sheets within a selected folder.

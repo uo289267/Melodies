@@ -4,10 +4,12 @@ import android.content.Context
 import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
-import tfg.uniovi.melodies.entities.HistoryEntry
+import tfg.uniovi.melodies.model.HistoryEntry
 import tfg.uniovi.melodies.preferences.PreferenceManager
+import tfg.uniovi.melodies.repositories.config.FirestoreConfig
 
 private const val USER_REPOSITORY = "UserRepository"
 
@@ -17,8 +19,8 @@ private const val USER_REPOSITORY = "UserRepository"
  * Handles the creation and initialization of user documents,
  * checking for existence, and setting up default folders and sheets.
  */
-class UsersFirestore {
-    private val db = Firebase.firestore
+class UsersFirestore (private val db: FirebaseFirestore = Firebase.firestore) {
+    private val usersCollectionName = FirestoreConfig.getUsersCollectionName()
     /**
      * Checks if a nickname is already taken in Firestore.
      *
@@ -27,7 +29,7 @@ class UsersFirestore {
      */
     suspend fun nicknameExists(nickname: String): Boolean {
         return try {
-            val querySnapshot = db.collection("users")
+            val querySnapshot =db.collection(usersCollectionName)
                 .whereEqualTo("nickname", nickname)
                 .limit(1)
                 .get()
@@ -49,7 +51,7 @@ class UsersFirestore {
      */
     suspend fun updateUserNickname(userId: String, newNickname: String) {
         try {
-            val userRef = db.collection("users").document(userId)
+            val userRef = db.collection(usersCollectionName) .document(userId)
 
             userRef.update("nickname", newNickname).await()
             Log.d(USER_REPOSITORY, "Nickname updated for user $userId -> $newNickname")
@@ -67,7 +69,7 @@ class UsersFirestore {
      */
     suspend fun getUserIdFromNickname(nickname: String): String? {
         return try {
-            val querySnapshot = db.collection("users")
+            val querySnapshot = db.collection(usersCollectionName)
                 .whereEqualTo("nickname", nickname)
                 .limit(1)
                 .get()
@@ -91,7 +93,7 @@ class UsersFirestore {
      */
     suspend fun getNicknameFromUserId(userId: String): String? {
         return try {
-            val documentSnapshot = db.collection("users")
+            val documentSnapshot = db.collection(usersCollectionName)
                 .document(userId)
                 .get()
                 .await()
@@ -132,9 +134,12 @@ class UsersFirestore {
                 return null //the user has already been created
             }
         }
+        if(nicknameExists(nickname)){
+            return null
+        }
 
         return try {
-            val userRef = db.collection("users").document() // ID automático
+            val userRef = db.collection(usersCollectionName).document() // ID automático
             val userId = userRef.id
             // Create user document
             val userData = mapOf("createdAt" to FieldValue.serverTimestamp(), "nickname" to nickname)
@@ -163,6 +168,35 @@ class UsersFirestore {
             throw DBException("Unable to create user $nickname")
         }
     }
+    suspend fun deleteUserAndAllData(nickname: String) {
+        val userQuery = db.collection(usersCollectionName)
+            .whereEqualTo("nickname", nickname)
+            .get()
+            .await()
+
+        if (userQuery.isEmpty) {
+            println("⚠️ No se encontró ningún usuario con nickname '$nickname'")
+            return
+        }
+
+        val userDoc = userQuery.documents.first()
+        val userRef = userDoc.reference
+
+        val folders = userRef.collection("folders").get().await()
+        for (folder in folders.documents) {
+            val sheets = folder.reference.collection("sheets").get().await()
+            for (sheet in sheets.documents) {
+                sheet.reference.delete().await()
+            }
+            folder.reference.delete().await()
+        }
+
+        userRef.delete().await()
+
+        println("Usuario '$nickname' y todos sus datos eliminados correctamente.")
+    }
+
+
 
     /**
      * Retrieves the 5 most recent HistoryEntries for the current user,
@@ -174,7 +208,7 @@ class UsersFirestore {
      */
     suspend fun getAllHistoryEntries(userId: String): List<HistoryEntry> {
         return try {
-            val result = db.collection("users").document(userId)
+            val result = db.collection(usersCollectionName).document(userId)
                 .collection("historyEntries")
                 .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .limit(5)

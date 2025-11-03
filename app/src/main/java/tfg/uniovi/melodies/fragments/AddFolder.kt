@@ -14,14 +14,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentAddFolderBinding
-import tfg.uniovi.melodies.entities.Colors
 import tfg.uniovi.melodies.fragments.adapters.SpinnerFoldersColorsAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.AddFolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.AddFolderViewModelProviderFactory
-import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
-import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModelProviderFactory
+import tfg.uniovi.melodies.model.Colors
 import tfg.uniovi.melodies.preferences.PreferenceManager
-import tfg.uniovi.melodies.utils.TextWatcherAdapter
+import tfg.uniovi.melodies.fragments.utils.TextWatcherAdapter
 
 private const val CREATE_FOLDER_TAG = "CREATE_FOLDER"
 
@@ -31,10 +29,14 @@ private const val CREATE_FOLDER_TAG = "CREATE_FOLDER"
  * and interacting with the ViewModels to save the folder.
  */
 const val MAX_LENGTH_FOLDER_NAME: Int= 30
+val colors = listOf(
+    Triple(R.drawable.folder_yellow,R.string.yellow, Colors.YELLOW),
+    Triple(R.drawable.folder_pink,R.string.pink, Colors.PINK),
+    Triple(R.drawable.folder_blue, R.string.blue, Colors.BLUE)
+)
 class AddFolder : Fragment() {
 
-    private lateinit var  binding: FragmentAddFolderBinding
-    private lateinit var foldersViewModel: FolderViewModel
+    private lateinit var binding: FragmentAddFolderBinding
     private lateinit var addFolderViewModel: AddFolderViewModel
 
     private val folderNameWatcher = object : TextWatcherAdapter() {
@@ -43,21 +45,11 @@ class AddFolder : Fragment() {
             this@AddFolder.addFolderViewModel.updateFolderName(s.toString())
         }
     }
-    private val colors = listOf(
-        Triple(R.drawable.folder_yellow,R.string.yellow, Colors.YELLOW),
-        Triple(R.drawable.folder_pink,R.string.pink, Colors.PINK),
-        Triple(R.drawable.folder_blue, R.string.blue, Colors.BLUE)
-    )
+
     private var colorSelected: Triple<Int,Int,Colors> = colors[0]
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        //FolderViewModelProvider
-        val owner = findNavController().getViewModelStoreOwner(R.id.navigation)
-        val factory = FolderViewModelProviderFactory(PreferenceManager.getUserId(requireContext())!!)
-        foldersViewModel = ViewModelProvider(owner, factory)[FolderViewModel::class.java]
-
 
         val toolbar = activity?.findViewById<Toolbar>(R.id.toolbar)
         toolbar?.setNavigationOnClickListener{
@@ -75,7 +67,6 @@ class AddFolder : Fragment() {
         configureSpinner(binding.spFolderColors)
         configureButtonAddFolder(binding)
         binding.folderNameInput.addTextChangedListener(folderNameWatcher)
-
         addFolderViewModel = ViewModelProvider(this, AddFolderViewModelProviderFactory(
             PreferenceManager.getUserId(requireContext())!!
         ))[AddFolderViewModel::class.java]
@@ -85,7 +76,7 @@ class AddFolder : Fragment() {
         }
         addFolderViewModel.folderCreated.observe(viewLifecycleOwner) { created ->
             if (created) {
-                findNavController().popBackStack() // navega atrás solo cuando se haya guardado
+                findNavController().popBackStack()
             }
         }
 
@@ -151,7 +142,7 @@ class AddFolder : Fragment() {
      * @param spFolderColors The Spinner view used for selecting folder colors.
      */
     private fun configureSpinner(spFolderColors: Spinner){
-        spFolderColors.adapter = SpinnerFoldersColorsAdapter(requireContext(),colors)
+        spFolderColors.adapter = SpinnerFoldersColorsAdapter(requireContext())
         spFolderColors.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,

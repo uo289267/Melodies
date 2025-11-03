@@ -8,10 +8,10 @@ import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
-import tfg.uniovi.melodies.entities.Colors
-import tfg.uniovi.melodies.entities.Folder
+import tfg.uniovi.melodies.model.Colors
+import tfg.uniovi.melodies.model.Folder
 import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
-import tfg.uniovi.melodies.utils.ShowAlertDialog
+import tfg.uniovi.melodies.fragments.utils.ShowAlertDialog
 
 private const val FOLDER_RENAME = "FOLDER_RENAME"
 class FolderViewHolder(

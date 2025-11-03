@@ -18,14 +18,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentImportBinding
-import tfg.uniovi.melodies.entities.Folder
+import tfg.uniovi.melodies.model.Folder
 import tfg.uniovi.melodies.fragments.adapters.SpinnerFoldersAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.ImportViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.ImportViewModelProviderFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
-import tfg.uniovi.melodies.utils.ShowAlertDialog
-import tfg.uniovi.melodies.utils.parser.String2MusicXML
-import tfg.uniovi.melodies.utils.parser.XMLParser
+import tfg.uniovi.melodies.fragments.utils.ShowAlertDialog
+import tfg.uniovi.melodies.processing.parser.String2MusicXML
+import tfg.uniovi.melodies.processing.parser.XMLParser
 
 private const val IMPORT_TAG = "IMPORT"
 private const val EXTENSION_APP_XML = "application/xml"
@@ -54,16 +54,19 @@ class Import : Fragment() {
                     try {
                         val doc = String2MusicXML.string2doc(xmlContent)
                         val parser = XMLParser(doc)
-                        importViewModel.addMusicXMLSheet(xmlContent,
-                            parser.findNameTitle(requireContext(),doc).substring(0, MAX_LENGTH_SHEET_NAME),
-                            parser.findAuthor(requireContext(),doc))
+                        val title = parser.findNameTitle(requireContext(), doc)
+                        val safeTitle = if (title.length > MAX_LENGTH_SHEET_NAME)
+                            title.substring(0, MAX_LENGTH_SHEET_NAME)
+                        else
+                            title
+                        importViewModel.addMusicXMLSheet(xmlContent, safeTitle, parser.findAuthor(requireContext(), doc))
                     } catch (e: Exception) {
                         ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(
                             requireContext(),
                             getString(R.string.alert_dialog_title_error_parsing),
                             e.message!!,
                             IMPORT_TAG,
-                            "Error parsing XML to import (archivo $index): ${e.message}"
+                            "Error parsing XML to import (file $index): ${e.message}"
                         )
                     }
                 } else {
@@ -72,7 +75,7 @@ class Import : Fragment() {
                         getString(R.string.alert_dialog_title_error_parsing),
                         getString(R.string.alert_dialog_msg_error_parsing),
                         IMPORT_TAG,
-                        "Error parsing XML to import (archivo $index): xml was null/empty"
+                        "Error parsing XML to import (file $index): xml was null/empty"
                     )
                 }
             }
@@ -173,16 +176,13 @@ class Import : Fragment() {
             this.folders = folders
             val adapter = binding.spFolder.adapter as SpinnerFoldersAdapter
             adapter.updateFolders(folders)
-            // Aquí ya sí podemos usar folderId de los args
             val folderId = args.folderIdImport
             if(folderId.isNotEmpty()){
                 folderChosen = folders.find { it.folderId == folderId }
-                // Si hay una carpeta encontrada, actualizar Spinner y ViewModel
                 folderChosen?.let {
                     val index = folders.indexOf(it)
                     if (index != -1){
                         binding.spFolder.setSelection(index)
-                        importViewModel.getColorOfSelectedFolder(folderId)
                     }
                     importViewModel.updateFolderChosen(it)
                 }
@@ -208,8 +208,8 @@ class Import : Fragment() {
             }
         }
 
-        importViewModel.folderChosenColor.observe(viewLifecycleOwner){
-            val backgroundColor = Color.parseColor(importViewModel.folderChosenColor.value?.hex)
+        importViewModel.folderChosen.observe(viewLifecycleOwner){
+            val backgroundColor = Color.parseColor(importViewModel.folderChosen.value?.color?.hex)
             binding.btnImport.setBackgroundColor(backgroundColor)
 
         }
@@ -242,7 +242,6 @@ class Import : Fragment() {
             ) {
                 folderChosen = folders[position]
                 importViewModel.updateFolderChosen(folderChosen!!)
-                importViewModel.getColorOfSelectedFolder(folderChosen!!.folderId)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {

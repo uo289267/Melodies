@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import tfg.uniovi.melodies.entities.HistoryEntry
+import tfg.uniovi.melodies.model.HistoryEntry
 import tfg.uniovi.melodies.repositories.UsersFirestore
 
 class ProfileViewModelProviderFactory: ViewModelProvider.Factory {
@@ -38,9 +38,8 @@ class ProfileViewModel(private val usersBD: UsersFirestore):ViewModel(){
         viewModelScope.launch {
             try {
                 usersBD.updateUserNickname(userId, newNickname) // suspend call
-                _nickname.postValue(newNickname) // actualizar LiveData
+                _nickname.postValue(newNickname)
             } catch (e: Exception) {
-                // Manejo de errores, log o mostrar mensaje
                 Log.e("ProfileViewModel", "Error renaming nickname", e)
             }
         }

@@ -1,6 +1,7 @@
 package tfg.uniovi.melodies.fragments
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -27,22 +28,22 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.caverock.androidsvg.SVG
 import com.caverock.androidsvg.SVGExternalFileResolver
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentSheetVisualizationBinding
-import tfg.uniovi.melodies.entities.HistoryEntry
-import tfg.uniovi.melodies.entities.MusicXMLSheet
+import tfg.uniovi.melodies.model.HistoryEntry
+import tfg.uniovi.melodies.model.MusicXMLSheet
 import tfg.uniovi.melodies.fragments.viewmodels.CHECK
 import tfg.uniovi.melodies.fragments.viewmodels.NoteCheckingState
 import tfg.uniovi.melodies.fragments.viewmodels.PAGING
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationViewModelFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
-import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.MIC_REQ_CODE
-import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.startListening
-import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.stopListening
-import tfg.uniovi.melodies.utils.ShowAlertDialog
-import tfg.uniovi.melodies.utils.parser.XMLParserException
+import tfg.uniovi.melodies.processing.PitchDetector.MIC_REQ_CODE
+import tfg.uniovi.melodies.processing.PitchDetector.startListening
+import tfg.uniovi.melodies.processing.PitchDetector.stopListening
+import tfg.uniovi.melodies.fragments.utils.BottomNavUtils
+import tfg.uniovi.melodies.fragments.utils.ShowAlertDialog
+import tfg.uniovi.melodies.processing.parser.XMLParserException
 
 
 //LOG TAGS
@@ -89,7 +90,7 @@ class SheetVisualization : Fragment() {
         super.onStop()
         //Pitch detector stop listening and processing audio
         stopListening()
-        setBottomNavMenuVisibility(View.VISIBLE)
+        BottomNavUtils.setBottomNavMenuVisibility(this,View.VISIBLE)
     }
 
     override fun onCreateView(
@@ -108,7 +109,7 @@ class SheetVisualization : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.post {
-            setBottomNavMenuVisibility(View.GONE)
+            BottomNavUtils.setBottomNavMenuVisibility(this, View.GONE)
         }
         setupWebView()
         setupNavigationButtons()
@@ -131,6 +132,7 @@ class SheetVisualization : Fragment() {
                             getString(R.string.sheet_visualization_invalid_xml_msg),
                             PARSING,
                             "alert dialog showed because xml missing attributes and/or elements")
+                            sheetVisualizationViewModel.updateNoteCheckingState(NoteCheckingState.NOT_AVAILABLE)
                     }
                     val encondedXML =
                         Base64.encodeToString(it.stringSheet.toByteArray(), Base64.NO_WRAP)
@@ -197,7 +199,7 @@ class SheetVisualization : Fragment() {
 
                 val message = getString(R.string.sheet_visualization_finish_msg) +
                         " " + musicXMLSheet.name +
-                        "\n\n⏱️ Tiempo total: $elapsedFormatted"
+                        "\n\n ${getString(R.string.tot_time)} $elapsedFormatted"
 
                 ShowAlertDialog.showAlertDialogOnlyWithPositiveButton(
                     requireContext(),
@@ -220,21 +222,10 @@ class SheetVisualization : Fragment() {
                 else -> "$seconds s"
             }
             sheetVisualizationViewModel.saveNewHistoryEntry(HistoryEntry(musicXMLSheet.name, elapsedFormatted))
-            Log.d("SHEET_TIME", "Tiempo total en tocar la canción: $elapsedFormatted (mm:ss)")
+
         }
     }
 
-    /**
-     * Changes the visibility of the Bottom Navigation
-     *
-     * @param visibility the value for the Bottom Navigation Menu Visibility (View.VISIBLE/View.GONE)
-     */
-    private fun setBottomNavMenuVisibility(visibility: Int){
-        if(visibility == View.GONE || visibility == View.VISIBLE){
-            val navView = activity?.findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-            navView?.visibility = visibility
-        }
-    }
 
     /**
      * Sets up the toolbar and its back button
@@ -250,6 +241,7 @@ class SheetVisualization : Fragment() {
     /**
      * Configures the WebView with Verovio JS
      */
+    @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebView() {
         binding.webView.settings.javaScriptEnabled = true
         binding.webView.settings.allowFileAccess = true

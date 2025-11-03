@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import tfg.uniovi.melodies.entities.MusicXMLSheet
+import tfg.uniovi.melodies.model.MusicXMLSheet
 import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
 
 class LibraryViewModelProviderFactory(

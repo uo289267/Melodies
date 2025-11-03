@@ -26,25 +26,24 @@ class MelodiesApp : Application() {
                 ).show()
             }
 
-            // Guardar en log
+            // Save log
             saveExceptionToFile(exception)
         }
     }
 
     private fun saveExceptionToFile(exception: Throwable) {
         try {
-            // Crear carpeta melodies/log en almacenamiento interno
+            // create melodies/log folder
             val logDir = File(filesDir, "melodies/log")
             if (!logDir.exists()) {
                 logDir.mkdirs()
             }
 
-            // Nombre de archivo con timestamp
             val sdf = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault())
             val fileName = "crash_${sdf.format(Date())}.log"
             val logFile = File(logDir, fileName)
 
-            // Escribir stacktrace en archivo
+            // Write stacktrace
             FileWriter(logFile, true).use { fw ->
                 PrintWriter(fw).use { pw ->
                     pw.println("Thread: ${Thread.currentThread().name}")
@@ -52,9 +51,9 @@ class MelodiesApp : Application() {
                 }
             }
 
-            Log.d("MelodiesApp", "Crash log guardado en: ${logFile.absolutePath}")
+            Log.d("MelodiesApp", "Crash log saved in: ${logFile.absolutePath}")
         } catch (e: Exception) {
-            Log.e("MelodiesApp", "Error al guardar log: ${e.message}")
+            Log.e("MelodiesApp", "Crash log saved in: ${e.message}")
         }
     }
 }
