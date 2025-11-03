@@ -17,8 +17,6 @@ import tfg.uniovi.melodies.databinding.FragmentAddFolderBinding
 import tfg.uniovi.melodies.fragments.adapters.SpinnerFoldersColorsAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.AddFolderViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.AddFolderViewModelProviderFactory
-import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModel
-import tfg.uniovi.melodies.fragments.viewmodels.FolderViewModelProviderFactory
 import tfg.uniovi.melodies.model.Colors
 import tfg.uniovi.melodies.preferences.PreferenceManager
 import tfg.uniovi.melodies.fragments.utils.TextWatcherAdapter
@@ -78,7 +76,7 @@ class AddFolder : Fragment() {
         }
         addFolderViewModel.folderCreated.observe(viewLifecycleOwner) { created ->
             if (created) {
-                findNavController().popBackStack() // navega atrás solo cuando se haya guardado
+                findNavController().popBackStack()
             }
         }
 

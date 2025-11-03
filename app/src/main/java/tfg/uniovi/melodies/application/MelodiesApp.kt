@@ -51,9 +51,9 @@ class MelodiesApp : Application() {
                 }
             }
 
-            Log.d("MelodiesApp", "Crash log guardado en: ${logFile.absolutePath}")
+            Log.d("MelodiesApp", "Crash log saved in: ${logFile.absolutePath}")
         } catch (e: Exception) {
-            Log.e("MelodiesApp", "Error al guardar log: ${e.message}")
+            Log.e("MelodiesApp", "Crash log saved in: ${e.message}")
         }
     }
 }

@@ -169,7 +169,6 @@ class UsersFirestore (private val db: FirebaseFirestore = Firebase.firestore) {
         }
     }
     suspend fun deleteUserAndAllData(nickname: String) {
-        // Buscar el documento del usuario cuyo campo "nickname" coincida
         val userQuery = db.collection(usersCollectionName)
             .whereEqualTo("nickname", nickname)
             .get()
@@ -180,11 +179,9 @@ class UsersFirestore (private val db: FirebaseFirestore = Firebase.firestore) {
             return
         }
 
-        // Suponemos que el nickname es único → tomamos el primero
         val userDoc = userQuery.documents.first()
         val userRef = userDoc.reference
 
-        // Eliminar subcolección "folders" y sus "sheets"
         val folders = userRef.collection("folders").get().await()
         for (folder in folders.documents) {
             val sheets = folder.reference.collection("sheets").get().await()
@@ -194,10 +191,9 @@ class UsersFirestore (private val db: FirebaseFirestore = Firebase.firestore) {
             folder.reference.delete().await()
         }
 
-        // Finalmente eliminar el documento del usuario
         userRef.delete().await()
 
-        println("✅ Usuario '$nickname' y todos sus datos eliminados correctamente.")
+        println("Usuario '$nickname' y todos sus datos eliminados correctamente.")
     }
 
 

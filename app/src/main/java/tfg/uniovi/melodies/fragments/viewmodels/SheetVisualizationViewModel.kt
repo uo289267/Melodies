@@ -77,7 +77,7 @@ class SheetVisualizationViewModel(
     private var isCurrentPageAllSetUp = false
 
     /**
-     * Loads the musicxml given the sheedId and the folderId where the sheet resides
+     * Loads the musicxml given the sheetId and the folderId where the sheet resides
      */
     fun loadMusicSheet(dto: SheetVisualizationDto){
         viewModelScope.launch {

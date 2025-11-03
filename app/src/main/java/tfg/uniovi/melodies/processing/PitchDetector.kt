@@ -56,7 +56,7 @@ object PitchDetector {
      */
     fun startListening(scope: CoroutineScope) {
 
-        if (isRunning) return  // Evitar múltiples inicios
+        if (isRunning) return
         isRunning = true
 
         dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(SAMPLE_RATE, BUFFER_SIZE, 0)

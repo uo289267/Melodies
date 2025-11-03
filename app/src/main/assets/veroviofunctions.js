@@ -1,4 +1,4 @@
-// Inicializamos Verovio
+
 var tk = new verovio.toolkit();
 tk.setOptions({
     font: 'Bravura',
@@ -8,7 +8,6 @@ tk.setOptions({
     scale: 180
 });
 
-// Funciones globales
 window.loadMusicXmlFromBase64 = function(base64) {
     const xml = atob(base64);
     try {

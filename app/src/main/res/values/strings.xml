@@ -4,7 +4,6 @@
     <string name="yellow">Yellow</string>
     <string name="pink">Pink</string>
     <string name="blue">Blue</string>
-    <string name="author">Author:</string>
     <string name="play_icon">play icon</string>
     <string name="error_blank_folder_name">Folder\'s name cannot be empty</string>
     <string name="too_long_folder_name">Folder\'s name cannot be longer than 30 characters\n</string>
@@ -24,8 +23,6 @@
     <string name="delete_successful"> was deleted successfully</string>
     <string name="delete_title">Delete sheet </string>
     <string name="delete_sheet_quest">Are you sure you want to delete this sheet?</string>
-    <string name="user_id">User Id</string>
-    <string name="first_time_using_melodies_msg">If this is your first time using Melodies, please click the following button and enjoy the app.</string>
     <string name="log_in">Log In</string>
     <string name="log_out_question">Are you sure you want to log out?</string>
     <string name="log_in_successfull">Log in successful</string>
@@ -51,7 +48,7 @@
     <string name="sheet_visualization_finish">Finished!</string>
     <string name="sheet_visualization_finish_msg">Congratulations you finished practicing </string>
     <string name="rename">Modifying sheet</string>
-    <string name="rename_folder_title">Rename folder</string>
+    <string name="rename_folder_title">Modifying folder</string>
     <string name="rename_quest">Enter new name: </string>
     <string name="rename_empty_err">New name cannot be empty</string>
     <string name="rename_length_err">New name cannot be more than 20 chars long</string>
@@ -62,9 +59,7 @@
     <string name="rename_nick_length_err">New nickname cannot be more than 20 chars long</string>
     <string name="delete_folder">Delete folder</string>
     <string name="delete_btn">Delete sheet</string>
-    <string name="delete_ques">Are you sure you want to delete </string>
     <string name="delete_confirm"> Folder was deleted</string>
-    <string name="enter">Enter</string>
     <string name="upload">Upload</string>
     <string name="rename_btn">change nickname</string>
     <string name="folder">folder</string>
@@ -83,14 +78,12 @@
     <string name="log_in_title">Log In</string>
     <string name="register_title">Register</string>
     <string name="nickname_input">Nickname</string>
-    <string name="nickname">nickname</string>
     <string name="nickname_rename">Change Nickname</string>
     <string name="nickname_new_name">Changing my nickname </string>
     <string name="nickname_new_name2">to something new: </string>
     <string name="nickname_unable">Unable to register with given nickname</string>
     <string name="nickname_title">Nickname</string>
     <string name="nickname_hint">Enter new nickname…</string>
-    <string name="name_already_exists">This name already exists</string>
     <string name="last_sheets_played">Last sheets played</string>
     <string name="unexpected_error">An unexpected error occurred</string>
     <string name="new_user_create_account">New User? Create account</string>

@@ -4,7 +4,6 @@
     <string name="yellow">Amarillo</string>
     <string name="pink">Rosa</string>
     <string name="blue">Azul</string>
-    <string name="author">Autor:</string>
     <string name="play_icon">icono de reproducir</string>
     <string name="error_blank_folder_name">El nombre de la carpeta no puede estar vacío</string>
     <string name="too_long_folder_name">El nombre de la carpeta no puede tener más de 30 caracteres\n</string>
@@ -24,8 +23,6 @@
     <string name="delete_successful"> se eliminó correctamente</string>
     <string name="delete_title">Eliminar partitura </string>
     <string name="delete_sheet_quest">¿Seguro que quieres eliminar esta partitura?</string>
-    <string name="user_id">ID de usuario</string>
-    <string name="first_time_using_melodies_msg">Si es tu primera vez usando Melodies, haz clic en el siguiente botón y disfruta de la aplicación.</string>
     <string name="log_in">Iniciar sesión</string>
     <string name="log_out_question">¿Seguro que quieres cerrar sesión?</string>
     <string name="log_in_successfull">Inicio de sesión exitoso</string>
@@ -62,9 +59,7 @@
     <string name="rename_nick_length_err">El nuevo apodo no puede tener más de 20 caracteres</string>
     <string name="delete_folder">Eliminar carpeta</string>
     <string name="delete_btn">Eliminar partitura</string>
-    <string name="delete_ques">¿Seguro que quieres eliminar </string>
     <string name="delete_confirm"> La carpeta fue eliminada</string>
-    <string name="enter">Entrar</string>
     <string name="upload">Subir</string>
     <string name="rename_btn">Cambiar apodo</string>
     <string name="folder">carpeta</string>
@@ -83,14 +78,12 @@
     <string name="log_in_title">Iniciar sesión</string>
     <string name="register_title">Registrarse</string>
     <string name="nickname_input">Apodo</string>
-    <string name="nickname">apodo</string>
     <string name="nickname_rename">Cambiar apodo</string>
     <string name="nickname_new_name">Cambiando mi apodo </string>
     <string name="nickname_new_name2">por uno nuevo: </string>
     <string name="nickname_unable">No se puede registrar con el apodo dado</string>
     <string name="nickname_title">Apodo</string>
     <string name="nickname_hint">Introduce un nuevo apodo…</string>
-    <string name="name_already_exists">Este nombre ya existe</string>
     <string name="last_sheets_played">Últimas partituras reproducidas</string>
     <string name="unexpected_error">Ocurrió un error inesperado</string>
     <string name="new_user_create_account">¿Nuevo usuario? Crear cuenta</string>

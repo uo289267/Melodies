@@ -66,7 +66,7 @@ class Import : Fragment() {
                             getString(R.string.alert_dialog_title_error_parsing),
                             e.message!!,
                             IMPORT_TAG,
-                            "Error parsing XML to import (archivo $index): ${e.message}"
+                            "Error parsing XML to import (file $index): ${e.message}"
                         )
                     }
                 } else {
@@ -75,7 +75,7 @@ class Import : Fragment() {
                         getString(R.string.alert_dialog_title_error_parsing),
                         getString(R.string.alert_dialog_msg_error_parsing),
                         IMPORT_TAG,
-                        "Error parsing XML to import (archivo $index): xml was null/empty"
+                        "Error parsing XML to import (file $index): xml was null/empty"
                     )
                 }
             }

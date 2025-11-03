@@ -42,7 +42,7 @@ class AddFolderViewModel (private val folderBD: FoldersAndSheetsFirestore)
     fun createFolder() {
         viewModelScope.launch {
             folderBD.addFolder(_folderDTO.value!!)
-            _folderCreated.postValue(true) // notifica éxito
+            _folderCreated.postValue(true)
 
         }
     }

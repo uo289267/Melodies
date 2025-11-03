@@ -38,9 +38,8 @@ class ProfileViewModel(private val usersBD: UsersFirestore):ViewModel(){
         viewModelScope.launch {
             try {
                 usersBD.updateUserNickname(userId, newNickname) // suspend call
-                _nickname.postValue(newNickname) // actualizar LiveData
+                _nickname.postValue(newNickname)
             } catch (e: Exception) {
-                // Manejo de errores, log o mostrar mensaje
                 Log.e("ProfileViewModel", "Error renaming nickname", e)
             }
         }

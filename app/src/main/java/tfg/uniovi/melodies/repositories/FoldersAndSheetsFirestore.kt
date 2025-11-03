@@ -24,7 +24,7 @@ private const val FIRESTORE = "FIRESTORE"
  * @property userId The ID of the authenticated Firebase user.
  */
 class FoldersAndSheetsFirestore (private val userId: String,
-                                 private val usersCollection: CollectionReference? = null ){
+                                 usersCollection: CollectionReference? = null ){
 
     private val usersColl: CollectionReference = usersCollection ?: Firebase.firestore.collection(
         FirestoreConfig.getUsersCollectionName())

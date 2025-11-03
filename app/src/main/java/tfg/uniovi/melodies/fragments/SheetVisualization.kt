@@ -1,6 +1,7 @@
 package tfg.uniovi.melodies.fragments
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -240,6 +241,7 @@ class SheetVisualization : Fragment() {
     /**
      * Configures the WebView with Verovio JS
      */
+    @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebView() {
         binding.webView.settings.javaScriptEnabled = true
         binding.webView.settings.allowFileAccess = true

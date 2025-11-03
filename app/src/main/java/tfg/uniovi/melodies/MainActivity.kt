@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Callback response to microphon permissions
+    // Callback response to microphone permissions
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
