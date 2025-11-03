@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import tfg.uniovi.melodies.entities.Colors
+import tfg.uniovi.melodies.model.Colors
 import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
 
 class AddFolderViewModelProviderFactory(
@@ -42,7 +42,7 @@ class AddFolderViewModel (private val folderBD: FoldersAndSheetsFirestore)
     fun createFolder() {
         viewModelScope.launch {
             folderBD.addFolder(_folderDTO.value!!)
-            _folderCreated.postValue(true) // notifica éxito
+            _folderCreated.postValue(true)
 
         }
     }

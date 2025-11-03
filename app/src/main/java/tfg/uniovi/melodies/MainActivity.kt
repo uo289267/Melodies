@@ -13,8 +13,8 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import tfg.uniovi.melodies.preferences.PreferenceManager
-import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.MIC_REQ_CODE
-import tfg.uniovi.melodies.tools.pitchdetector.PitchDetector.startListening
+import tfg.uniovi.melodies.processing.PitchDetector.MIC_REQ_CODE
+import tfg.uniovi.melodies.processing.PitchDetector.startListening
 
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
             insets
         }
         bottomNavView = findViewById(R.id.bottomNavigationView)
@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Callback cuando el usuario responde a la solicitud de permisos
+    // Callback response to microphone permissions
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

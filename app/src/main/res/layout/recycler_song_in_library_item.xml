@@ -10,12 +10,12 @@
 
     <ImageButton
         android:id="@+id/btn_start_playing"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:layout_marginTop="5dp"
         android:layout_marginStart="34dp"
         android:contentDescription="@string/play_icon"
-        android:src="@drawable/play"
+        android:src="@drawable/clave_sol"
         android:scaleType="fitCenter"
         android:adjustViewBounds="true"
         android:background="@drawable/round_border" />

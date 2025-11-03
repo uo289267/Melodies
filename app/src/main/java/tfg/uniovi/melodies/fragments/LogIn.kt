@@ -10,14 +10,14 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import tfg.uniovi.melodies.R
 import tfg.uniovi.melodies.databinding.FragmentLogInBinding
 import tfg.uniovi.melodies.fragments.viewmodels.LogInViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.LogInViewModelProviderFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
-import tfg.uniovi.melodies.utils.ShowAlertDialog.showAlertDialogOnlyWithPositiveButton
-import tfg.uniovi.melodies.utils.TextWatcherAdapter
+import tfg.uniovi.melodies.fragments.utils.BottomNavUtils
+import tfg.uniovi.melodies.fragments.utils.ShowAlertDialog.showAlertDialogOnlyWithPositiveButton
+import tfg.uniovi.melodies.fragments.utils.TextWatcherAdapter
 /**
  * Fragment responsible for handling user login.
  * Allows users to enter an existing user ID or create a new user.
@@ -37,7 +37,7 @@ class LogIn : Fragment() {
     override fun onStop() {
         super.onStop()
         //Pitch detector stop listening and processing audio
-        setBottomNavMenuVisibility(View.VISIBLE)
+        BottomNavUtils.setBottomNavMenuVisibility(this, View.VISIBLE)
     }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -94,27 +94,15 @@ class LogIn : Fragment() {
 
         override fun onResume() {
         super.onResume()
-        setBottomNavMenuVisibility(View.GONE)
+        BottomNavUtils.setBottomNavMenuVisibility(this, View.GONE)
     }
 
 
     /**
-     * Changes the visibility of the Bottom Navigation
+     * Updates the user nickname EditText field with a new value without triggering the text watcher.
      *
-     * @param visibility the value for the Bottom Navigation Menu Visibility (View.VISIBLE/View.GONE)
-     */
-    private fun setBottomNavMenuVisibility(visibility: Int){
-        if(visibility == View.GONE || visibility == View.VISIBLE ||visibility == View.INVISIBLE){
-            val navView =
-                requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-            navView.visibility = visibility
-        }
-    }
-    /**
-     * Updates the user ID EditText field with a new value without triggering the text watcher.
-     *
-     * @param etName The EditText view for the user ID input.
-     * @param newName The new user ID string to set in the EditText.
+     * @param etName The EditText view for the nickname input.
+     * @param newName The new nickname string to set in the EditText.
      */
     private fun modifyNicknameEditText(etName: EditText, newName:String){
         etName.apply {

@@ -6,12 +6,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import tfg.uniovi.melodies.R
-import tfg.uniovi.melodies.entities.Folder
+import tfg.uniovi.melodies.model.Folder
 import tfg.uniovi.melodies.fragments.adapters.SheetInFolderAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.LibraryViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto
-import tfg.uniovi.melodies.utils.RecyclerViewItemDecoration
-import tfg.uniovi.melodies.utils.SheetItemToucherHelper
+import tfg.uniovi.melodies.fragments.utils.RecyclerViewItemDecoration
+import tfg.uniovi.melodies.fragments.utils.SheetItemToucherHelper
 
 const val DELETE = "DELETE"
 
@@ -28,8 +28,10 @@ class FolderInFullLibraryViewHolder(
         val adapter = SheetInFolderAdapter( emptyList(), navigateFunction, lifecycleOwner, libraryViewModel)
         recyclerSongsPerFolder.adapter =  adapter
         recyclerSongsPerFolder.layoutManager = LinearLayoutManager(view.context)
-        recyclerSongsPerFolder.addItemDecoration(RecyclerViewItemDecoration(view.context
-            , R.drawable.divider))
+        recyclerSongsPerFolder.addItemDecoration(
+            RecyclerViewItemDecoration(view.context
+            , R.drawable.divider)
+        )
         recyclerSongsPerFolder.setHasFixedSize(false)
         recyclerSongsPerFolder.isNestedScrollingEnabled = false
         libraryViewModel.sheets.observe(lifecycleOwner) { list ->

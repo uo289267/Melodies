@@ -9,12 +9,12 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import tfg.uniovi.melodies.entities.HistoryEntry
-import tfg.uniovi.melodies.entities.MusicXMLSheet
-import tfg.uniovi.melodies.entities.notes.interfaces.ScoreElement
+import tfg.uniovi.melodies.model.HistoryEntry
+import tfg.uniovi.melodies.model.MusicXMLSheet
+import tfg.uniovi.melodies.model.notes.ScoreElement
 import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
-import tfg.uniovi.melodies.tools.pitchdetector.SheetChecker2
-import tfg.uniovi.melodies.utils.parser.XMLParser
+import tfg.uniovi.melodies.processing.SheetChecker
+import tfg.uniovi.melodies.processing.parser.XMLParser
 import java.io.Serializable
 
 class SheetVisualizationViewModelFactory(
@@ -32,8 +32,8 @@ private const val PAGES = "PAGES"
 const val PAGING = "PAGING"
 const val CHECK = "CHECK"
 
-private const val COLOR_FOR_WRONG = "#FF0000" //red
-private const val COLOR_FOR_RIGHT = "#00FF00" //green
+private const val COLOR_FOR_WRONG = "#ed6b11"  //"#FF0000" //red
+private const val COLOR_FOR_RIGHT = "#C7C8CA"//"#00FF00" //green
 
 private const val PAGE_COMPLETION = "PAGE_COMPLETION"
 private const val SHEET_VISUALIZER = "SheetVisualizer"
@@ -52,9 +52,8 @@ class SheetVisualizationViewModel(
         get() = _svg
 
 
-    private val sheetChecker: SheetChecker2 = SheetChecker2()
+    private val sheetChecker: SheetChecker = SheetChecker()
     private var currentNoteIndex = 0  // Absolute index
-    private var isCheckingNotes = false
     private var _noteList : MutableList<ScoreElement> = mutableListOf()
 
     private var totalPages = 1
@@ -78,7 +77,7 @@ class SheetVisualizationViewModel(
     private var isCurrentPageAllSetUp = false
 
     /**
-     * Loads the musicxml given the sheedId and the folderId where the sheet resides
+     * Loads the musicxml given the sheetId and the folderId where the sheet resides
      */
     fun loadMusicSheet(dto: SheetVisualizationDto){
         viewModelScope.launch {
@@ -116,7 +115,7 @@ class SheetVisualizationViewModel(
                     currentNoteIndex = it.first
             }
             _shouldNavigateToNextPage.postValue(false)
-            if(noteCheckingState.value!= NoteCheckingState.CHECKING )
+            if(noteCheckingState.value == NoteCheckingState.NONE )
                 checkNextNote()
         }
     }
@@ -213,9 +212,11 @@ class SheetVisualizationViewModel(
                     }
                     }
                 }
-            _elapsedTimeMs.postValue(System.currentTimeMillis() - startTime)
-            _noteCheckingState.postValue(NoteCheckingState.FINISHED)
-            Log.d(CHECK, "All notes finished! Total: ${_elapsedTimeMs.value?.div(1000.0)} segundos")
+            if(!_noteCheckingState.equals(NoteCheckingState.NONE)){
+                _elapsedTimeMs.postValue(System.currentTimeMillis() - startTime)
+                _noteCheckingState.postValue(NoteCheckingState.FINISHED)
+                Log.d(CHECK, "All notes finished! Total: ${_elapsedTimeMs.value?.div(1000.0)} segundos")
+            }
         }
     }
 
@@ -237,7 +238,6 @@ class SheetVisualizationViewModel(
             _shouldNavigateToNextPage.postValue(true)
         } else {
             // Finished all pages
-            isCheckingNotes = false
             Log.d(PAGE_COMPLETION, "Todas las páginas completadas!")
         }
 
@@ -281,11 +281,10 @@ class SheetVisualizationViewModel(
             sheetBD.saveNewHistoryEntry(historyEntry)
         }
     }
-
 }
 
 enum class NoteCheckingState {
-    CHECKING, FINISHED, NONE
+    CHECKING, FINISHED, NONE, NOT_AVAILABLE
 }
 
 class SheetVisualizationDto (

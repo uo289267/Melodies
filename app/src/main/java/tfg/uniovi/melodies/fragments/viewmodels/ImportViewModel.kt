@@ -7,8 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import tfg.uniovi.melodies.entities.Colors
-import tfg.uniovi.melodies.entities.Folder
+import tfg.uniovi.melodies.model.Folder
 import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
 
 class ImportViewModelProviderFactory(
@@ -38,9 +37,6 @@ class ImportViewModel(
     val folderChosen: LiveData<Folder>
         get() = _folderChosen
 
-    private val _folderChosenColor = MutableLiveData<Colors>()
-    val folderChosenColor: LiveData<Colors>
-        get() = _folderChosenColor
     /**
      * To be called before from the adapter
      */
@@ -87,11 +83,6 @@ class ImportViewModel(
         return true
     }
 
-    fun getColorOfSelectedFolder(folderId: String){
-        viewModelScope.launch {
-            _folderChosenColor.value = folderBD.getFolderColor(folderId)
-        }
-    }
 }
 
 

@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import tfg.uniovi.melodies.entities.Folder
+import tfg.uniovi.melodies.model.Folder
 import tfg.uniovi.melodies.repositories.FoldersAndSheetsFirestore
 
 class FullLibraryViewModelProviderFactory(
@@ -30,12 +30,6 @@ class FullLibraryViewModel(
     fun loadFolders(){
         viewModelScope.launch {
             _folders.postValue(folderBD.getAllFolders())
-        }
-    }
-
-    fun renameSheet(sheetId: String, folderId: String, newName: String) {
-        viewModelScope.launch {
-            folderBD.setNewSheetName(sheetId,folderId, newName)
         }
     }
 

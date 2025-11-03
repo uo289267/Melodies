@@ -20,7 +20,7 @@ import tfg.uniovi.melodies.fragments.adapters.HistoryEntryAdapter
 import tfg.uniovi.melodies.fragments.viewmodels.ProfileViewModel
 import tfg.uniovi.melodies.fragments.viewmodels.ProfileViewModelProviderFactory
 import tfg.uniovi.melodies.preferences.PreferenceManager
-import tfg.uniovi.melodies.utils.ShowAlertDialog.showInputNewNicknameDialog
+import tfg.uniovi.melodies.fragments.utils.ShowAlertDialog.showInputNewNicknameDialog
 
 private const val LOGOUT_TAG = "LOGOUT"
 private const val AVATAR_HTTPS = "https://anonymous-animals.azurewebsites.net/avatar/"

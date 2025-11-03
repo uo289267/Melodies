@@ -19,3 +19,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Reglas personalizadas de ProGuard/R8.
+
+-keep class tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto { *; }
+
+-keepnames class tfg.uniovi.melodies.fragments.viewmodels.SheetVisualizationDto implements android.os.Parcelable {
+    public static final android.os.Parcelable$Creator *;
+}
