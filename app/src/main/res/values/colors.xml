@@ -143,4 +143,6 @@
     <color name="md_theme_surfaceContainer_highContrast">#F0DFD7</color>
     <color name="md_theme_surfaceContainerHigh_highContrast">#E1D1C9</color>
     <color name="md_theme_surfaceContainerHighest_highContrast">#D3C3BB</color>
+    <color name="mtrl_textinput_default_box_stroke_color">#7A481F</color>
+
 </resources>

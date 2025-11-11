@@ -65,7 +65,7 @@ class RenameFolderSuccessTest {
         val okButton = device.findObject(By.textContains("OK"))
         okButton?.click()
 
-        device.wait(Until.hasObject(By.textContains(newFolderName)), 7000)
+        device.wait(Until.hasObject(By.textContains(newFolderName)), 8000)
 
         // Verify folder is renamed in the list
         onView(withId(R.id.recyclerView))

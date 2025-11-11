@@ -9,7 +9,7 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,14 +20,16 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/folder_name"
-        android:layout_width="400dp"
+        android:layout_width="wrap_content"
+        android:maxWidth="450dp"
+        android:minWidth="400dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="150dp"
         android:hint="@string/folder_s_name"
         app:boxBackgroundMode="outline"
         app:boxStrokeColor="@color/md_theme_primary"
         app:boxStrokeErrorColor="@color/md_theme_error"
-        app:boxStrokeWidth="2dp"
+        app:boxStrokeWidth="1dp"
         app:boxStrokeWidthFocused="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

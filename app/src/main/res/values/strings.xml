@@ -89,5 +89,9 @@
     <string name="new_user_create_account">New User? Create account</string>
     <string name="sheet_name">Sheet Name</string>
     <string name="x_min_x_s">X min X s</string>
+    <string name="log_in_button_descrip">Log In</string>
+    <string name="go_to_register_screen_descrip">Create new account</string>
+    <string name="register">Register</string>
+    <string name="navigate_back">Go back</string>
 
 </resources>
