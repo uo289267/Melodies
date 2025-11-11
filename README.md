@@ -91,5 +91,5 @@ This project was developed as a **Final Degree Project (TFG)** for the
 - Icons
   <a href="https://www.flaticon.es/iconos-gratis/clave-de-sol" title="clave de sol iconos">Clave de sol iconos creados por Freepik - Flaticon</a>
 
-© 2025 Lucía Ruiz Núñez — This software is licensed under **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**.
+© 2025 Lucía Ruiz Núñez — This documentatios is licensed under **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**.
 
