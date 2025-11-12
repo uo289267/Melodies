@@ -58,7 +58,7 @@ class ViewSheetsContentFromLibraryTest {
     }
     @Rule
     @JvmField
-    var mGrantPermissionRule =
+    var mGrantPermissionRule: GrantPermissionRule =
         GrantPermissionRule.grant(
             "android.permission.RECORD_AUDIO"
         )
