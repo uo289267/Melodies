@@ -56,6 +56,7 @@ class AddFolder : Fragment() {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
+
     }
 
     override fun onCreateView(

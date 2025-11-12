@@ -36,7 +36,6 @@ class LogIn : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        //Pitch detector stop listening and processing audio
         BottomNavUtils.setBottomNavMenuVisibility(this, View.VISIBLE)
     }
     override fun onCreateView(
