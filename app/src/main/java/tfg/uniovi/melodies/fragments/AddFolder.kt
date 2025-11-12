@@ -55,7 +55,6 @@ class AddFolder : Fragment() {
         toolbar?.setNavigationOnClickListener{
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
-        toolbar?.navigationContentDescription = getString(R.string.navigate_back)
 
 
     }
